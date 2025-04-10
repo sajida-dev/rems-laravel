@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('agent_id');
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('location');
@@ -32,7 +33,6 @@ return new class extends Migration
             $table->integer('garage')->nullable();
             $table->integer('is_luggage')->nullable();
             $table->string('image_url')->nullable();
-            $table->unsignedBigInteger('agent_id')->nullable();
             $table->enum('status', ['available', 'sold', 'rented'])->default('available');
             $table->timestamps();
             $table->softDeletes();
