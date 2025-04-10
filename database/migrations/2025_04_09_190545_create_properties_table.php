@@ -18,13 +18,22 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('location');
             $table->decimal('rent_price', 10, 2);
-            $table->decimal('purchase_price', 10, 2)->nullable();
+            $table->decimal('purchase_price', 10, 2);
+            $table->decimal('old_rent_price', 10, 2)->nullable();
+            $table->decimal('old_purchase_price', 10, 2)->nullable();
             $table->integer('bedrooms')->nullable();
             $table->integer('bathrooms')->nullable();
-            $table->integer('area')->nullable(); // e.g., in square feet
-            $table->string('image_url')->nullable(); //  image URL 
+            $table->integer('lot_area')->nullable();
+            $table->integer('floor_area')->nullable();
+            $table->date('year_built')->nullable();
+            $table->boolean('is_water')->nullable();
+            $table->integer('stories')->nullable();
+            $table->boolean('is_new_roofing')->nullable();
+            $table->integer('garage')->nullable();
+            $table->integer('is_luggage')->nullable();
+            $table->string('image_url')->nullable();
             $table->unsignedBigInteger('agent_id')->nullable();
-            $table->enum('status', ['available', 'sold', 'rented'])->default('available'); // status: available, sold, or rented
+            $table->enum('status', ['available', 'sold', 'rented'])->default('available');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null')->onUpdate('cascade');
