@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
+use Inertia\Inertia;
 
 class PropertyController extends Controller
 {
@@ -13,7 +14,11 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        //
+        $properties = Property::all();
+
+        return Inertia::render('Properties/Index', [
+            'properties' => $properties
+        ]);
     }
 
     /**
