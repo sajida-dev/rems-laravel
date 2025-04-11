@@ -1,6 +1,6 @@
 <template>
     <footer class="bg-gray-100 py-16 text-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-10">
             <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10 md:text-left text-center">
                 <!-- Uptown / About -->
                 <div>

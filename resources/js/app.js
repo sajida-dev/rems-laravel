@@ -6,8 +6,10 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { createHead } from '@vueuse/head'
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const head = createHead()
+const appName = import.meta.env.VITE_APP_NAME || 'Uptown';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -21,4 +23,7 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+
 });
+app.use(head)
+

@@ -1,91 +1,32 @@
-<!-- <template>
-  <section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-2">
-        <div
-          class="min-h-[300px] bg-cover bg-center"
-          :style="{ backgroundImage: `url(${imageUrl})` }"
-          role="img"
-          :aria-label="imageAlt"
-        ></div>
+<template>
+  <section class="py-16 overflow-x-hidden">
+    <div class="container mx-auto px-10">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 items-center ">
 
-        <div class="flex items-center">
-          <div class="p-6 md:p-10">
-            <h2 class="text-3xl md:text-4xl font-semibold text-gray-900 mb-6">
-              {{ title }}
+        <div
+          class="min-h-[600px] bg-cover bg-center rounded-sm shadow-lg transition-all duration-700 ease-in-out delay-200"
+          :style="{ backgroundImage: 'url(frontend/images/about.jpg)' }">
+        </div>
+
+        <div class="wrap-about transition-all duration-700 ease-in-out delay-200">
+          <div class="heading-section space-y-8 px-8 md:px-12  py-20 bg-white rounded-sm shadow-custom lg:ml-[-130px]">
+            <h2 class="text-3xl md:text-5xl text-gray-800 ">
+              We Put People First.
             </h2>
 
-            <p class="text-gray-700 leading-relaxed mb-4">
-              {{ paragraph1 }}
+            <p class="text-gray-500 text-xl">
+              A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a
+              paradisematic country, in which roasted parts of sentences fly into your mouth.
             </p>
 
-            <p class="text-gray-700 leading-relaxed">
-              {{ paragraph2 }}
+            <p class="text-gray-500 text-xl">
+              On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have
+              been rewritten a thousand times and everything that was left from its origin would be the word "and" and
+              the Little Blind Text should turn around and return to its own, safe country. But nothing the copy said
+              could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her
+              drunk with Longe and Parole and dragged her into their agency, where they abused her for their.
             </p>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</template>
-
-<script setup>
-defineProps({
-  title: {
-    type: String,
-    default: 'We Put People First.',
-  },
-  imageUrl: {
-    type: String,
-    default: '/images/about.jpg',
-  },
-  imageAlt: {
-    type: String,
-    default: 'About our company',
-  },
-  paragraph1: {
-    type: String,
-    default:
-      'A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.',
-  },
-  paragraph2: {
-    type: String,
-    default:
-      'On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and"...',
-  },
-});
-</script> -->
-
-
-
-<template>
-  <section class="py-16">
-    <div class="container mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        
-        <!-- Image Section -->
-        <div 
-          class="min-h-[300px] bg-cover bg-center rounded-xl shadow-lg"
-          :style="{ backgroundImage: 'url(/images/about.jpg)' }">
-        </div>
-
-        <!-- Content Section -->
-        <div class="space-y-6">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 leading-tight">
-            We Put People First.
-          </h2>
-
-          <p class="text-gray-600">
-            A small river named Duden flows by their place and supplies it with the necessary regelialia.
-            It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-          </p>
-
-          <p class="text-gray-600">
-            On her way she met a copy. The copy warned the Little Blind Text, that where it came from
-            it would have been rewritten a thousand times and everything that was left from its origin
-            would be the word "and" and the Little Blind Text should turn around and return to its own,
-            safe country.
-          </p>
         </div>
 
       </div>
@@ -94,11 +35,19 @@ defineProps({
 </template>
 
 <script>
+
 export default {
   name: 'AboutSection',
+
 }
 </script>
 
 <style scoped>
-/* Add any additional custom styling here */
+@media (min-width: 992px) {
+  .heading-section {
+    margin-left: -130px;
+    background: #fff;
+    box-shadow: -20px 5px 14px -15px rgba(0, 0, 0, 0.13);
+  }
+}
 </style>
