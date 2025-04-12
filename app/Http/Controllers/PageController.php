@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Property;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -9,6 +10,8 @@ class PageController extends Controller
 {
     public function home()
     {
+        $properties = Property::latest()->take(6)->get();
+
         return Inertia::render('Public/Home');
     }
 
@@ -34,6 +37,10 @@ class PageController extends Controller
         return Inertia::render('Public/Services');
     }
     public function properties()
+    {
+        return Inertia::render('Public/Properties');
+    }
+    public function propertySingle()
     {
         return Inertia::render('Public/Properties');
     }

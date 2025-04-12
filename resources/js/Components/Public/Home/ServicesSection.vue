@@ -6,7 +6,8 @@
                     <!-- Services Section Title with Line -->
                     <div class="flex items-center my-8 w-64 mx-auto">
                         <hr class="flex-grow border-t-2 border-pink-300">
-                        <span class="subheading mx-4 text-base text-pink-700">Our Services</span>
+                        <span class="subheading mx-4 text-base text-pink-700 uppercase tracking-widest">Our
+                            Services</span>
                         <hr class="flex-grow border-t-2 border-pink-300">
                     </div>
 

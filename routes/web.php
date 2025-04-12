@@ -38,6 +38,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
 // Properties Listing
 Route::get('/properties', [PageController::class, 'properties'])->name('properties');
+Route::get('/{name}/{id}', [PageController::class, 'propertySingle'])->name('property-single');
 
 Route::get('/agents/pending-count', function () {
     return response()->json([
