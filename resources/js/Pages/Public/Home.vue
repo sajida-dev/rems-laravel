@@ -7,6 +7,8 @@
     <PropertiesSection :properties="properties" />
     <WorkFlowSection />
     <AboutUsSection />
+    <CounterSection />
+    <AgentSection />
 </template>
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
@@ -14,7 +16,9 @@ defineOptions({ layout: PublicLayout })
 
 import PropertiesSection from '@/Components/Public/Property/PropertiesSection.vue'
 import WorkFlowSection from '@/Components/Public/Home/WorkFlowSection.vue'
+import AgentSection from '@/Components/Public/Agent/AgentSection.vue'
 import AboutUsSection from '@/Components/Public/About/AboutUsSection.vue'
+import CounterSection from '@/Components/Public/About/CounterSection.vue'
 import HeroSection from '@/Components/Public/Common/HeroSection.vue'
 import ServicesSection from '@/Components/Public/Home/ServicesSection.vue';
 

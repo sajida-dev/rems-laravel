@@ -12,7 +12,7 @@ class PageController extends Controller
     {
         $properties = Property::latest()->take(6)->get();
 
-        return Inertia::render('Public/Home');
+        return Inertia::render('Public/Home', ['properties' => $properties]);
     }
 
     // , [
