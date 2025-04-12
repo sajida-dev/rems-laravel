@@ -3,13 +3,11 @@
         { label: 'Home', link: '/' },
         { label: 'Contact Us' }
     ]" />
-    <div>
-        Contact Page
-    </div>
+    <ContactSection />
 </template>
 <script setup>
 import HeroSection from '@/Components/Public/Common/HeroSection.vue'
-
+import ContactSection from '@/Components/Public/Contact/ContactSection.vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 defineOptions({ layout: PublicLayout })
 </script>

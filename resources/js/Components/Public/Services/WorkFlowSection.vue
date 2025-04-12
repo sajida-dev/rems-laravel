@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import WorkflowItem from '@/components/Public/Home/WorkflowItem.vue'
+import WorkflowItem from '@/components/Public/Services/WorkflowItem.vue'
 
 const workflowItems = [
     {

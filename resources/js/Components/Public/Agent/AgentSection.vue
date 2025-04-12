@@ -2,40 +2,13 @@
     <section class="py-16 bg-white mb-16">
         <div class="container mx-auto px-4">
             <!-- Heading -->
-            <div class="text-center mb-12">
-                <div class="flex items-center my-8 w-64 mx-auto">
-                    <hr class="flex-grow border-t-2 border-pink-300">
-                    <span class="subheading mx-4 text-base text-pink-400 uppercase tracking-widest">Agents</span>
-                    <hr class="flex-grow border-t-2 border-pink-300">
-                </div>
-                <h2 class="text-3xl font-semibold">Our Agents</h2>
-            </div>
+            <SectionHeading subheading="Agents" title="Our Agents" />
+
 
             <!-- Agent Cards -->
             <div class="flex flex-wrap -mx-4">
                 <div v-for="agent in agents" :key="agent.id" class="w-full md:w-1/2 lg:w-1/4 px-4 mb-10">
-                    <div class="relative w-full z-0">
-                        <!-- Agent Image -->
-                        <div class="relative overflow-hidden custom-img">
-                            <img :src="agent.profile_pic ? `${agent.profile_pic}` : 'frontend/images/avatar.png'"
-                                alt="Agent Image"
-                                class="w-full h-full object-cover transition-transform duration-500 transform hover:scale-110" />
-                        </div>
-
-                        <!-- Description Card -->
-                        <div
-                            class="relative w-[85%] md:w-[80%] bg-white p-5 -mt-[50px] ml-5 shadow-[0px_5px_21px_-14px_rgba(0,0,0,0.14)]">
-                            <h3 class="text-[20px] font-medium leading-tight mb-2">
-                                <a :href="`/single-agent/${agent.id}`" class="text-black hover:text-pink-500">
-                                    {{ agent.name }}
-                                </a>
-                            </h3>
-                            <p class="text-[16px] m-0">
-                                <span class="text-gray-500">Listing</span>
-                                <span class="text-black ml-1">— {{ agent.property_count }} Properties</span>
-                            </p>
-                        </div>
-                    </div>
+                    <AgentCard :agent="agent" />
                 </div>
             </div>
         </div>
@@ -43,6 +16,9 @@
 </template>
 
 <script setup>
+import AgentCard from '@/components/Public/Agent/AgentCard.vue'
+import SectionHeading from '@/components/Public/Common/SectionHeading.vue'
+
 const agents = [
     {
         id: 1,

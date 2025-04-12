@@ -1,10 +1,10 @@
 <template>
-    <div class="w-full md:w-1/2 lg:w-1/4 mb-10">
+    <div class="w-full mb-10">
         <div class="relative w-full z-0">
             <!-- Agent Image -->
             <div class="relative overflow-hidden border-3 border-gray-200">
                 <img :src="profileImage" alt="Agent Image"
-                    class="transition-transform duration-500  transform hover:scale-110 w-full" />
+                    class="transition-transform duration-500 h-[350px] object-cover transform hover:scale-110 w-full" />
             </div>
 
             <!-- Description -->
@@ -25,7 +25,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const { agent } = defineProps({
     agent: {
         type: Object,
         required: true,
