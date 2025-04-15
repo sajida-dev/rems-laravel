@@ -12,8 +12,10 @@
 <script setup>
 import Header from '@/Components/Public/Common/Header.vue'
 import Footer from '@/Components/Public/Common/Footer.vue'
-import PageLoader from '@/components/Public/Common/PageLoader.vue'
+import PageLoader from '@/Components/Public/Common/PageLoader.vue'
+import { ref } from 'vue'
 
+const loading = ref(false)
 const props = defineProps({
     isHomePage: {
         type: Boolean,

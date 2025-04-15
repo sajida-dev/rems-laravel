@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="flex min-h-screen">
         <Sidebar />
         <div class="flex-1 flex flex-col">
@@ -17,7 +17,7 @@ import Sidebar from '@/Components/Admin/Sidebar.vue'
 import Header from '@/Components/Admin/Header.vue'
 import PageHeader from '@/Components/Admin/PageHeader.vue'
 import Footer from '@/Components/Admin/Footer.vue'
-</script>
+</script> -->
 
 <template>
     <div class="flex">
@@ -37,13 +37,13 @@ import Footer from '@/Components/Admin/Footer.vue'
 </template>
 
 <script setup>
-import Sidebar from '@/Components/Sidebar.vue'
-import Header from '@/Components/Header.vue'
-import PageHeader from '@/Components/PageHeader.vue'
-import Footer from '@/Components/Footer.vue'
-import ApplicationLogo from '@/Components/ApplicationLogo.vue'
+import Sidebar from '@/Components/Admin/Sidebar.vue'
+import Header from '@/Components/Admin/Header.vue'
+import PageHeader from '@Components/Admin/PageHeader.vue'
+import Footer from '@/Components/Admin/Footer.vue'
+import ApplicationLogo from '@/Components/Admin/ApplicationLogo.vue'
 
 defineProps({
-  pageTitle: String
+    pageTitle: String
 })
 </script>

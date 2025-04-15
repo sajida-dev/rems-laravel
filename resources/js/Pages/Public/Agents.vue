@@ -1,8 +1,10 @@
 <template lang="">
-<HeroSection variant="page" heading="Agent" :breadcrumbs="[
-        { label: 'Home', link: '/' },
-        { label: 'Agent' }
-    ]" />
+    <HeroSection 
+            variant="page" heading="Agent" :breadcrumbs="[
+            { label: 'Home', link: '/' },
+            { label: 'Agent' }
+        ]"
+     />
     <AgentListSection
     :agents="paginatedAgents"
     :message="message"
@@ -15,7 +17,7 @@
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import HeroSection from '@/Components/Public/Common/HeroSection.vue'
 import { ref } from 'vue'
-import AgentListSection from '@/components/Public/Agent/AgentListSection.vue'
+import AgentListSection from '@/Components/Public/Agent/AgentListSection.vue'
 defineOptions({ layout: PublicLayout })
 import { computed } from 'vue'
 

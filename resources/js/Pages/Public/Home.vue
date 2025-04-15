@@ -1,5 +1,4 @@
 <template>
-
     <HeroSection variant="home" heading="The Simplest Way to Find Property"
         subheading="A small river named Duden flows by their place and supplies it with the necessary regelialia."
         showSearchForm formAction="filter-properties.php" />

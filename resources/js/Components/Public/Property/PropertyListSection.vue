@@ -16,7 +16,7 @@
 
             <!-- No Properties / Message -->
             <div v-else class="text-center">
-                <div class="bg-blue-100 text-blue-700 p-5 rounded shadow-sm">
+                <div class="text-pink-500 p-5 rounded shadow-sm">
                     {{ message }}
                 </div>
             </div>
@@ -27,7 +27,7 @@
 <script setup>
 import PropertyCard from './PropertyCard.vue'
 import Pagination from '@/Components/Public/Common/Pagination.vue'
-import SectionHeading from '@/components/Public/Common/SectionHeading.vue'
+import SectionHeading from '@/Components/Public/Common/SectionHeading.vue'
 
 const props = defineProps({
     properties: Array,

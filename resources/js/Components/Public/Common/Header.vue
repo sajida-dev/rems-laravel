@@ -3,7 +3,7 @@
         <div class="container h-14 mx-auto flex items-center justify-between px-5 lg:py-3 py-4">
             <!-- Brand -->
             <a :class="brandClasses" href="/">
-                Uptown 
+                Uptown
             </a>
             <!-- Mobile Menu Toggle Button -->
             <button class="lg:hidden focus:outline-none" @click="toggleNav" :class="togglerClasses">
@@ -25,13 +25,13 @@
                         <a :href="'/about'" :class="getNavLinkClasses('/about')">About</a>
                     </li>
                     <li>
-                        <a :href="'/agent'" :class="getNavLinkClasses('/agent')">Agent</a>
+                        <a :href="'/all-agents'" :class="getNavLinkClasses('/all-agents')">Agent</a>
                     </li>
                     <li>
                         <a :href="'/services'" :class="getNavLinkClasses('/services')">Services</a>
                     </li>
                     <li>
-                        <a :href="'/properties'" :class="getNavLinkClasses('/properties')">Properties</a>
+                        <a :href="'/all-properties'" :class="getNavLinkClasses('/all-properties')">Properties</a>
                     </li>
                     <li>
                         <a :href="'/contact'" :class="getNavLinkClasses('/contact')">Contact</a>
@@ -77,13 +77,14 @@
                                 <a :href="'/about'" :class="getNavLinkMobileClasses('/about')">About</a>
                             </li>
                             <li>
-                                <a :href="'/agent'" :class="getNavLinkMobileClasses('/agent')">Agent</a>
+                                <a :href="'/all-agents'" :class="getNavLinkMobileClasses('/all-agents')">Agent</a>
                             </li>
                             <li>
                                 <a :href="'/services'" :class="getNavLinkMobileClasses('/services')">Services</a>
                             </li>
                             <li>
-                                <a :href="'/properties'" :class="getNavLinkMobileClasses('/properties')">Properties</a>
+                                <a :href="'/all-properties'"
+                                    :class="getNavLinkMobileClasses('/all-properties')">Properties</a>
                             </li>
                             <li>
                                 <a :href="'/contact'" :class="getNavLinkMobileClasses('/contact')">Contact</a>
@@ -153,6 +154,11 @@ export default {
         },
         navLinkMobileClasses() {
             return "block text-[15px] font-normal transition-colors duration-300 py-3 px-4 text-black hover:text-pink-400";
+        },
+        togglerClasses() {
+            return 'w-10 h-10 flex items-center justify-center' +
+                (this.isOpen ? ' bg-pink-100 text-pink-500' : ' bg-white text-black') +
+                ' rounded border transition duration-300';
         }
     },
     methods: {
@@ -200,6 +206,7 @@ export default {
         window.removeEventListener("scroll", this.handleScroll);
     }
 };
+
 </script>
 
 <style>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -29,9 +30,24 @@ class PageController extends Controller
 
     public function agent()
     {
-        return Inertia::render('Public/Agent');
+        return Inertia::render('Public/Agents');
     }
 
+    public function agentDetails($id, $slug)
+    {
+        // $agent = Agent::findOrFail($id);
+
+        // Optional: Validate slug
+        // $expectedSlug = strtolower(str_replace(' ', '-', $agent->name));
+        // if ($slug !== $expectedSlug) {
+        //     return redirect()->route('agent.show', ['id' => $agent->id, 'slug' => $expectedSlug]);
+        // }
+
+        // return Inertia::render('Public/AgentDetails', [
+        //     'agent' => $agent,
+        // ]);
+        return Inertia::render('Public/AgentDetails');
+    }
     public function services()
     {
         return Inertia::render('Public/Services');
@@ -40,9 +56,9 @@ class PageController extends Controller
     {
         return Inertia::render('Public/Properties');
     }
-    public function propertySingle()
+    public function propertyDetails($id, $slug)
     {
-        return Inertia::render('Public/Properties');
+        return Inertia::render('Public/PropertyDetails');
     }
     public function contact()
     {

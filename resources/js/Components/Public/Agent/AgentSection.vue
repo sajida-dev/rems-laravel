@@ -16,8 +16,8 @@
 </template>
 
 <script setup>
-import AgentCard from '@/components/Public/Agent/AgentCard.vue'
-import SectionHeading from '@/components/Public/Common/SectionHeading.vue'
+import AgentCard from '@/Components/Public/Agent/AgentCard.vue'
+import SectionHeading from '@/Components/Public/Common/SectionHeading.vue'
 
 const agents = [
     {

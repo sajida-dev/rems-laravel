@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PropertyController;
+use App\Models\Agent;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,17 +34,18 @@ use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 // });
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::get('/agent', [PageController::class, 'agent'])->name('agent');
+Route::get('/all-agents', [PageController::class, 'agent'])->name('agent');
+Route::get('/agent/{id}-{name}', [PageController::class, 'agentDetails'])->name('agent-details');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
 // Properties Listing
-Route::get('/properties', [PageController::class, 'properties'])->name('properties');
-Route::get('/{name}/{id}', [PageController::class, 'propertySingle'])->name('property-single');
+Route::get('/all-properties', [PageController::class, 'properties'])->name('properties');
+Route::get('/property/{id}', [PageController::class, 'propertyDetails'])->name('property-details');
 
 Route::get('/agents/pending-count', function () {
     return response()->json([
-        'count' => \App\Models\Agent::where('status', 0)->count()
+        'count' => Agent::where('status', 0)->count()
     ]);
 });
 
@@ -52,14 +55,17 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         return inertia('Admin/Dashboard');
     })->name('admin.dashboard');
 
-    // Category resource routes
     Route::resource('categories', CategoryController::class);
-
-    // Amenity resource routes
+    // Route::resource('properties', PropertyController::class);
+    // Route::resource('agents', AgentController::class);
     Route::resource('amenities', AmenityController::class);
 
-    // User management routes for admin
     Route::resource('users', RegisteredUserController::class);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/bookmarks', [PropertyController::class, 'updateBookMark'])->name('property-bookmark-update');
+    Route::delete('/bookmarks/{id}', [PropertyController::class, 'deleteBookMark'])->name('property-bookmark-delete');
 });
 
 Route::middleware([

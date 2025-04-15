@@ -14,7 +14,7 @@
 
 <script setup>
 import HeroSection from '@/Components/Public/Common/HeroSection.vue'
-import PropertyListSection from '@/components/Public/Property/PropertyListSection.vue'
+import PropertyListSection from '@/Components/Public/Property/PropertyListSection.vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 defineOptions({ layout: PublicLayout })
 import { computed } from 'vue'

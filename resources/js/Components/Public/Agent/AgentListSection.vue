@@ -27,7 +27,7 @@
 <script setup>
 import AgentCard from './AgentCard.vue'
 import Pagination from '@/Components/Public/Common/Pagination.vue'
-import SectionHeading from '@/components/Public/Common/SectionHeading.vue'
+import SectionHeading from '@/Components/Public/Common/SectionHeading.vue'
 
 const props = defineProps({
     agents: Array,

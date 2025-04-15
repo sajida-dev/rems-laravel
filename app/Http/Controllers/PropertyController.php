@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
+use App\Models\Bookmark;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class PropertyController extends Controller
 {
@@ -67,5 +70,29 @@ class PropertyController extends Controller
     public function destroy(Property $property)
     {
         //
+    }
+
+
+    public function updateBookMark(Request $request)
+    {
+        $request->validate([
+            'property_id' => 'required|exists:properties,id',
+        ]);
+
+        $bookmark = Bookmark::firstOrCreate([
+            'user_id' => Auth::id(),
+            'property_id' => $request->property_id,
+        ]);
+
+        return back(); // Or return response()->json(['success' => true]);
+    }
+
+    public function deleteBookMark(Property $property)
+    {
+        $deleted = Bookmark::where('user_id', Auth::id())
+            ->where('property_id', $property->id)
+            ->delete();
+
+        return back(); // Or return response()->json(['success' => $deleted > 0]);
     }
 }
