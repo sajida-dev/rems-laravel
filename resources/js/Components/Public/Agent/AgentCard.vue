@@ -37,6 +37,6 @@ function slugify(name) {
     return name.toLowerCase().replace(/\s+/g, '-')
 }
 const profileImage = computed(() =>
-    agent.profile_pic ? `${agent.profile_pic}` : 'frontend/images/avatar.png'
+    agent.profile_pic ? `/${agent.profile_pic}` : '/frontend/images/avatar.png'
 )
 </script>

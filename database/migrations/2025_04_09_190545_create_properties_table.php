@@ -36,8 +36,8 @@ return new class extends Migration
             $table->enum('status', ['available', 'sold', 'rented'])->default('available');
             $table->timestamps();
             $table->softDeletes();
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('agent_id')->references('id')->on('agents')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('agent_id')->references('id')->on('agents')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

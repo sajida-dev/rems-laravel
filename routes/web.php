@@ -32,6 +32,8 @@ use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 //         'phpVersion' => PHP_VERSION,
 //     ]);
 // });
+
+
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/all-agents', [PageController::class, 'agent'])->name('agent');
@@ -41,7 +43,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
 // Properties Listing
 Route::get('/all-properties', [PageController::class, 'properties'])->name('properties');
-Route::get('/property/{id}', [PageController::class, 'propertyDetails'])->name('property-details');
+Route::get('/property/{id}-{title}', [PageController::class, 'propertyDetails'])->name('property-details');
 
 Route::get('/agents/pending-count', function () {
     return response()->json([
