@@ -7,19 +7,19 @@ const testimonials = [
         text: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
         name: "Roger Scott",
         position: "Marketing Manager",
-        image: "/images/person_1.jpg",
+        image: "/frontend/images/person_1.jpg",
     },
     {
         text: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
         name: "Roger Scott",
         position: "Marketing Manager",
-        image: "/images/person_2.jpg",
+        image: "/frontend/images/person_2.jpg",
     },
     {
         text: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
         name: "Roger Scott",
         position: "Marketing Manager",
-        image: "/images/person_3.jpg",
+        image: "/frontend/images/person_3.jpg",
     },
 ];
 </script>

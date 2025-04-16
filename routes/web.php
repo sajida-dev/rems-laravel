@@ -43,6 +43,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
 // Properties Listing
 Route::get('/all-properties', [PageController::class, 'properties'])->name('properties');
+Route::get('/filter-properties', [PageController::class, 'filterProperties'])->name('properties.filter');
 Route::get('/property/{id}-{title}', [PageController::class, 'propertyDetails'])->name('property-details');
 
 Route::get('/agents/pending-count', function () {

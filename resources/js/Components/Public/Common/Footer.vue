@@ -26,8 +26,8 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Community</h2>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-pink-500 transition">Search Properties</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">For Agents</a></li>
+                        <li><a href="/all-properties" class="hover:text-pink-500 transition">Search Properties</a></li>
+                        <li><a href="/all-agents" class="hover:text-pink-500 transition">For Agents</a></li>
                         <li><a href="#" class="hover:text-pink-500 transition">Reviews</a></li>
                         <li><a href="#" class="hover:text-pink-500 transition">FAQs</a></li>
                     </ul>
@@ -47,9 +47,9 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Company</h2>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-pink-500 transition">About Us</a></li>
+                        <li><a href="/about" class="hover:text-pink-500 transition">About Us</a></li>
                         <li><a href="#" class="hover:text-pink-500 transition">Press</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Contact</a></li>
+                        <li><a href="/contact" class="hover:text-pink-500 transition">Contact</a></li>
                         <li><a href="#" class="hover:text-pink-500 transition">Careers</a></li>
                     </ul>
                 </div>

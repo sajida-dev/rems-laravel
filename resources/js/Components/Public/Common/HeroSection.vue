@@ -2,7 +2,7 @@
     <section class="overflow-hidden pb-7 lg:min-h-[600px] md:min-h-[750px] min-h-[500px]">
         <section
             class="relative w-full lg:min-h-[600px] md:min-h-[850px] min-h-[500px] bg-cover  bg-center flex items-center "
-            :style="{ backgroundImage: `url('/${bgImgUrl}')` }">
+            :style="{ backgroundImage: `url('${bgImgUrl}')` }">
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-b from-white via-white/30 to-transparent z-10"></div>
 
@@ -103,8 +103,8 @@ defineProps({
     },
     formAction: {
         type: String,
-        default: '#',
+        default: '/filter-properties',
     },
 });
-const bgImgUrl = "frontend/images/bg_1.jpg";
+const bgImgUrl = "/frontend/images/bg_1.jpg";
 </script>

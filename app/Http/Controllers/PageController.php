@@ -48,18 +48,27 @@ class PageController extends Controller
         // ]);
         return Inertia::render('Public/AgentDetails');
     }
+
     public function services()
     {
         return Inertia::render('Public/Services');
     }
+
     public function properties()
     {
         return Inertia::render('Public/Properties');
     }
+
     public function propertyDetails($id, $slug)
     {
         return Inertia::render('Public/PropertyDetails');
     }
+
+    public function filterProperties()
+    {
+        return Inertia::render('Public/PropertyFilter');
+    }
+
     public function contact()
     {
         return Inertia::render('Public/Contact');

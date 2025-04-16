@@ -6,14 +6,14 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
 
-                <div></div> <!-- Empty Column for spacing -->
+                <div></div>
 
                 <!-- Total Properties -->
                 <div class="counter-wrap">
                     <div class="py-6 mb-4 ">
                         <div class="flex flex-col items-center justify-center">
                             <strong class="text-5xl font-bold text-gray-800" ref="totalProperties">{{ displayProperties
-                                }}</strong>
+                            }}</strong>
                             <span class="mt-2 text-lg text-gray-600">Total <br>Properties</span>
                         </div>
                     </div>
@@ -24,13 +24,13 @@
                     <div class="py-6 mb-4">
                         <div class="flex flex-col items-center justify-center">
                             <strong class="text-5xl font-bold text-gray-800" ref="averageHouse">{{ displayAverage
-                                }}</strong>
+                            }}</strong>
                             <span class="mt-2 text-lg text-gray-600">Average <br>House</span>
                         </div>
                     </div>
                 </div>
 
-                <div></div> <!-- Empty Column for spacing -->
+                <div></div>
 
             </div>
         </div>
@@ -63,7 +63,7 @@ export default {
     methods: {
         animateCounter(target, endValue) {
             let start = 0;
-            const duration = 2000;
+            const duration = 1000;
             const stepTime = Math.abs(Math.floor(duration / endValue));
             const timer = setInterval(() => {
                 start += 1;

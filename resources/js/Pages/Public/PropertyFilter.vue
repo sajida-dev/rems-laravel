@@ -1,27 +1,53 @@
-<template lang="">
-    <HeroSection variant="page" heading="Properties" :breadcrumbs="[
+<template>
+    <HeroSection variant="page" heading="Search Properties" :breadcrumbs="[
         { label: 'Home', link: '/' },
-        { label: 'Properties' }
+        { label: 'Filtered Properties' }
     ]" />
-     <PropertyListSection
-    :properties="paginatedProperty"
-    :message="message"
-    :currentPage="currentPage"
-    :totalPages="totalPages"
-    @updatePage="goToPage"
-  />
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Sidebar Filter -->
+                <FilterForm :categories="categories" :allAmenities="allAmenities" @applyFilters="applyFilters" />
+
+                <!-- Property Listings -->
+                <div class="md:col-span-3">
+                    <PropertyListSection :properties="properties" />
+                </div>
+            </div>
+        </div>
+    </section>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { ref } from 'vue'
-import HeroSection from '@/Components/Public/Common/HeroSection.vue'
-import PropertyListSection from '@/Components/Public/Property/PropertyListSection.vue'
+import { ref, computed } from 'vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import HeroSection from '@/Components/Public/Common/HeroSection.vue';
+import FilterForm from '@/Components/Public/Property/Filter/FilterForm.vue'
+import PropertyListSection from '@/Components/Public/Property/PropertyListSection.vue'
 defineOptions({ layout: PublicLayout })
 
+defineProps(['categories', 'allAmenities'])
 
-const properties = [
+const applyFilters = (filters) => {
+    // Use Inertia to apply filters
+    console.log('Apply filters:', filters)
+    // Inertia.get(route('properties.index'), filters, { preserveScroll: true })
+}
+
+
+const filters = ref({
+    search: '',
+    category_id: '',
+    location: '',
+    min_price: '',
+    max_price: '',
+    bedrooms: '',
+    amenities: []
+})
+
+
+
+const properties = ref([
     {
         id: 1,
         title: 'Modern Family House',
@@ -31,7 +57,7 @@ const properties = [
         bedrooms: 3,
         bathrooms: 2,
         area: 1600,
-        image_url: 'frontend/images/image_1.jpg'
+        image_url: '/frontend/images/image_1.jpg'
     },
     {
         id: 2,
@@ -42,7 +68,7 @@ const properties = [
         bedrooms: 5,
         bathrooms: 4,
         area: 3200,
-        image_url: 'frontend/images/image_2.jpg'
+        image_url: '/frontend/images/image_2.jpg'
     },
     {
         id: 3,
@@ -53,7 +79,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 4,
@@ -64,7 +90,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 5,
@@ -75,7 +101,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 6,
@@ -86,7 +112,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 7,
@@ -97,7 +123,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 8,
@@ -108,7 +134,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 9,
@@ -119,7 +145,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 10,
@@ -130,7 +156,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 11,
@@ -141,7 +167,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 12,
@@ -152,7 +178,7 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
     {
         id: 13,
@@ -163,36 +189,18 @@ const properties = [
         bedrooms: 2,
         bathrooms: 1,
         area: 900,
-        image_url: 'frontend/images/image_3.jpg'
+        image_url: '/frontend/images/image_3.jpg'
     },
-]
-const message = ref('Loading properties...')
-const currentPage = ref(1)
-const perPage = 9
-const totalPages = computed(() => Math.ceil(properties.length / perPage))
-
-const paginatedProperty = computed(() => {
-    const start = (currentPage.value - 1) * perPage
-    return properties.slice(start, start + perPage)
-})
-
-function goToPage(page) {
-    if (page >= 1 && page <= totalPages.value) {
-        currentPage.value = page
-    }
-}
+])
 </script>
-
-<style lang="">
-
-</style>
 
 <script>
 export default {
-    name: "Properties",
+    name: "PropertyFilter",
     components: {
-        PropertyListSection,
         HeroSection,
+        FilterForm,
+        PropertyListSection
     }
 }
 </script>

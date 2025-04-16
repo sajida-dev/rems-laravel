@@ -4,7 +4,6 @@
             <!-- If message exists -->
             <div v-if="message && properties.length">
                 <SectionHeading subheading="Properties" title="Our Properties" />
-                <!-- Agent Cards -->
                 <div class="flex flex-wrap -mx-4">
                     <div v-for="property in properties" :key="property.id" class="w-full md:w-1/2 lg:w-1/3 px-4 mb-10">
                         <PropertyCard :property="property" />
