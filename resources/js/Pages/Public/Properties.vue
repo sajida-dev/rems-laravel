@@ -9,6 +9,7 @@
     :currentPage="currentPage"
     :totalPages="totalPages"
     @updatePage="goToPage"
+    :columns="3"
   />
 </template>
 

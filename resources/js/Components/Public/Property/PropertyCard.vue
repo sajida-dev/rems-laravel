@@ -69,7 +69,7 @@ const { property, initialBookmarkStatus } = defineProps({
 
 const isBookmarked = ref(initialBookmarkStatus)
 
-const imageUrl = computed(() => `/${property.image_url}`)
+const imageUrl = computed(() => `${property.image_url}`)
 const formattedPurchasePrice = computed(() =>
     Number(property.purchase_price).toLocaleString()
 )

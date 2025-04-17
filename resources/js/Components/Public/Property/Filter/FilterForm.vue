@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full p-4 ">
+    <div class="w-full p-4 bg-white sticky top-24 h-[calc(100vh-5rem)] overflow-y-auto rounded-lg shadow-md">
         <h4 class="text-lg font-semibold mb-4">Filter Properties</h4>
         <form @submit.prevent="submitFilter" class="flex flex-col space-y-3">
             <SearchInput v-model="filters.search" />
