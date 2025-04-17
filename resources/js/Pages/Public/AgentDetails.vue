@@ -33,7 +33,7 @@ const agent = {
             bedrooms: 3,
             bathrooms: 2,
             area: 1600,
-            image_url: 'frontend/images/image_1.jpg'
+            image_url: '/frontend/images/image_1.jpg'
         },
         {
             id: 2,
@@ -44,7 +44,7 @@ const agent = {
             bedrooms: 5,
             bathrooms: 4,
             area: 3200,
-            image_url: 'frontend/images/image_2.jpg'
+            image_url: '/frontend/images/image_2.jpg'
         },
         {
             id: 3,
@@ -55,7 +55,7 @@ const agent = {
             bedrooms: 2,
             bathrooms: 1,
             area: 900,
-            image_url: 'frontend/images/image_3.jpg'
+            image_url: '/frontend/images/image_3.jpg'
         }
     ]
 };
