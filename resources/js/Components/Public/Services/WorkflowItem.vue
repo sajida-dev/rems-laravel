@@ -1,4 +1,3 @@
-<!-- components/WorkflowItem.vue -->
 <template>
     <div class="w-full lg:w-1/2 flex items-center justify-center ftco-animate mb-5 lg:mb-0">
         <div class="w-full h-full">

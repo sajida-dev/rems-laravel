@@ -1,4 +1,6 @@
 <template lang="">
+        <Head :title="property.title" />
+
     <HeroSection variant="page" :heading="property.title" :breadcrumbs="[
             { label: 'Home', link: '/' },
             { label: 'Property Details' }
@@ -12,6 +14,8 @@
 </template>
 <script setup>
 import { ref } from 'vue'
+import { Head } from '@inertiajs/vue3'
+
 import HeroSection from '@/Components/Public/Common/HeroSection.vue';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PropertyHeader from '@/Components/Public/Property/PropertyHeader.vue';

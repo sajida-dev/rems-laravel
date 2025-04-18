@@ -1,5 +1,6 @@
 <template>
-    <title>About</title>
+
+    <Head title="About Us" />
     <HeroSection variant="page" heading="About Us" :breadcrumbs="[
         { label: 'Home', link: '/' },
         { label: 'About' }
@@ -9,6 +10,7 @@
 </template>
 <script setup>
 import { onMounted } from 'vue'
+import { Head } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import HeroSection from '@/Components/Public/Common/HeroSection.vue'
 import AboutUsSection from '@/Components/Public/About/AboutUsSection.vue';

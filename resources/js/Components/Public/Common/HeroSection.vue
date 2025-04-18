@@ -20,10 +20,10 @@
                         <p class="breadcrumbs space-x-2">
                             <template v-for="(crumb, index) in breadcrumbs" :key="index">
                                 <span v-if="crumb.link">
-                                    <a :href="crumb.link" class="text-gray-600 hover:text-pink-500 transition">
-                                        {{ crumb.label }}
-                                        <i class="fas fa-angle-right text-xs mx-1"></i>
-                                    </a>
+                                    <Link :href="crumb.link" class="text-gray-600 hover:text-pink-500 transition">
+                                    {{ crumb.label }}
+                                    <i class="fas fa-angle-right text-xs mx-1"></i>
+                                    </Link>
                                 </span>
                                 <span v-else>{{ crumb.label }}</span>
                             </template>
@@ -66,16 +66,18 @@
             <!-- Scroll Mouse Icon -->
             <div v-if="variant === 'home'"
                 class="absolute lg:bottom-[-20px] bottom-[-3px] left-0 right-0 z-30 flex justify-center">
-                <a href="#scrollTarget"
+                <Link href="#scrollTarget"
                     class="w-[80px] h-[80px] bg-pink-400 border border-pink-400 rounded-full flex items-center justify-center  text-white text-3xl">
-                    <i class="fas fa-angle-down animate-bounce"></i>
-                </a>
+                <i class="fas fa-angle-down animate-bounce"></i>
+                </Link>
             </div>
         </section>
     </section>
 </template>
 
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     variant: {
         type: String,

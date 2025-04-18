@@ -1,4 +1,3 @@
-<!-- components/Common/SectionHeading.vue -->
 <template>
     <div class="flex justify-center mb-12">
         <div class="text-center heading-section ftco-animate">

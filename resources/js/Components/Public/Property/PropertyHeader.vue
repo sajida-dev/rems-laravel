@@ -1,21 +1,3 @@
-<!-- <template>
-    <div>
-        <h1 class="text-3xl font-semibold text-gray-800 mb-2">{{ title }}</h1>
-        <p class="text-gray-600 flex items-center">
-            <i class="fas fa-map-marker-alt mr-2 text-red-500"></i> {{ location }}
-        </p>
-    </div>
-</template>
-
-<script setup>
-defineProps({
-    title: String,
-    location: String,
-})
-</script> -->
-
-
-
 <template>
     <div>
         <!-- Header Image -->

@@ -5,13 +5,15 @@
         </div>
         <p>
             <span class="block text-lg font-semibold text-black">{{ label }}:</span>
-            <a v-if="link" :href="link" class="text-gray-800 hover:text-pink-600">{{ value }}</a>
+            <Link v-if="link" :href="link" class="text-gray-800 hover:text-pink-600">{{ value }}</Link>
             <span v-else class="text-gray-700">{{ value }}</span>
         </p>
     </div>
 </template>
 
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     icon: String,
     label: String,

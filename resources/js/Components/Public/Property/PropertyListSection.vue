@@ -1,7 +1,6 @@
 <template>
     <section class="py-16 bg-white">
         <div class="container mx-auto px-4">
-            <!-- If message exists -->
             <div v-if="properties.length">
                 <SectionHeading subheading="Properties" title="Our Properties" />
                 <div class="flex flex-wrap -mx-4">
@@ -10,11 +9,9 @@
                         <PropertyCard :property="property" />
                     </div>
                 </div>
-                <!-- Pagination -->
                 <Pagination :currentPage="currentPage" :totalPages="totalPages" @change="handlePageChange" />
             </div>
 
-            <!-- No Properties / Message -->
             <div v-else class="text-center">
                 <div class="text-pink-500 p-5 rounded shadow-sm">
                     {{ message || 'No properties found.' }}

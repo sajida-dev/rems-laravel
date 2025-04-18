@@ -1,4 +1,7 @@
 <template>
+
+    <Head :title="agent.name" />
+
     <div>
         <HeroSection variant="page" :heading="agent.name" :breadcrumbs="[
             { label: 'Home', link: '/' },
@@ -9,6 +12,8 @@
 </template>
 
 <script setup>
+import { Head } from '@inertiajs/vue3'
+
 import HeroSection from '@/Components/Public/Common/HeroSection.vue'
 import AgentTabs from '@/Components/Public/Agent/AgentTabs.vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue';

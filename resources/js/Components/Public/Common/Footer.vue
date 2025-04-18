@@ -7,18 +7,18 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Uptown</h2>
                     <p class="text-sm mb-5">Far far away, behind the word mountains, far from the countries.</p>
                     <div class="flex space-x-3">
-                        <a href="#" aria-label="Twitter"
+                        <Link href="#" aria-label="Twitter"
                             class="w-10 h-10 bg-white shadow rounded-full flex items-center justify-center text-pink-500 hover:bg-pink-500 hover:text-white transition duration-300">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" aria-label="Facebook"
+                        <i class="fab fa-twitter"></i>
+                        </Link>
+                        <Link href="#" aria-label="Facebook"
                             class="w-10 h-10 bg-white shadow rounded-full flex items-center justify-center text-pink-500 hover:bg-pink-500 hover:text-white transition duration-300">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" aria-label="Instagram"
+                        <i class="fab fa-facebook-f"></i>
+                        </Link>
+                        <Link href="#" aria-label="Instagram"
                             class="w-10 h-10 bg-white shadow rounded-full flex items-center justify-center text-pink-500 hover:bg-pink-500 hover:text-white transition duration-300">
-                            <i class="fab fa-instagram"></i>
-                        </a>
+                        <i class="fab fa-instagram"></i>
+                        </Link>
                     </div>
                 </div>
 
@@ -26,10 +26,18 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Community</h2>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="/all-properties" class="hover:text-pink-500 transition">Search Properties</a></li>
-                        <li><a href="/all-agents" class="hover:text-pink-500 transition">For Agents</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Reviews</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">FAQs</a></li>
+                        <li>
+                            <Link href="/all-properties" class="hover:text-pink-500 transition">Search Properties</Link>
+                        </li>
+                        <li>
+                            <Link href="/all-agents" class="hover:text-pink-500 transition">For Agents</Link>
+                        </li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">Reviews</Link>
+                        </li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">FAQs</Link>
+                        </li>
                     </ul>
                 </div>
 
@@ -37,9 +45,15 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">About Us</h2>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-pink-500 transition">Our Story</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Meet the team</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Careers</a></li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">Our Story</Link>
+                        </li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">Meet the team</Link>
+                        </li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">Careers</Link>
+                        </li>
                     </ul>
                 </div>
 
@@ -47,10 +61,18 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Company</h2>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="/about" class="hover:text-pink-500 transition">About Us</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Press</a></li>
-                        <li><a href="/contact" class="hover:text-pink-500 transition">Contact</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Careers</a></li>
+                        <li>
+                            <Link href="/about" class="hover:text-pink-500 transition">About Us</Link>
+                        </li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">Press</Link>
+                        </li>
+                        <li>
+                            <Link href="/contact" class="hover:text-pink-500 transition">Contact</Link>
+                        </li>
+                        <li>
+                            <Link href="#" class="hover:text-pink-500 transition">Careers</Link>
+                        </li>
                     </ul>
                 </div>
 
@@ -64,11 +86,12 @@
                         </li>
                         <li class="flex md:items-start justify-center items-center">
                             <i class="fas fa-phone-alt text-pink-500 mr-2 mt-1"></i>
-                            <a href="tel:+23923929210" class="hover:text-pink-500 transition">+2 392 3929 210</a>
+                            <Link href="tel:+23923929210" class="hover:text-pink-500 transition">+2 392 3929 210</Link>
                         </li>
                         <li class="flex md:items-start justify-center items-center">
                             <i class="fas fa-envelope text-pink-500 mr-2 mt-1"></i>
-                            <a href="mailto:info@uptown.com" class="hover:text-pink-500 transition">info@uptown.com</a>
+                            <Link href="mailto:info@uptown.com" class="hover:text-pink-500 transition">info@uptown.com
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -89,4 +112,7 @@ export default {
         };
     },
 };
+</script>
+<script setup>
+import { Link } from '@inertiajs/vue3';
 </script>

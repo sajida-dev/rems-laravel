@@ -1,4 +1,7 @@
 <template>
+
+    <Head title="Properties Filter" />
+
     <HeroSection variant="page" heading="Search Properties" :breadcrumbs="[
         { label: 'Home', link: '/' },
         { label: 'Filtered Properties' }
@@ -21,6 +24,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { Head } from '@inertiajs/vue3'
+
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import HeroSection from '@/Components/Public/Common/HeroSection.vue';
 import FilterForm from '@/Components/Public/Property/Filter/FilterForm.vue';

@@ -2,9 +2,9 @@
     <nav :class="navbarClasses">
         <div class="container h-14 mx-auto flex items-center justify-between px-5 lg:py-3 py-4">
             <!-- Brand -->
-            <a :class="brandClasses" href="/">
-                Uptown
-            </a>
+            <Link :class="brandClasses" href="/">
+            Uptown
+            </Link>
             <!-- Mobile Menu Toggle Button -->
             <button class="lg:hidden focus:outline-none" @click="toggleNav" :class="togglerClasses">
                 <svg class="h-auto w-6 fill-current" viewBox="0 0 24 24">
@@ -16,32 +16,32 @@
             <div class="hidden lg:flex items-center">
                 <ul class="flex space-x-2">
                     <li>
-                        <a :href="'/'" :class="getNavLinkClasses('/')">Home</a>
+                        <Link :href="'/'" :class="getNavLinkClasses('/')">Home</Link>
                     </li>
                     <li v-if="isAuthenticated">
-                        <a :href="profileUrl" :class="getNavLinkClasses(profileUrl)">Profile</a>
+                        <Link :href="profileUrl" :class="getNavLinkClasses(profileUrl)">Profile</Link>
                     </li>
                     <li>
-                        <a :href="'/about'" :class="getNavLinkClasses('/about')">About</a>
+                        <Link :href="'/about'" :class="getNavLinkClasses('/about')">About</Link>
                     </li>
                     <li>
-                        <a :href="'/all-agents'" :class="getNavLinkClasses('/all-agents')">Agent</a>
+                        <Link :href="'/all-agents'" :class="getNavLinkClasses('/all-agents')">Agent</Link>
                     </li>
                     <li>
-                        <a :href="'/services'" :class="getNavLinkClasses('/services')">Services</a>
+                        <Link :href="'/services'" :class="getNavLinkClasses('/services')">Services</Link>
                     </li>
                     <li>
-                        <a :href="'/all-properties'" :class="getNavLinkClasses('/all-properties')">Properties</a>
+                        <Link :href="'/all-properties'" :class="getNavLinkClasses('/all-properties')">Properties</Link>
                     </li>
                     <li>
-                        <a :href="'/contact'" :class="getNavLinkClasses('/contact')">Contact</a>
+                        <Link :href="'/contact'" :class="getNavLinkClasses('/contact')">Contact</Link>
                     </li>
                     <template v-if="!isAuthenticated">
                         <li>
-                            <a :href="'/login'" :class="getButtonLinkClasses('/login')">Login</a>
+                            <Link :href="'/login'" :class="getButtonLinkClasses('/login')">Login</Link>
                         </li>
                         <li>
-                            <a :href="'/register'" :class="getButtonLinkClasses('/register')">Register</a>
+                            <Link :href="'/register'" :class="getButtonLinkClasses('/register')">Register</Link>
                         </li>
                     </template>
                     <template v-else>
@@ -49,7 +49,7 @@
                             <span :class="navLinkClasses">{{ userName }}</span>
                         </li>
                         <li>
-                            <a :href="'/logout'" :class="getButtonLinkClasses('/logout')">Logout</a>
+                            <Link :href="'/logout'" :class="getButtonLinkClasses('/logout')">Logout</Link>
                         </li>
                     </template>
                 </ul>
@@ -61,40 +61,42 @@
                 <div class="absolute inset-0 bg-black opacity-50" @click="toggleNav"></div>
                 <div class="relative px-4 z-50 h-full w-72 bg-white shadow transform transition-transform duration-300">
                     <div class="p-4 border-b">
-                        <a :class="brandClasses" href="/">
-                            Uptown <span class="text-pink-400 font-bold">Brand</span>
-                        </a>
+                        <Link :class="brandClasses" href="/">
+                        Uptown <span class="text-pink-400 font-bold">Brand</span>
+                        </Link>
                     </div>
                     <div class="p-4">
                         <ul class="flex flex-col space-y-1">
                             <li>
-                                <a :href="'/'" :class="getNavLinkMobileClasses('/')">Home</a>
+                                <Link :href="'/'" :class="getNavLinkMobileClasses('/')">Home</Link>
                             </li>
                             <li v-if="isAuthenticated">
-                                <a :href="profileUrl" :class="getNavLinkMobileClasses(profileUrl)">Profile</a>
+                                <Link :href="profileUrl" :class="getNavLinkMobileClasses(profileUrl)">Profile</Link>
                             </li>
                             <li>
-                                <a :href="'/about'" :class="getNavLinkMobileClasses('/about')">About</a>
+                                <Link :href="'/about'" :class="getNavLinkMobileClasses('/about')">About</Link>
                             </li>
                             <li>
-                                <a :href="'/all-agents'" :class="getNavLinkMobileClasses('/all-agents')">Agent</a>
+                                <Link :href="'/all-agents'" :class="getNavLinkMobileClasses('/all-agents')">Agent</Link>
                             </li>
                             <li>
-                                <a :href="'/services'" :class="getNavLinkMobileClasses('/services')">Services</a>
+                                <Link :href="'/services'" :class="getNavLinkMobileClasses('/services')">Services</Link>
                             </li>
                             <li>
-                                <a :href="'/all-properties'"
-                                    :class="getNavLinkMobileClasses('/all-properties')">Properties</a>
+                                <Link :href="'/all-properties'" :class="getNavLinkMobileClasses('/all-properties')">
+                                Properties
+                                </Link>
                             </li>
                             <li>
-                                <a :href="'/contact'" :class="getNavLinkMobileClasses('/contact')">Contact</a>
+                                <Link :href="'/contact'" :class="getNavLinkMobileClasses('/contact')">Contact</Link>
                             </li>
                             <template v-if="!isAuthenticated">
                                 <li>
-                                    <a :href="'/login'" :class="getButtonLinkMobileClasses('/login')">Login</a>
+                                    <Link :href="'/login'" :class="getButtonLinkMobileClasses('/login')">Login</Link>
                                 </li>
                                 <li>
-                                    <a :href="'/register'" :class="getButtonLinkMobileClasses('/register')">Register</a>
+                                    <Link :href="'/register'" :class="getButtonLinkMobileClasses('/register')">Register
+                                    </Link>
                                 </li>
                             </template>
                             <template v-else>
@@ -102,7 +104,7 @@
                                     <span :class="navLinkMobileClasses">{{ userName }}</span>
                                 </li>
                                 <li>
-                                    <a :href="'/logout'" :class="getButtonLinkMobileClasses('/logout')">Logout</a>
+                                    <Link :href="'/logout'" :class="getButtonLinkMobileClasses('/logout')">Logout</Link>
                                 </li>
                             </template>
                         </ul>
@@ -115,7 +117,10 @@
         </transition>
     </nav>
 </template>
+<script setup>
+import { Link } from '@inertiajs/vue3';
 
+</script>
 <script>
 export default {
     name: "Navbar",
@@ -169,7 +174,8 @@ export default {
             this.scrolled = window.scrollY > 100;
         },
         isActive(href) {
-            return window.location.pathname === href;
+            // return window.location.pathname === href;
+            return this.$page.url === href;
         },
         getNavLinkClasses(href) {
             return [

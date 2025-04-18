@@ -1,4 +1,6 @@
 <template>
+
+    <Head title="Welcome" />
     <HeroSection variant="home" heading="The Simplest Way to Find Property"
         subheading="A small river named Duden flows by their place and supplies it with the necessary regelialia."
         showSearchForm formAction="filter-properties.php" />
@@ -12,7 +14,7 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 defineOptions({ layout: PublicLayout })
-
+import { Head } from '@inertiajs/vue3'
 import PropertiesSection from '@/Components/Public/Property/PropertiesSection.vue'
 import WorkFlowSection from '@/Components/Public/Services/WorkFlowSection.vue'
 import AgentSection from '@/Components/Public/Agent/AgentSection.vue'
