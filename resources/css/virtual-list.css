@@ -1,0 +1,8 @@
+.virtual-list {
+    display: block;
+    overflow-y: auto;
+}
+
+.virtual-list li {
+    list-style: none;
+}

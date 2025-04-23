@@ -3,13 +3,13 @@
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EndUserController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PropertyController;
 use App\Models\Agent;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,16 +22,6 @@ use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 |
 */
 
-
-
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
 
 
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -53,17 +43,12 @@ Route::get('/agents/pending-count', function () {
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    // Dashboard route
-    Route::get('/dashboard', function () {
-        return inertia('Admin/Dashboard');
-    })->name('admin.dashboard');
 
     Route::resource('categories', CategoryController::class);
-    // Route::resource('properties', PropertyController::class);
-    // Route::resource('agents', AgentController::class);
+    Route::resource('properties', PropertyController::class);
+    Route::resource('agents', AgentController::class);
     Route::resource('amenities', AmenityController::class);
-
-    Route::resource('users', RegisteredUserController::class);
+    Route::resource('end-users', EndUserController::class);
 });
 
 Route::middleware('auth')->group(function () {
@@ -71,12 +56,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/bookmarks/{id}', [PropertyController::class, 'deleteBookMark'])->name('property-bookmark-delete');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-});
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

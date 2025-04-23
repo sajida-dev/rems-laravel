@@ -26,6 +26,9 @@ export default defineConfig({
             },
         }),
     ],
+    optimizeDeps: {
+        include: ['vue3-virtual-scroll-list']
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'resources/js'),

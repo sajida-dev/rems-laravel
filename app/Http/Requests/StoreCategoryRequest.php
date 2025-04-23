@@ -11,7 +11,7 @@ class StoreCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,18 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'categoryName' => ['required', 'string', 'max:100'],
+            'categoryDescription' => ['required', 'string', 'max:500'],
         ];
+    }
+
+    /**
+     * Custom forbidden response for unauthorized users
+     */
+    public function forbiddenResponse()
+    {
+        return response()->json([
+            'message' => 'You are not authorized to perform this action.'
+        ], 403);
     }
 }

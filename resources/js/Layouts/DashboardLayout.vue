@@ -1,49 +1,41 @@
-<!-- <template>
-    <div class="flex min-h-screen">
-        <Sidebar />
+<template>
+    <div class="flex h-screen bg-gray-100">
+        <Sidebar :open="sidebarOpen" @close="sidebarOpen = false" :user="user" />
+        <div v-if="sidebarOpen" class="fixed inset-0 bg-black bg-opacity-40 z-10 lg:hidden"
+            @click="sidebarOpen = false"></div>
+
         <div class="flex-1 flex flex-col">
-            <Header />
-            <PageHeader />
-            <main class="flex-1 p-4">
+            <Header @toggle-sidebar="sidebarOpen = !sidebarOpen" :user="user" />
+
+            <PageHeader :title="header.title" :mainPage="header.mainPage" :page="header.page" />
+
+            <main class="flex-1 overflow-y-auto p-6">
                 <slot />
             </main>
             <Footer />
         </div>
+
     </div>
 </template>
 
 <script setup>
-import Sidebar from '@/Components/Admin/Sidebar.vue'
-import Header from '@/Components/Admin/Header.vue'
-import PageHeader from '@/Components/Admin/PageHeader.vue'
-import Footer from '@/Components/Admin/Footer.vue'
-</script> -->
+import { ref } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 
-<template>
-    <div class="flex">
-        <Sidebar>
-            <template #logo>
-                <ApplicationLogo class="w-20 h-20" />
-            </template>
-        </Sidebar>
+const { props } = usePage()
+const user = props.auth.user
 
-        <div class="main-content">
-            <Header />
-            <PageHeader :title="pageTitle" />
-            <slot />
-            <Footer />
-        </div>
-    </div>
-</template>
+import Sidebar from '@Components/Dashboard/Common/Sidebar.vue'
+import Footer from '@Components/Dashboard/Common/Footer.vue'
+import Header from '@Components/Dashboard/Common/Header.vue'
+import PageHeader from '@Components/Dashboard/Common/PageHeader.vue'
+const sidebarOpen = ref(false)
 
-<script setup>
-import Sidebar from '@/Components/Admin/Sidebar.vue'
-import Header from '@/Components/Admin/Header.vue'
-import PageHeader from '@Components/Admin/PageHeader.vue'
-import Footer from '@/Components/Admin/Footer.vue'
-import ApplicationLogo from '@/Components/Admin/ApplicationLogo.vue'
+import { inject } from 'vue'
 
-defineProps({
-    pageTitle: String
+const header = inject('layoutHeader', {
+    title: 'Dashbaord',
+    mainPage: 'Pages',
+    page: ''
 })
 </script>

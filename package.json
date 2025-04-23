@@ -25,6 +25,8 @@
         "@motionone/vue": "^10.16.4",
         "@vueuse/head": "^2.0.0",
         "gsap": "^3.12.7",
-        "swiper": "^11.2.6"
+        "lodash.debounce": "^4.0.8",
+        "swiper": "^11.2.6",
+        "vue3-virtual-scroll-list": "^0.2.1"
     }
 }

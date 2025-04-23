@@ -7,7 +7,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { createHead } from '@vueuse/head'
-
+import VirtualList from 'vue3-virtual-scroll-list'
 const head = createHead()
 const appName = import.meta.env.VITE_APP_NAME || 'Uptown';
 
@@ -19,6 +19,7 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(head)
+            .component('virtual-list', VirtualList)
             .mount(el);
     },
     progress: {
