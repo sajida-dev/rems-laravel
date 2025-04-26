@@ -7,6 +7,7 @@ import InputError from '@/Components/Default/InputError.vue';
 import InputLabel from '@/Components/Default/InputLabel.vue';
 import PrimaryButton from '@/Components/Default/PrimaryButton.vue';
 import TextInput from '@/Components/Default/TextInput.vue';
+import { toast } from 'vue3-toastify'
 
 defineProps({
     canResetPassword: Boolean,
@@ -24,7 +25,13 @@ const submit = () => {
         ...data,
         remember: form.remember ? 'on' : '',
     })).post(route('login'), {
-        onFinish: () => form.reset('password'),
+        onSuccess: (responce) => {
+            toast.success("Login Successfully.")
+            form.reset('password')
+        },
+        onError: (error) => {
+            toast.error("Try Again. " + error)
+        }
     });
 };
 </script>

@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_amenities', function (Blueprint $table) {
+        Schema::create('property_category', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('property_id');
-            $table->unsignedBigInteger('amenity_id');
+            $table->unsignedBigInteger('category_id');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('amenity_id')->references('id')->on('amenities')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('property_amenities');
+        Schema::dropIfExists('property_category');
     }
 };

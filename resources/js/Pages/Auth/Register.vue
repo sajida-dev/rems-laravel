@@ -121,6 +121,7 @@ import InputLabel from '@/Components/Default/InputLabel.vue'
 import PrimaryButton from '@/Components/Default/PrimaryButton.vue'
 import TextInput from '@/Components/Default/TextInput.vue'
 import Checkbox from '@/Components/Default/Checkbox.vue';
+import { toast } from 'vue3-toastify'
 
 const form = useForm({
     name: '',
@@ -134,7 +135,13 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+        onSuccess: () => {
+            toast.success("Registerd Successfully.");
+            form.reset('password', 'password_confirmation')
+        },
+        onError: (error) => {
+            toast.error("Try Again. " + error);
+        }
     })
 }
 </script>

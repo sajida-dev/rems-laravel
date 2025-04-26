@@ -3,7 +3,6 @@
         <h5 class="text-2xl text-center my-5 font-bold">
             {{ title }}
         </h5>
-        <input type="hidden" name="_token" :value="csrfToken" />
 
 
         <div class="main-body">
@@ -22,6 +21,11 @@
 import { useForm } from '@inertiajs/vue3'
 import PrimaryButton from '@/Components/Default/PrimaryButton.vue'
 import { defineProps } from 'vue'
+import { ref } from 'vue'
+import { toast } from 'vue3-toastify'
+
+
+const csrfToken = ref(document.querySelector('meta[name="csrf-token"]').getAttribute('content'))
 
 const props = defineProps({
     title: String,
@@ -43,7 +47,13 @@ const form = useForm({ ...props.fields })
 const submit = () => {
     form[props.method](route(props.routeName, props.routeParams), {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: (response) => {
+            form.reset()
+            toast.success(response.props.flash.success)
+        },
+        onError: (errors) => {
+            toast.error(response.props.flash.success + errors)
+        },
     })
 }
 </script>

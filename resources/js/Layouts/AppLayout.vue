@@ -8,6 +8,7 @@ import DropdownLink from '@/Components/Default/DropdownLink.vue';
 import NavLink from '@/Components/Default/NavLink.vue';
 import ResponsiveNavLink from '@/Components/Default/ResponsiveNavLink.vue';
 
+
 defineProps({
     title: String,
 });

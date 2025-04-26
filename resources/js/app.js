@@ -8,6 +8,10 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { createHead } from '@vueuse/head'
 import VirtualList from 'vue3-virtual-scroll-list'
+import Vue3Toastify from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
+
 const head = createHead()
 const appName = import.meta.env.VITE_APP_NAME || 'Uptown';
 
@@ -20,10 +24,17 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(head)
             .component('virtual-list', VirtualList)
+            .use(Vue3Toastify, {
+                autoClose: 3000,
+                position: "top-right",
+                theme: "light",
+            })
             .mount(el);
+
+
     },
     progress: {
-        color: '#4B5563',
+        color: '#d23f95',
     },
 
 });

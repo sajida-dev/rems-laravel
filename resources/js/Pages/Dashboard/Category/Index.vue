@@ -15,7 +15,13 @@
       createRoute="/categories/create"
       createLabel="Add Category"
       :hasRowActions="true"
-      @update="loadCategories"
+      :pagination="{
+        total: categories.total,
+        perPage: categories.per_page,
+        currentPage: categories.current_page,
+        lastPage: categories.last_page
+      }"
+      @update="loadData"
     >
 
     <template #row-actions="{ row }">
@@ -37,6 +43,8 @@ import ServerSideDataTable from '@/Components/Dashboard/Common/ServerSideDataTab
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Head } from '@inertiajs/vue3'
 import { provide } from 'vue'
+import { toast } from 'vue3-toastify'
+import { reactive } from 'vue'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -57,47 +65,51 @@ const columns = [
 
 ]
 
+const tableState = reactive({
+  filters: { global: '' },
+  sortBy: 'id',
+  sortDesc: false,
+  page: 1,
+  perPage: 10,
+})
+
+
 const deleteCategory = (row) => {
 
   router.delete(route('categories.destroy', row.id), {
     preserveScroll: true,
-    onSuccess: () => {
-      // loadCategories()
-      loadCategories({
-        filters: { global: '' },
-        sortBy: 'id',
-        sortDesc: false,
-        page: 1,
-        perPage: 10,
-      })
-    }
+    onSuccess: (response) => {
+      toast.success(response.props.flash.success)
+      loadData()
+    },
+    onError: (errors) => {
+      toast.error('Something went wrong!')
+    },
+
   })
 }
 
-// const confirmDelete = () => {
-//   router.delete(route('categories.destroy', selectedRow.value.id), {
-//     preserveScroll: true,
-//     onSuccess: () => {
-//       loadCategories()
-//     }
-//   })
-//   showConfirm.value = false
-// }
 
-const loadCategories = ({ filters, sortBy, sortDesc, page, perPage }) => {
-  router.get(
-    route('categories.index'),
-    {
-      global: filters.global,
-      sortBy,
-      sortDesc,
-      page,
-      perPage,
-    },
-    {
-      preserveState: true,
-      replace: true,
-    }
-  )
+const loadData = (options = {}) => {
+  router.get(route('categories.index'), {
+    global: tableState.filters.global,
+    sortBy: tableState.sortBy,
+    sortDesc: tableState.sortDesc,
+    page: options.page ?? tableState.page,
+    perPage: tableState.perPage,
+  }, {
+    preserveState: true,
+    replace: true,
+  })
 }
+const updateTableState = ({ filters, sortBy, sortDesc, page, perPage }) => {
+  tableState.filters = filters
+  tableState.sortBy = sortBy
+  tableState.sortDesc = sortDesc
+  tableState.page = page
+  tableState.perPage = perPage
+
+  loadData()
+}
+
 </script>

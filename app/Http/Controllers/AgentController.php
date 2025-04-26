@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agent;
 use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\UpdateAgentRequest;
+use Inertia\Inertia;
 
 class AgentController extends Controller
 {
@@ -13,7 +14,7 @@ class AgentController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render("Dashboard/Agent/Index");
     }
 
     /**
@@ -21,7 +22,7 @@ class AgentController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render("Dashboard/Agent/Create");
     }
 
     /**
@@ -29,7 +30,8 @@ class AgentController extends Controller
      */
     public function store(StoreAgentRequest $request)
     {
-        //
+        Agent::create([]);
+        return redirect()->route("agents.index")->with("success", "Agents inserted Successfully.");
     }
 
     /**
@@ -37,7 +39,7 @@ class AgentController extends Controller
      */
     public function show(Agent $agent)
     {
-        //
+        return Inertia::render("Dashboard/Agent/Create", ['agent' => $agent]);
     }
 
     /**
@@ -45,7 +47,7 @@ class AgentController extends Controller
      */
     public function edit(Agent $agent)
     {
-        //
+        return Inertia::render("Dashboard/Agent/Edit", ['agent' => $agent]);
     }
 
     /**
@@ -53,7 +55,8 @@ class AgentController extends Controller
      */
     public function update(UpdateAgentRequest $request, Agent $agent)
     {
-        //
+        $agent->update([]);
+        return redirect()->route("agents.index")->with("success", "Agents inserted Successfully.");
     }
 
     /**
@@ -61,6 +64,7 @@ class AgentController extends Controller
      */
     public function destroy(Agent $agent)
     {
-        //
+        $agent->delete();
+        return redirect()->route("agents.index")->with("success", "Agents deleted Successfully.");
     }
 }

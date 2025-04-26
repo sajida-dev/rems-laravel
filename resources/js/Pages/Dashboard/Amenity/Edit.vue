@@ -3,7 +3,7 @@
     <Head title="Edit Amenity" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
         <FormLayout title="Update Amenity" :method="'put'" :routeName="'amenities.update'"
-            :routeParams="amenity = amenity.id"
+            :routeParams="{ amenity: amenity.id }"
             :fields="{ amenityName: amenity.name, amenityDescription: amenity.description }">
             <template #fields="{ form, errors }">
                 <div>

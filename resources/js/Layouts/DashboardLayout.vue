@@ -8,7 +8,6 @@
             <Header @toggle-sidebar="sidebarOpen = !sidebarOpen" :user="user" />
 
             <PageHeader :title="header.title" :mainPage="header.mainPage" :page="header.page" />
-
             <main class="flex-1 overflow-y-auto p-6">
                 <slot />
             </main>
@@ -19,23 +18,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-
-const { props } = usePage()
-const user = props.auth.user
-
+import { ref, inject } from 'vue';
 import Sidebar from '@Components/Dashboard/Common/Sidebar.vue'
 import Footer from '@Components/Dashboard/Common/Footer.vue'
 import Header from '@Components/Dashboard/Common/Header.vue'
 import PageHeader from '@Components/Dashboard/Common/PageHeader.vue'
-const sidebarOpen = ref(false)
 
-import { inject } from 'vue'
+const { props } = usePage()
+const user = props.auth?.user
+const sidebarOpen = ref(false)
 
 const header = inject('layoutHeader', {
     title: 'Dashbaord',
     mainPage: 'Pages',
     page: ''
-})
+});
+
+
+
 </script>

@@ -93,6 +93,7 @@ class CategoryController extends Controller
             'name' => $request->input('categoryName'),
             'description' => $request->input('categoryDescription'),
         ]);
+        session()->flash('success', 'Category updated successfully!');
 
         return redirect()->route('categories.index')->with('success', 'Category updated successfully!');
     }

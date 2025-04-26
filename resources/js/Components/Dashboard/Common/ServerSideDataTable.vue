@@ -81,11 +81,13 @@
         <!-- Pagination -->
         <div class="flex justify-between items-center p-4 border-t bg-gray-50">
             <div>
-                Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredData.length }}
+                Showing {{ pageStart }} to {{ pageEnd }} of {{ props.pagination.total }}
             </div>
             <div class="flex items-center gap-2">
-                <button @click="prevPage" :disabled="page === 1" class="px-3 py-1 border rounded">Previous</button>
-                <button @click="nextPage" :disabled="page === totalPages" class="px-3 py-1 border rounded">Next</button>
+                <button @click="prevPage" :disabled="props.pagination.currentPage === 1"
+                    class="px-3 py-1 border rounded">Previous</button>
+                <button @click="nextPage" :disabled="props.pagination.currentPage === props.pagination.lastPage"
+                    class="px-3 py-1 border rounded">Next</button>
             </div>
         </div>
     </div>
@@ -112,6 +114,8 @@ const props = defineProps({
     createRoute: { type: String, default: '' },
     createLabel: { type: String, default: '' },
     hasRowActions: { type: Boolean, default: false },
+    pagination: { type: Object, required: true },
+
 })
 
 const emit = defineEmits(['update'])
@@ -170,16 +174,25 @@ const paginatedData = computed(() => {
     return filteredData.value.slice(start, start + props.perPage)
 })
 
-const pageStart = computed(() => (page.value - 1) * props.perPage + 1)
-const pageEnd = computed(() => Math.min(page.value * props.perPage, filteredData.value.length))
-const totalPages = computed(() => Math.ceil(filteredData.value.length / props.perPage))
+const pageStart = computed(() => (props.pagination.perPage * (props.pagination.currentPage - 1)) + 1)
+const pageEnd = computed(() => Math.min(props.pagination.currentPage * props.pagination.perPage, props.pagination.total))
+const totalPages = computed(() => props.pagination.lastPage)
+
 
 const sort = key => {
     if (sortBy.value === key) sortDesc.value = !sortDesc.value
     else { sortBy.value = key; sortDesc.value = false }
 }
-const prevPage = () => { if (page.value > 1) page.value-- }
-const nextPage = () => { if (page.value < totalPages.value) page.value++ }
+const prevPage = () => {
+    if (props.pagination.currentPage > 1) {
+        emit('update', { page: props.pagination.currentPage - 1 })
+    }
+}
+const nextPage = () => {
+    if (props.pagination.currentPage < props.pagination.lastPage) {
+        emit('update', { page: props.pagination.currentPage + 1 })
+    }
+}
 
 watch([filters, sortBy, sortDesc, page], () => {
     emit('update', {

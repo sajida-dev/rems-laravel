@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agent_specializations', function (Blueprint $table) {
+        Schema::create('agent_category', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('agent_id');
             $table->unsignedBigInteger('category_id');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agent_specializations');
+        Schema::dropIfExists('agent_category');
     }
 };
