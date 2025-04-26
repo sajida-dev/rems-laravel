@@ -2,7 +2,7 @@
 
     <Head title="New Category" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
-        <FormLayout title="Add Category" :routeName="'categories.store'"
+        <FormLayout title="Add Category" :method="'post'" :routeName="'categories.store'"
             :fields="{ categoryName: '', categoryDescription: '' }">
             <template #fields="{ form, errors }">
                 <div>

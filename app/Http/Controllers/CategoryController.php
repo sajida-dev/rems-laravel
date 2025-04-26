@@ -13,16 +13,12 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index()
-    // {
-    //     return Inertia::render('Dashboard/Category/Index');
-    // }
+
 
     public function index(Request $request)
     {
         $query = Category::query();
 
-        // Global search across id, name, description
         if ($request->filled('global')) {
             $search = $request->global;
             $query->where(function ($q) use ($search) {
@@ -70,10 +66,11 @@ class CategoryController extends Controller
             'description' => $request->input('categoryDescription'),
         ]);
 
-        session()->flash('success', 'Category created successfully!');
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', 'Category created successfully!');
     }
+
+
 
 
 
@@ -82,8 +79,9 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        dd($category);
-        return Inertia::render('Dashboard/Category/Edit', []);
+        return Inertia::render('Dashboard/Category/Edit', [
+            'category' => $category,
+        ]);
     }
 
     /**
@@ -91,7 +89,12 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        //
+        $category->update([
+            'name' => $request->input('categoryName'),
+            'description' => $request->input('categoryDescription'),
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully!');
     }
 
     /**
@@ -99,6 +102,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return redirect()->back()->with('success', 'Category deleted successfully!');
     }
 }

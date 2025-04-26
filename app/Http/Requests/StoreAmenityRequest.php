@@ -11,7 +11,7 @@ class StoreAmenityRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,18 @@ class StoreAmenityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'amenityName' => ['required', 'string', 'max:100'],
+            'amenityDescription' => ['required', 'string', 'max:500'],
         ];
+    }
+
+    /**
+     * Custom forbidden response for unauthorized users
+     */
+    public function forbiddenResponse()
+    {
+        return response()->json([
+            'message' => 'You are not authorized to perform this action.'
+        ], 403);
     }
 }

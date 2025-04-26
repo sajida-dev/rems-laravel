@@ -12,60 +12,92 @@
       :filterable="true"
       :perPage="categories.per_page"
       :virtualScroll="false"
+      createRoute="/categories/create"
+      createLabel="Add Category"
+      :hasRowActions="true"
       @update="loadCategories"
     >
-      <!-- Example: custom render for dates -->
-      <template #cell-created_at="{ row }">
-        {{ new Date(row.created_at).toLocaleDateString() }}
-      </template>
-<template #cell-updated_at="{ row }">
-        {{ new Date(row.updated_at).toLocaleDateString() }}
-      </template>
+
+    <template #row-actions="{ row }">
+  <RowActions
+    :row="row"
+    :editRoute="row => route('categories.edit', row.id)"
+    :deleteHandler="deleteCategory"
+  />
+</template>
 </ServerSideDataTable>
+
 </div>
 </div>
 </template>
 <script setup>
 import { router } from '@inertiajs/vue3'
+import RowActions from '@/Components/Dashboard/Common/RowActions.vue'
 import ServerSideDataTable from '@/Components/Dashboard/Common/ServerSideDataTable.vue'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Head } from '@inertiajs/vue3'
 import { provide } from 'vue'
+
 defineOptions({ layout: DashboardLayout })
 
 const header = {
-    title: 'Category',
-    mainPage: 'Pages',
-    page: 'Create',
+  title: 'Category',
+  mainPage: 'Pages',
+  page: 'Create',
 };
 provide('layoutHeader', header)
 const props = defineProps({
-    categories: Object, // Inertia prop from controller
+  categories: Object,
 })
 
 const columns = [
-    { key: 'id', label: 'ID' },
-    { key: 'name', label: 'Name' },
-    { key: 'description', label: 'Description' },
-    { key: 'action', label: 'Action' },
+  { key: 'id', label: 'ID' },
+  { key: 'name', label: 'Name' },
+  { key: 'description', label: 'Description' },
 
 ]
 
-// fired whenever DataTable’s search, sort, page, perPage change
+const deleteCategory = (row) => {
+
+  router.delete(route('categories.destroy', row.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      // loadCategories()
+      loadCategories({
+        filters: { global: '' },
+        sortBy: 'id',
+        sortDesc: false,
+        page: 1,
+        perPage: 10,
+      })
+    }
+  })
+}
+
+// const confirmDelete = () => {
+//   router.delete(route('categories.destroy', selectedRow.value.id), {
+//     preserveScroll: true,
+//     onSuccess: () => {
+//       loadCategories()
+//     }
+//   })
+//   showConfirm.value = false
+// }
+
 const loadCategories = ({ filters, sortBy, sortDesc, page, perPage }) => {
-    router.get(
-        route('dashboard.categories.index'), // your named route
-        {
-            global: filters.global,
-            sortBy,
-            sortDesc,
-            page,
-            perPage,
-        },
-        {
-            preserveState: true,
-            replace: true,
-        }
-    )
+  router.get(
+    route('categories.index'),
+    {
+      global: filters.global,
+      sortBy,
+      sortDesc,
+      page,
+      perPage,
+    },
+    {
+      preserveState: true,
+      replace: true,
+    }
+  )
 }
 </script>

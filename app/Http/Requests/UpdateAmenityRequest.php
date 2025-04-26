@@ -11,7 +11,7 @@ class UpdateAmenityRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,8 @@ class UpdateAmenityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'amenityName' => ['required', 'string', 'max:100'],
+            'amenityDescription' => ['required', 'string', 'max:500'],
         ];
     }
 }

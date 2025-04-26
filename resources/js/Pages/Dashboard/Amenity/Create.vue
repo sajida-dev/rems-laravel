@@ -1,22 +1,22 @@
 <template>
 
-    <Head title="New Category" />
+    <Head title="New Amenity" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
-        <FormLayout title="Add Category" :routeName="'categories.store'"
-            :fields="{ categoryName: '', categoryDescription: '' }">
+        <FormLayout title="Add Amenity" :method="'post'" :routeName="'amenities.store'"
+            :fields="{ amenityName: '', amenityDescription: '' }">
             <template #fields="{ form, errors }">
                 <div>
-                    <InputLabel for="categoryName" value="Category Name" />
-                    <TextInput id="categoryName" v-model="form.categoryName" type="text" class="mt-1 block w-full"
+                    <InputLabel for="amenityName" value="Amenity Name" />
+                    <TextInput id="amenityName" v-model="form.amenityName" type="text" class="mt-1 block w-full"
                         autofocus />
-                    <InputError class="mt-2" :message="errors.categoryName" />
+                    <InputError class="mt-2" :message="errors.amenityName" />
                 </div>
 
                 <div class="mt-4">
-                    <InputLabel for="categoryDescription" value="Category Description" />
-                    <textarea id="categoryDescription" v-model="form.categoryDescription"
+                    <InputLabel for="amenityDescription" value="Amenity Description" />
+                    <textarea id="amenityDescription" v-model="form.amenityDescription"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300"></textarea>
-                    <InputError class="mt-2" :message="errors.categoryDescription" />
+                    <InputError class="mt-2" :message="errors.amenityDescription" />
                 </div>
             </template>
         </FormLayout>
@@ -35,7 +35,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 defineOptions({ layout: DashboardLayout })
 
 const header = {
-    title: 'Category',
+    title: 'Amenity',
     mainPage: 'Pages',
     page: 'Create',
 };

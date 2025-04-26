@@ -3,6 +3,7 @@
         <h5 class="text-2xl text-center my-5 font-bold">
             {{ title }}
         </h5>
+        <input type="hidden" name="_token" :value="csrfToken" />
 
 
         <div class="main-body">
@@ -26,12 +27,21 @@ const props = defineProps({
     title: String,
     fields: Object,
     routeName: String,
+    method: {
+        type: String,
+        default: 'post',
+        validator: (value) => ['post', 'put', 'patch'].includes(value.toLowerCase()),
+    },
+    routeParams: {
+        type: Object,
+        default: () => ({}),
+    },
 })
 
 const form = useForm({ ...props.fields })
 
 const submit = () => {
-    form.post(route(props.routeName), {
+    form[props.method](route(props.routeName, props.routeParams), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
     })

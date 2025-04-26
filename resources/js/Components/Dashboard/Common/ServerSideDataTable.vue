@@ -4,20 +4,21 @@
         <div class="flex items-center justify-between p-4 bg-gray-100">
             <input v-model="filters.global" @input="debouncedSearch" type="text" placeholder="Search..."
                 class="px-3 py-2 border rounded w-1/3" />
-            <slot name="actions">
-                <div>
-                    <button @click="exportCSV" class="px-3 py-1 bg-pink-600 text-white rounded">
-                        Export CSV
-                    </button>
-                    <Link href="/categories/create" class="px-3 py-1 bg-pink-600 text-white rounded">
-                    Add new categories
-                    </Link>
-                </div>
-
-            </slot>
+            <div>
+                <Link v-if="createRoute && createLabel" :href="createRoute"
+                    class="mx-3 px-3 py-2 bg-pink-500 text-white rounded">
+                {{ createLabel }}
+                </Link>
+                <button @click="exportCSV" class="px-3 py-1 bg-black text-white rounded">
+                    Export CSV
+                </button>
+                <button @click="exportPDF" class=" mx-3 px-3 py-1 bg-yellow-600 text-white rounded">
+                    Export PDF
+                </button>
+            </div>
         </div>
 
-        <!-- Horizontal scroll container -->
+        <!-- Horizontal scroll -->
         <div class="overflow-x-auto">
             <table class="min-w-full table-auto text-sm">
                 <thead class="bg-gray-50">
@@ -32,6 +33,7 @@
                                 {{ sortDesc ? '🔽' : '🔼' }}
                             </span>
                         </th>
+                        <th v-if="hasRowActions" class="px-3 py-2 text-left">Actions</th>
                         <th v-if="expandable" class="w-10 px-3 py-2"></th>
                     </tr>
                     <tr v-if="filterable">
@@ -40,56 +42,50 @@
                             <input v-model="filters.columns[column.key]" @input="debouncedSearch" type="text"
                                 class="px-2 py-1 border rounded w-full" placeholder="Filter..." />
                         </th>
-                        <th v-if="expandable"></th>
+                        <th v-if="expandable || hasRowActions"></th>
                     </tr>
                 </thead>
 
-                <!-- Virtualized rows -->
-                <virtual-list :data-key="'id'" :data-sources="filteredData" :size="rowHeight" tag="tbody"
-                    class="virtual-list bg-white">
-                    <template #default="{ item: row, index }">
-                        <tr class="hover:bg-gray-50 transition">
-                            <td v-if="selectable" class="sticky left-0 bg-white w-12 px-3 py-2 z-10">
-                                <input type="checkbox" v-model="selectedRows" :value="row.id" />
-                            </td>
+                <tbody class="bg-white">
+                    <tr v-for="(row, index) in paginatedData" :key="row.id" class="hover:bg-gray-50 transition">
+                        <td v-if="selectable" class="sticky left-0 bg-white w-12 px-3 py-2 z-10">
+                            <input type="checkbox" v-model="selectedRows" :value="row.id" />
+                        </td>
+                        <td v-for="column in columns" :key="column.key" class="px-3 py-2 whitespace-nowrap">
+                            <template v-if="$slots['cell-' + column.key]">
+                                <slot :name="'cell-' + column.key" :row="row" />
+                            </template>
+                            <template v-else>
+                                {{ row[column.key] }}
+                            </template>
+                        </td>
+                        <td v-if="hasRowActions" class="px-3 py-2 whitespace-nowrap">
+                            <slot name="row-actions" :row="row" />
+                        </td>
+                        <td v-if="expandable" class="text-center px-3 py-2">
+                            <button @click="toggleExpand(row.id)">
+                                {{ expandedRows.includes(row.id) ? '−' : '+' }}
+                            </button>
+                        </td>
+                    </tr>
 
-                            <td v-for="column in columns" :key="column.key" class="px-3 py-2 whitespace-nowrap">
-                                <template v-if="$slots['cell-' + column.key]">
-                                    <slot :name="'cell-' + column.key" :row="row" />
-                                </template>
-                                <template v-else>
-                                    {{ row[column.key] }}
-                                </template>
-                            </td>
-
-                            <td v-if="expandable" class="text-center px-3 py-2">
-                                <button @click="toggleExpand(row.id)">
-                                    {{ expandedRows.includes(row.id) ? '−' : '+' }}
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="expandable && expandedRows.includes(row.id)" class="bg-gray-50">
-                            <td :colspan="columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0)" class="p-3">
-                                <slot name="expand" :row="row" />
-                            </td>
-                        </tr>
-                    </template>
-                </virtual-list>
+                    <tr v-if="expandable && expandedRows.includes(row.id)" class="bg-gray-50">
+                        <td :colspan="columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0)" class="p-3">
+                            <slot name="expand" :row="row" />
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
-        <!-- Pagination (if not using virtual scroll for full dataset) -->
-        <div v-if="!virtualScroll" class="flex justify-between items-center p-4 border-t bg-gray-50">
+        <!-- Pagination -->
+        <div class="flex justify-between items-center p-4 border-t bg-gray-50">
             <div>
                 Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredData.length }}
             </div>
             <div class="flex items-center gap-2">
-                <button @click="prevPage" :disabled="page === 1" class="px-3 py-1 border rounded">
-                    Previous
-                </button>
-                <button @click="nextPage" :disabled="page === totalPages" class="px-3 py-1 border rounded">
-                    Next
-                </button>
+                <button @click="prevPage" :disabled="page === 1" class="px-3 py-1 border rounded">Previous</button>
+                <button @click="nextPage" :disabled="page === totalPages" class="px-3 py-1 border rounded">Next</button>
             </div>
         </div>
     </div>
@@ -98,8 +94,11 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import debounce from 'lodash.debounce'
-import VirtualList from 'vue3-virtual-scroll-list'
 import { Link } from '@inertiajs/vue3'
+
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+
 
 const props = defineProps({
     columns: { type: Array, required: true },
@@ -108,8 +107,11 @@ const props = defineProps({
     expandable: { type: Boolean, default: false },
     filterable: { type: Boolean, default: false },
     perPage: { type: Number, default: 10 },
-    virtualScroll: { type: Boolean, default: true },
-    rowHeight: { type: Number, default: 48 }
+    virtualScroll: { type: Boolean, default: false },
+    rowHeight: { type: Number, default: 48 },
+    createRoute: { type: String, default: '' },
+    createLabel: { type: String, default: '' },
+    hasRowActions: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update'])
@@ -176,11 +178,17 @@ const sort = key => {
     if (sortBy.value === key) sortDesc.value = !sortDesc.value
     else { sortBy.value = key; sortDesc.value = false }
 }
-const prevPage = () => page.value--
-const nextPage = () => page.value++
+const prevPage = () => { if (page.value > 1) page.value-- }
+const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 watch([filters, sortBy, sortDesc, page], () => {
-    emit('update', { filters: filters.value, sortBy: sortBy.value, sortDesc: sortDesc.value, page: page.value, perPage: props.perPage })
+    emit('update', {
+        filters: filters.value,
+        sortBy: sortBy.value,
+        sortDesc: sortDesc.value,
+        page: page.value,
+        perPage: props.perPage
+    })
 })
 
 const exportCSV = () => {
@@ -189,12 +197,32 @@ const exportCSV = () => {
     csvRows.push(headers.join(','))
     props.rows.forEach(row => {
         const values = props.columns.map(col => `"${row[col.key] ?? ''}"`)
-        csvRows.push(values.join('\n'))
+        csvRows.push(values.join(','))
     })
     const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.download = 'export.csv'
     link.click()
+}
+
+const exportPDF = () => {
+    const doc = new jsPDF()
+
+    const headers = props.columns.map(col => col.label)
+    const data = props.rows.map(row =>
+        props.columns.map(col => row[col.key] ?? '')
+    )
+
+    autoTable(doc, {
+        head: [headers],
+        body: data,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255] },
+        startY: 20,
+        margin: { top: 10 },
+    })
+
+    doc.save('export.pdf')
 }
 </script>
