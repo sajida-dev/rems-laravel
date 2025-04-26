@@ -19,7 +19,14 @@ class Payment extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'description',
+        'transaction_id',
+        'amount',
+        'payment_method',
+        'stripe_payment_id',
+        'status',
     ];
+    public function transaction()
+    {
+        return $this->belongsToMany(Transaction::class);
+    }
 }

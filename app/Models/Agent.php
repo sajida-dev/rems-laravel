@@ -20,4 +20,13 @@ class Agent extends Model
         'bio',
         'status',
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function conversation()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }

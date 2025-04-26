@@ -19,7 +19,23 @@ class HiringRequest extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'user_id',
+        'agent_id',
+        'request_type',
+        'category_id',
+        'location',
+        'min_budget',
+        'max_budget',
+        'bedrooms',
+        'requirements',
         'description',
     ];
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+    public function agents()
+    {
+        return $this->belongsToMany(Agent::class);
+    }
 }

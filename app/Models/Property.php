@@ -19,7 +19,39 @@ class Property extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'category_id',
+        'agent_id',
+        'title',
         'description',
+        'location',
+        'rent_price',
+        'purchase_price',
+        'old_rent_price',
+        'old_purchase_price',
+        'bedrooms',
+        'bathrooms',
+        'lot_area',
+        'floor_area',
+        'is_water',
+        'is_new_roofing',
+        'garage',
+        'is_luggage',
+        'image_url',
     ];
+    public function conversation()
+    {
+        return $this->hasOne(Conversation::class);
+    }
+    public function category()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class);
+    }
+    public function upload()
+    {
+        return $this->hasMany(Upload::class);
+    }
 }

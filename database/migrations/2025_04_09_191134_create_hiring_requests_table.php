@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('agent_id');
-            $table->enum('transaction_type', ['rent', 'buy', 'sell']);
-            $table->unsignedBigInteger('property_category');
+            $table->enum('request_type', ['rent', 'buy', 'sell']);
+            $table->unsignedBigInteger('category_id');
             $table->string('location');
             $table->decimal('min_budget', 10, 2)->nullable();
             $table->decimal('max_budget', 10, 2)->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->softDeletes();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('agent_id')->references('id')->on('agents')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('property_category')->references('id')->on('categories')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

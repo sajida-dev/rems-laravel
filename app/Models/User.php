@@ -72,4 +72,12 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+    public function agent()
+    {
+        return $this->hasOne(Agent::class);
+    }
+    public function conversation()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }

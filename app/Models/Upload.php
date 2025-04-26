@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EndUser extends Model
+class Upload extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -19,7 +19,12 @@ class EndUser extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'description',
+        'property_id',
+        'image_path',
+        'alt_text',
     ];
+    public function property()
+    {
+        return $this->belongsToMany(Property::class);
+    }
 }

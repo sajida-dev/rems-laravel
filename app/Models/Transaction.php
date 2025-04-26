@@ -19,7 +19,21 @@ class Transaction extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'description',
+        'user_id',
+        'property_id',
+        'transaction_type',
+        'status',
     ];
+    public function payment()
+    {
+        return $this->hasMany(Payment::class);
+    }
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+    public function property()
+    {
+        return $this->belongsToMany(Property::class);
+    }
 }

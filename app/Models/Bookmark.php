@@ -13,7 +13,7 @@ class Bookmark extends Model
 
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'name',
-        'description',
+        'user_id',
+        'property_id',
     ];
 }

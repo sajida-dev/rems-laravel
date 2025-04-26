@@ -19,7 +19,17 @@ class Message extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'description',
+        'conversation_id',
+        'sender_id',
+        'message',
+        'is_read',
     ];
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+    public function conversation()
+    {
+        return $this->belongsToMany(Conversation::class);
+    }
 }
