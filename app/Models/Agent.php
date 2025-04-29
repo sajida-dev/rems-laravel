@@ -29,4 +29,8 @@ class Agent extends Model
     {
         return $this->hasMany(Conversation::class);
     }
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
 }

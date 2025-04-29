@@ -31,6 +31,7 @@
                         <InputError class="mt-2" :message="errors.password" />
                     </div>
                 </div>
+
                 <div
                     class="w-full md:w-1/3 mt-6 md:mt-0 flex flex-col items-center justify-center border-l border-gray-200 pl-6">
                     <div class="relative">

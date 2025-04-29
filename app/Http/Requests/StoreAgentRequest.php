@@ -11,7 +11,7 @@ class StoreAgentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class StoreAgentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'licence_no' => 'nullable|numeric|unique:agents,licence_no',
+            'agency' => 'required|string|max:255',
+            'contact' => 'nullable|string|max:20',
+            'experience' => 'required|integer|min:0',
+            'bio' => 'nullable|string',
+            'status' => 'nullable|boolean',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
         ];
     }
 }

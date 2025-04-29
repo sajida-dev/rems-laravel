@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="submit" enctype="multipart/form-data">
+    <form @submit.prevent="submit">
         <h5 class="text-2xl text-center my-5 font-bold">
             {{ title }}
         </h5>

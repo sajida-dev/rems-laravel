@@ -10,7 +10,6 @@
       :selectable="false"
       :expandable="false"
       :filterable="true"
-      :perPage="agents.per_page"
       :virtualScroll="false"
       createRoute="/agents/create"
       createLabel="Add Agents"
@@ -27,6 +26,7 @@
     <template #row-actions="{ row }">
   <RowActions
     :row="row"
+    :viewRoute="row => route('agents.show', row.id)"
     :editRoute="row => route('agents.edit', row.id)"
     :deleteHandler="deleteData"
   />
@@ -91,7 +91,7 @@ const tableState = reactive({
     perPage: 10,
 })
 
-
+// console.log('agents.data', agents.data)
 
 const loadData = (options = {}) => {
     router.get(route('agents.index'), {
