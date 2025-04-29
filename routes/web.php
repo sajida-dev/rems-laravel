@@ -44,6 +44,7 @@ Route::get('/agents/pending-count', function () {
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
+
     Route::resource('categories', CategoryController::class);
     Route::resource('properties', PropertyController::class);
     Route::resource('agents', AgentController::class);
@@ -52,8 +53,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/bookmarks', [PropertyController::class, 'updateBookMark'])->name('property-bookmark-update');
     Route::delete('/bookmarks/{id}', [PropertyController::class, 'deleteBookMark'])->name('property-bookmark-delete');
 });
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

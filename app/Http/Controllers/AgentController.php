@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Agent;
 use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\UpdateAgentRequest;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AgentController extends Controller
@@ -12,9 +14,38 @@ class AgentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render("Dashboard/Agent/Index");
+        $query = User::query();
+        $query->where('role', 'agent');
+        if ($request->filled('global')) {
+            $search = $request->global;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', $search)
+                    ->orwhere('name', 'LIKE', "%{$search}%")
+                    ->orwhere('email', 'LIKE', "%{$search}%")
+                    ->orwhere('contact', 'LIKE', "%{$search}%")
+                    ->orwhere('role', 'LIKE', "%{$search}%")
+                ;
+            });
+        }
+
+
+        if ($request->filled('sortBy')) {
+            $direction = $request->sortBy === 'true' ? "desc" : "asc";
+            $query->orderBy($query->sortBy, $direction);
+        } else {
+            $query->latest('created_at');
+        }
+
+        $perPage = $request->perPage ?? 10;
+        $page = $request->page ?? 1;
+        $agents = $query->paginate($perPage, ['*'], 'page', $page)
+            ->appends($request->all());
+        return Inertia::render(
+            "Dashboard/Agent/Index",
+            ['agents' => $agents]
+        );
     }
 
     /**

@@ -58,15 +58,15 @@ class EndUserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request->all(), $request->file('avatar'));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $endUser)
     {
-        return Inertia::render('Dashboard/End-User/Show');
+        return Inertia::render('Dashboard/End-User/Show', ['endUser' => $endUser]);
     }
 
     /**

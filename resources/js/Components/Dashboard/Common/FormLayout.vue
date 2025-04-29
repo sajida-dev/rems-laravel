@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="submit">
+    <form @submit.prevent="submit" enctype="multipart/form-data">
         <h5 class="text-2xl text-center my-5 font-bold">
             {{ title }}
         </h5>
@@ -43,13 +43,15 @@ const props = defineProps({
 })
 
 const form = useForm({ ...props.fields })
+const hasFile = Object.values(form.data()).some(value => value instanceof File)
 
 const submit = () => {
     form[props.method](route(props.routeName, props.routeParams), {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: (response) => {
             form.reset()
-            toast.success(response.props.flash.success)
+            toast.success(response.props.flash.success || 'Submitted successfully')
         },
         onError: (errors) => {
             toast.error(response.props.flash.success + errors)

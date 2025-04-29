@@ -15,13 +15,37 @@ class PropertyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $properties = Property::all();
+        $query = Property::query();
+        if ($request->filled('global')) {
+            $search = $request->global;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', $search)
+                    ->orwhere('name', 'LIKE', "%{$search}%")
+                    ->orwhere('email', 'LIKE', "%{$search}%")
+                    ->orwhere('contact', 'LIKE', "%{$search}%")
+                    ->orwhere('role', 'LIKE', "%{$search}%")
+                ;
+            });
+        }
 
-        return Inertia::render('Properties/Index', [
-            'properties' => $properties
-        ]);
+
+        if ($request->filled('sortBy')) {
+            $direction = $request->sortBy === 'true' ? "desc" : "asc";
+            $query->orderBy($query->sortBy, $direction);
+        } else {
+            $query->latest('created_at');
+        }
+
+        $perPage = $request->perPage ?? 10;
+        $page = $request->page ?? 1;
+        $property = $query->paginate($perPage, ['*'], 'page', $page)
+            ->appends($request->all());
+        return Inertia::render(
+            "Dashboard/Propery/Index",
+            ['property' => $property]
+        );
     }
 
     /**
