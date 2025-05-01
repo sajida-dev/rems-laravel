@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('role', ['admin', 'user', 'agent'])->default('user');
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->default('/backend/assets/img/avatar.png');
-            $table->integer('contact')->nullable();
+            $table->string('contact')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

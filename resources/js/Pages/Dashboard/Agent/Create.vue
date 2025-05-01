@@ -11,7 +11,8 @@
                         <img :src="avatarPreview || 'https://ui-avatars.com/api/?name=Agent&size=256'" alt="Avatar"
                             class="w-64 h-64 rounded-full shadow-md mb-4 cursor-pointer object-cover"
                             @click="triggerFileInput" />
-                        <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" accept="image/*" />
+                        <input type="file" ref="fileInput" class="hidden" @input="form.avatar = $event.target.files[0]"
+                            @change="handleFileChange" accept="image/*" />
                     </div>
                     <InputError class="text-center" :message="errors.avatar" />
                 </div>

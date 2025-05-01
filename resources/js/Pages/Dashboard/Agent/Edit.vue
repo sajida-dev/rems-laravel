@@ -1,8 +1,8 @@
 <template>
 
-    <Head title="New Agent" />
+    <Head :title="agent.name" />
 
-    <FormLayout title="New Agent" :method="'post'" :routeName="'agents.update'" :route-params="agent = agent.id"
+    <FormLayout :title="agent.name" :method="'post'" :routeName="'agents.update'" :route-params="agent = agent.id"
         :fields="form" class="bg-white p-5">
         <template #fields="{ form, errors }">
             <div class="grid md:grid-cols-3 gap-6 w-[95%] mx-auto">
@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <SpecializationSelect :categories="categories" v-model="form.categories" />
+                        <SpecializationSelect :categories="props.allCategories" v-model="form.categories" />
                         <InputError class="mt-2" :message="errors.categories" />
                     </div>
                 </div>
@@ -87,24 +87,24 @@ import SpecializationSelect from '@/Components/Dashboard/Common/SpecializationSe
 
 defineOptions({ layout: DashboardLayout })
 
-defineProps({
-    categories: Array
+const props = defineProps({
+    agent: Array,
+    allCategories: Array
 })
 const form = reactive({
-    name: '',
-    email: '',
-    licence_no: '',
-    agency: '',
-    contact: '',
-    experience: '',
-    bio: '',
-    status: false,
-    categories: [],
-    avatar: null
+    name: props.agent.name,
+    email: props.agent.email,
+    licence_no: props.agent.agent?.licence_no ?? '',
+    agency: props.agent.agent?.agency ?? '',
+    contact: props.agent.contact,
+    experience: props.agent.agent?.experience ?? '',
+    bio: props.agent.agent?.bio ?? '',
+    status: props.agent.agent?.status ?? false,
+    categories: props.agent.agent?.categories?.map(c => c.id) ?? [],
+    avatar: null,
 })
-
-
-const avatarPreview = ref(null)
+console.log('props.agent', props.agent)
+const avatarPreview = ref(props.agent.profile_photo_path)
 const fileInput = ref(null)
 
 const triggerFileInput = () => fileInput.value.click()

@@ -50,6 +50,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::resource('agents', AgentController::class);
     Route::resource('amenities', AmenityController::class);
     Route::resource('end-users', EndUserController::class);
+    Route::post('/end-users/{end_user}', [EndUserController::class, 'update'])->name('end-users.update');
+    Route::post('/agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
+    Route::post('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
 });
 
 Route::middleware('auth')->group(function () {

@@ -2,16 +2,26 @@
 
     <Head title="New End User" />
     <FormLayout title="New End User" :method="'post'" :routeName="'end-users.store'"
-        :fields="{ name: '', username: '', email: '', password: '', avatar: '' }" class="bg-white p-5">
+        :fields="{ name: '', username: '', email: '', contact: '', password: '', password_confirmation: '', avatar: null }"
+        class="bg-white p-5">
         <template #fields="{ form, errors }">
             <div class="bg-white rounded w-[95%] mx-auto flex flex-col md:flex-row justify-between">
                 <div class="w-full md:w-2/3 pr-4">
-                    <div>
-                        <InputLabel for="name" value="Full Name" />
-                        <TextInput id="name" v-model="form.name" type="text" class="mt-1 text-sm block w-full"
-                            autofocus />
-                        <InputError class="mt-2" :message="errors.name" />
+                    <div class="flex flex-row gap-5">
+                        <div class="w-1/2">
+                            <InputLabel for="name" value="Full Name" />
+                            <TextInput id="name" v-model="form.name" type="text" class="mt-1 text-sm block w-full"
+                                autofocus />
+                            <InputError class="mt-2" :message="errors.name" />
+                        </div>
+                        <div class="w-1/2">
+                            <InputLabel for="contact" value="contact" />
+                            <TextInput id="contact" v-model="form.contact" type="text" placeholder="+92 (300) 1234567"
+                                class="mt-1 text-sm block w-full" />
+                            <InputError class="mt-2" :message="errors.contact" />
+                        </div>
                     </div>
+
 
                     <div class="mt-4">
                         <InputLabel for="username" value="Username" />
@@ -24,12 +34,22 @@
                         <TextInput id="email" v-model="form.email" type="email" class="mt-1 text-sm block w-full" />
                         <InputError class="mt-2" :message="errors.email" />
                     </div>
-                    <div class="mt-4">
-                        <InputLabel for="password" value="Password" />
-                        <TextInput id="password" v-model="form.password" type="password"
-                            class="mt-1 text-sm block w-full" />
-                        <InputError class="mt-2" :message="errors.password" />
+
+                    <div class="flex flex-row gap-5 mt-4">
+                        <div class="w-1/2">
+                            <InputLabel for="password" value="Password" />
+                            <TextInput id="password" v-model="form.password" type="password"
+                                class="mt-1 text-sm block w-full" />
+                            <InputError class="mt-2" :message="errors.password" />
+                        </div>
+                        <div class="w-1/2">
+                            <InputLabel for="password_confirmation" value="Confirm Password" />
+                            <TextInput id="password_confirmation" v-model="form.password_confirmation" type="password"
+                                class="mt-1 text-sm block w-full" />
+                            <InputError class="mt-2" :message="errors.password_confirmation" />
+                        </div>
                     </div>
+
                 </div>
 
                 <div
@@ -37,7 +57,9 @@
                     <div class="relative">
                         <img :src="avatarPreview || 'https://ui-avatars.com/api/?name=User&size=100'" alt="Avatar"
                             class="w-64 h-64 rounded-full shadow-md mb-4 cursor-pointer" @click="triggerFileInput" />
-                        <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" accept="image/*" />
+                        <input type="file" ref="fileInput" class="hidden" @input="form.avatar = $event.target.files[0]"
+                            @change="handleFileChange" accept="image/*" />
+                        <InputError class="mt-2" :message="errors.avatar" />
                     </div>
                 </div>
 
@@ -67,7 +89,6 @@ const triggerFileInput = () => {
 const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-        form.avatar = file;
         avatarPreview.value = URL.createObjectURL(file);
     }
 };
@@ -77,7 +98,9 @@ const form = reactive({
     username: '',
     email: '',
     password: '',
-    avatar: ''
+    contact: '',
+    password_confirmation: '',
+    avatar: null
 });
 
 

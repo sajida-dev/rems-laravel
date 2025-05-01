@@ -1,5 +1,7 @@
+<!-- FormLayout.vue -->
+
 <template>
-    <form @submit.prevent="submit">
+    <form @submit.prevent="submit" :enctype="enctype">
         <h5 class="text-2xl text-center my-5 font-bold">
             {{ title }}
         </h5>
@@ -31,6 +33,10 @@ const props = defineProps({
     title: String,
     fields: Object,
     routeName: String,
+    enctype: {
+        type: String,
+        default: 'application/x-www-form-urlencoded', // default if not set
+    },
     method: {
         type: String,
         default: 'post',
@@ -57,5 +63,13 @@ const submit = () => {
             toast.error(response.props.flash.success + errors)
         },
     })
+}
+
+
+
+function handleFileChange(event) {
+    const file = event.target.files[0];
+    form.avatar = file;
+    avatarPreview.value = URL.createObjectURL(file);
 }
 </script>

@@ -1,12 +1,12 @@
 <template lang="">
     <Head title="All Agents" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
-   <div class="">
+   <div>
     <h2 class="text-2xl font-semibold mb-4">Agents</h2>
 
     <ServerSideDataTable
       :columns="columns"
-      :rows="agents.data"
+      :rows="formattedAgents"
       :selectable="false"
       :expandable="false"
       :filterable="true"
@@ -44,7 +44,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Head } from '@inertiajs/vue3'
 import { provide } from 'vue'
 import { toast } from 'vue3-toastify'
-import { reactive } from 'vue'
+import { reactive, computed } from 'vue'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -56,7 +56,22 @@ const header = {
 provide('layoutHeader', header)
 const props = defineProps({
     agents: Object,
+    jetstream: Object,
+    auth: Object,
+    errorBags: Object,
+    errors: Object,
+    flash: Object
 })
+
+const formattedAgents = computed(() =>
+    props.agents.data.map(user => ({
+        ...user,
+        agency: user.agent?.agency ?? '-',
+        licence: user.agent?.licence_no ?? '-',
+        experience: user.agent?.experience ?? '-',
+        status: user.agent?.status === 1 ? 'Approved' : 'Pending',
+    }))
+)
 
 const columns = [
     { key: 'id', label: 'ID' },

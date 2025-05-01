@@ -32,7 +32,10 @@ import { ref, computed, watch } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps({
-    categories: Array,
+    categories: {
+        Array,
+        default: () => []
+    },
     modelValue: {
         type: Array,
         default: () => []

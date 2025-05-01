@@ -149,15 +149,41 @@ class AgentController extends Controller
      */
     public function show(User $agent)
     {
-        return Inertia::render("Dashboard/Agent/Create", ['agent' => $agent]);
+        $categories = Category::all(['id', 'name'])->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+            ];
+        });
+        $agent->load('agent.categories');
+        return Inertia::render(
+            "Dashboard/Agent/Create",
+            [
+                'agent' => $agent,
+                'categories' => $categories
+            ]
+        );
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Agent $agent)
+    public function edit(User $agent)
     {
-        return Inertia::render("Dashboard/Agent/Edit", ['agent' => $agent]);
+        $categories = Category::all(['id', 'name'])->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+            ];
+        });
+        $agent->load('agent.categories');
+        return Inertia::render(
+            "Dashboard/Agent/Edit",
+            [
+                'agent' => $agent,
+                'categories' => $categories
+            ]
+        );
     }
 
     /**
