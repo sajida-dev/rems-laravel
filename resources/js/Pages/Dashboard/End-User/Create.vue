@@ -1,7 +1,7 @@
 <template>
 
     <Head title="New End User" />
-    <FormLayout title="New End User" :method="'post'" :routeName="'end-users.store'"
+    <FormLayout title="New End User" :method="'post'" :enctype="'multipart/form-data'" :routeName="'end-users.store'"
         :fields="{ name: '', username: '', email: '', contact: '', password: '', password_confirmation: '', avatar: null }"
         class="bg-white p-5">
         <template #fields="{ form, errors }">

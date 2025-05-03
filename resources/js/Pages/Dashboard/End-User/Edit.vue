@@ -3,9 +3,15 @@
     <Head :title="endUser.name" />
 
     <FormLayout :title="endUser.name" :method="'post'" :routeName="'end-users.update'"
-        :routeParams="{ end_user: endUser.id }"
-        :fields="{ name: endUser.name, username: endUser.username, email: endUser.email, contact: endUser.contact, password: '', password_confirmation: '', avatar: endUser.profile_photo_path }"
-        class="bg-white p-5">
+        :submitLabel="'Update ' + endUser.name" :routeParams="{ end_user: endUser.id }" class="bg-white p-5" :fields="{
+            name: endUser.name,
+            username: endUser.username,
+            email: endUser.email,
+            contact: endUser.contact,
+            password: '',
+            password_confirmation: '',
+            avatar: endUser.profile_photo_path
+        }">
         <template #fields="{ form, errors }">
             <div class="bg-white rounded w-[95%] mx-auto flex flex-col md:flex-row justify-between">
                 <div class="w-full md:w-2/3 pr-4">

@@ -43,16 +43,19 @@ Route::get('/agents/pending-count', function () {
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-
-
-    Route::resource('categories', CategoryController::class);
-    Route::resource('properties', PropertyController::class);
-    Route::resource('agents', AgentController::class);
-    Route::resource('amenities', AmenityController::class);
-    Route::resource('end-users', EndUserController::class);
-    Route::post('/end-users/{end_user}', [EndUserController::class, 'update'])->name('end-users.update');
-    Route::post('/agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
+    Route::resource('categories', CategoryController::class)->except(['update']);
+    Route::resource('properties', PropertyController::class)->except(['update']);
+    Route::resource('agents', AgentController::class)->except(['update']);
+    Route::resource('amenities', AmenityController::class)->except(['update']);
+    Route::resource('end-users', EndUserController::class)->except(['update']);
     Route::post('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+    Route::post('/end-users/{end_user}', [EndUserController::class, 'update'])->name('end-users.update');
+});
+
+Route::post('/agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
+
+Route::get('/debug-auth', function () {
+    return auth()->user();
 });
 
 Route::middleware('auth')->group(function () {

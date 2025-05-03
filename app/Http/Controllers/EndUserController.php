@@ -33,7 +33,7 @@ class EndUserController extends Controller
 
         if ($request->filled('sortBy')) {
             $direction = $request->sortBy === 'true' ? "desc" : "asc";
-            $query->orderBy($query->sortBy, $direction);
+            $query->orderBy($request->sortBy, $direction);
         } else {
             $query->latest('created_at');
         }
@@ -112,7 +112,7 @@ class EndUserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'contact' => 'required|string|min:10|max:20',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'avatar' => 'nullable',
             'email' => [
                 'required',
                 'string',
@@ -150,8 +150,9 @@ class EndUserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $end_user)
     {
-        //
+        $end_user->delete();
+        return redirect()->route("end-users.index")->with("success", "End User deleted successfully.");
     }
 }

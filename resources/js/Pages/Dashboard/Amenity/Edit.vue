@@ -1,9 +1,9 @@
 <template>
 
-    <Head title="Edit Amenity" />
+    <Head :title="amenity.name" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
-        <FormLayout title="Update Amenity" :method="'put'" :routeName="'amenities.update'"
-            :routeParams="{ amenity: amenity.id }"
+        <FormLayout :title="amenity.name" :method="'put'" :routeName="'amenities.update'"
+            :routeParams="{ amenity: amenity.id }" :submitLabel="'Update ' + amenity.name"
             :fields="{ amenityName: amenity.name, amenityDescription: amenity.description }">
             <template #fields="{ form, errors }">
                 <div>

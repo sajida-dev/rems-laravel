@@ -1,9 +1,9 @@
 <template>
 
-    <Head title="Edit Category" />
+    <Head :title="category.name" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
-        <FormLayout title="Update Category" :method="'put'" :routeName="'categories.update'"
-            :route-params="{ category: category.id }"
+        <FormLayout :title="category.name" :method="'put'" :routeName="'categories.update'"
+            :routeParams="{ category: category.id }" :submitLabel="'Update ' + category.name"
             :fields="{ categoryName: category.name, categoryDescription: category.description }">
             <template #fields="{ form, errors }">
                 <div>
@@ -12,7 +12,6 @@
                         autofocus />
                     <InputError class="mt-2" :message="errors.categoryName" />
                 </div>
-                <input type="hidden" name="_method" value="put" />
 
                 <div class="mt-4">
                     <InputLabel for="categoryDescription" value="Category Description" />

@@ -1,9 +1,8 @@
 <template>
 
     <Head :title="agent.name" />
-
-    <FormLayout :title="agent.name" :method="'post'" :routeName="'agents.update'" :route-params="agent = agent.id"
-        :fields="form" class="bg-white p-5">
+    <FormLayout :title="agent.name" :method="'post'" :submitLabel="'update ' + agent.name" class="bg-white p-5"
+        :routeName="'agents.update'" :routeParams="{ agent: agent.id }" :fields="form">
         <template #fields="{ form, errors }">
             <div class="grid md:grid-cols-3 gap-6 w-[95%] mx-auto">
                 <!-- Avatar -->
@@ -46,7 +45,7 @@
 
                     <div>
                         <InputLabel for="experience" value="Experience (Years)" />
-                        <TextInput id="experience" v-model="form.experience" type="number"
+                        <TextInput id="experience" v-model="form.experience" type="text"
                             class="mt-1 text-sm block w-full" min="0" />
                         <InputError class="mt-2" :message="errors.experience" />
                     </div>
@@ -66,7 +65,7 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <SpecializationSelect :categories="props.allCategories" v-model="form.categories" />
+                        <SpecializationSelect :categories="props.categories" v-model="form.categories" />
                         <InputError class="mt-2" :message="errors.categories" />
                     </div>
                 </div>
@@ -88,9 +87,18 @@ import SpecializationSelect from '@/Components/Dashboard/Common/SpecializationSe
 defineOptions({ layout: DashboardLayout })
 
 const props = defineProps({
-    agent: Array,
-    allCategories: Array
+    agent: {
+        type: Object,
+        required: true
+    },
+    categories: {
+        type: Object,
+        required: true
+    },
 })
+
+console.log(window.route('agents.update', { agent: props.agent.id }))
+
 const form = reactive({
     name: props.agent.name,
     email: props.agent.email,
@@ -103,7 +111,6 @@ const form = reactive({
     categories: props.agent.agent?.categories?.map(c => c.id) ?? [],
     avatar: null,
 })
-console.log('props.agent', props.agent)
 const avatarPreview = ref(props.agent.profile_photo_path)
 const fileInput = ref(null)
 
@@ -120,7 +127,7 @@ const handleFileChange = (e) => {
 const header = {
     title: 'Agent Management',
     mainPage: 'Dashboard',
-    page: 'New Agent'
+    page: 'Edit Agent'
 }
 provide('layoutHeader', header)
 </script>

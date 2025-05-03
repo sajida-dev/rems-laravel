@@ -15,46 +15,13 @@ class AgentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index(Request $request)
-    // {
-    //     $query = User::query();
-    //     $query->where('role', 'agent');
-    //     if ($request->filled('global')) {
-    //         $search = $request->global;
-    //         $query->where(function ($q) use ($search) {
-    //             $q->where('id', $search)
-    //                 ->orwhere('name', 'LIKE', "%{$search}%")
-    //                 ->orwhere('email', 'LIKE', "%{$search}%")
-    //                 ->orwhere('contact', 'LIKE', "%{$search}%")
-    //                 ->orwhere('role', 'LIKE', "%{$search}%")
-    //             ;
-    //         });
-    //     }
 
-
-    //     if ($request->filled('sortBy')) {
-    //         $direction = $request->sortBy === 'true' ? "desc" : "asc";
-    //         $query->orderBy($query->sortBy, $direction);
-    //     } else {
-    //         $query->latest('created_at');
-    //     }
-
-    //     $perPage = $request->perPage ?? 10;
-    //     $page = $request->page ?? 1;
-    //     $agents = $query->paginate($perPage, ['*'], 'page', $page)
-    //         ->appends($request->all());
-    //     return Inertia::render(
-    //         "Dashboard/Agent/Index",
-    //         ['agents' => $agents]
-    //     );
-    // }
     public function index(Request $request)
     {
         $query = User::with(['agent'])
             ->where('role', 'agent');
 
 
-        // Global search on users and agents table
         if ($request->filled('global')) {
             $search = $request->global;
 
@@ -73,7 +40,6 @@ class AgentController extends Controller
             });
         }
 
-        // Sorting
         if ($request->filled('sortBy')) {
             $direction = $request->sortBy === 'true' ? 'desc' : 'asc';
             $sortField = $request->get('sortField', 'created_at');
@@ -82,7 +48,6 @@ class AgentController extends Controller
             $query->latest('created_at');
         }
 
-        // Pagination
         $perPage = $request->perPage ?? 10;
         $page = $request->page ?? 1;
 
@@ -115,7 +80,7 @@ class AgentController extends Controller
     {
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $avatarPath = '/storage' . '/' . $request->file('avatar')->store('avatars', 'public');
         }
 
         $user = User::create([
@@ -191,7 +156,29 @@ class AgentController extends Controller
      */
     public function update(UpdateAgentRequest $request, Agent $agent)
     {
-        $agent->update([]);
+        dd($request);
+        $validated = $request->validated();
+        $agent->user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+        $agent->update([
+            'agency' => $validated['agency'],
+            'licence_no' => $validated['licence_no'],
+            'contact' => $validated['contact'],
+            'experience' => $validated['experience'],
+            'bio' => $validated['bio'],
+            'status' => $validated['status'] ?? false,
+        ]);
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+
+            $agent->user->update([
+                'profile_photo_path' => $path,
+            ]);
+        }
+        $agent->categories()->sync($validated['categories'] ?? []);
+
         return redirect()->route("agents.index")->with("success", "Agents inserted Successfully.");
     }
 

@@ -30,7 +30,6 @@ class StoreAgentRequest extends FormRequest
             'experience' => 'required|integer|min:0',
             'bio' => 'nullable|string',
             'status' => 'nullable|boolean',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
         ];

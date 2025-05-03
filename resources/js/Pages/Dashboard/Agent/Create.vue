@@ -2,7 +2,8 @@
 
     <Head title="New Agent" />
 
-    <FormLayout title="New Agent" :method="'post'" :routeName="'agents.store'" :fields="form" class="bg-white p-5">
+    <FormLayout title="New Agent" :method="'post'" :enctype="'multipart/form-data'" :routeName="'agents.store'"
+        :fields="form" class="bg-white p-5">
         <template #fields="{ form, errors }">
             <div class="grid md:grid-cols-3 gap-6 w-[95%] mx-auto">
                 <!-- Avatar -->
