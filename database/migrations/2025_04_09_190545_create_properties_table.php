@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('bathrooms')->nullable();
             $table->integer('lot_area')->nullable();
             $table->integer('floor_area')->nullable();
-            $table->date('year_built')->nullable();
+            $table->year('year_built')->nullable();
             $table->boolean('is_water')->nullable();
             $table->integer('stories')->nullable();
             $table->boolean('is_new_roofing')->nullable();
@@ -34,6 +34,8 @@ return new class extends Migration
             $table->integer('is_luggage')->nullable();
             $table->string('image_url')->nullable();
             $table->enum('status', ['available', 'sold', 'rented'])->default('available');
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade')->onUpdate('cascade');

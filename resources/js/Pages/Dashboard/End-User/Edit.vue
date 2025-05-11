@@ -2,16 +2,8 @@
 
     <Head :title="endUser.name" />
 
-    <FormLayout :title="endUser.name" :method="'post'" :routeName="'end-users.update'"
-        :submitLabel="'Update ' + endUser.name" :routeParams="{ end_user: endUser.id }" class="bg-white p-5" :fields="{
-            name: endUser.name,
-            username: endUser.username,
-            email: endUser.email,
-            contact: endUser.contact,
-            password: '',
-            password_confirmation: '',
-            avatar: endUser.profile_photo_path
-        }">
+    <FormLayout :title="endUser.name" :routeName="'end-users.update'" :submitLabel="'Update ' + endUser.name"
+        :routeParams="{ end_user: endUser.id }" class="bg-white p-5" :fields="form">
         <template #fields="{ form, errors }">
             <div class="bg-white rounded w-[95%] mx-auto flex flex-col md:flex-row justify-between">
                 <div class="w-full md:w-2/3 pr-4">
@@ -24,8 +16,8 @@
                         </div>
                         <div class="w-1/2">
                             <InputLabel for="contact" value="contact" />
-                            <TextInput id="contact" v-model="form.contact" type="text" placeholder="+92 (300) 1234567"
-                                class="mt-1 text-sm block w-full" />
+                            <TextInput id="contact" autocomplete="tel" v-model="form.contact" type="text"
+                                placeholder="+92 (300) 1234567" class="mt-1 text-sm block w-full" />
                             <InputError class="mt-2" :message="errors.contact" />
                         </div>
                     </div>
@@ -69,6 +61,7 @@
                         <input type="file" ref="fileInput" class="hidden" @input="form.avatar = $event.target.files[0]"
                             @change="handleFileChange" accept="image/*" />
                         <InputError class="mt-2" :message="errors.avatar" />
+
                     </div>
                 </div>
 
@@ -94,7 +87,7 @@ const { endUser } = defineProps({
 
 
 const avatarPreview = ref(endUser.profile_photo_path
-    ? `${endUser.profile_photo_path}`
+    ? `${'/storage' + '/' + endUser.profile_photo_path}`
     : null);
 const fileInput = ref(null);
 
@@ -115,7 +108,7 @@ const form = reactive({
     contact: endUser.contact,
     password: '',
     password_confirmation: '',
-    avatar: endUser.profile_photo_path
+    avatar: endUser.profile_photo_path,
 });
 
 const header = {

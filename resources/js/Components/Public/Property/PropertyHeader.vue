@@ -2,7 +2,7 @@
     <div>
         <!-- Header Image -->
         <div class="w-full h-[600px] mb-10 bg-cover bg-center"
-            :style="{ backgroundImage: 'url(' + property.image_url + ')' }"></div>
+            :style="{ backgroundImage: 'url(/storage/' + property.image_url + ')' }"></div>
         <!-- Header Text -->
         <div class="text-center flex flex-col space-y-7">
             <span class="text-xs uppercase font-semibold tracking-[2px] text-black/40 block">

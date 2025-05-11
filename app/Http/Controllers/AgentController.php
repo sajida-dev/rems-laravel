@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\UserHelper;
 use App\Models\Agent;
 use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\UpdateAgentRequest;
@@ -9,6 +10,9 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
+use App\Mail\AgentApprovedMail;
+use Illuminate\Support\Facades\Mail;
 
 class AgentController extends Controller
 {
@@ -80,7 +84,7 @@ class AgentController extends Controller
     {
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            $avatarPath = '/storage' . '/' . $request->file('avatar')->store('avatars', 'public');
+            $avatarPath =  $request->file('avatar')->store('avatars', 'public');
         }
 
         $user = User::create([
@@ -103,29 +107,42 @@ class AgentController extends Controller
 
         ]);
 
-        if ($request->filled('categories')) {
-            $agent->categories()->sync($request->categories);
-        }
+        $agent->categories()->attach($request->categories);
 
         return redirect()->route("agents.index")->with("success", "Agent inserted successfully.");
     }
     /**
      * Display the specified resource.
      */
-    public function show(User $agent)
+    public function show(Agent $agent)
     {
-        $categories = Category::all(['id', 'name'])->map(function ($category) {
-            return [
-                'id' => $category->id,
-                'name' => $category->name,
-            ];
-        });
-        $agent->load('agent.categories');
+        $agent->load([
+            'user',
+            'categories',
+            'properties.category',
+            'properties.amenities',
+            'properties.uploads',
+        ]);
+        $properties = $agent && $agent->properties
+            ? $agent->properties->map(function ($property) {
+                return [
+                    'id' => $property->id,
+                    'title' => $property->title,
+                    'location' => $property->location,
+                    'rent_price' => $property->rent_price,
+                    'purchase_price' => $property->purchase_price,
+                    'category_name' => $property->category->name ?? 'N/A',
+                    'image_url' => $property->image_url,
+                    'amenities' => $property->amenities->pluck('name')->join(', '),
+                ];
+            })
+            : [];
+
         return Inertia::render(
-            "Dashboard/Agent/Create",
+            "Dashboard/Agent/Show",
             [
                 'agent' => $agent,
-                'categories' => $categories
+                'properties' => $properties,
             ]
         );
     }
@@ -133,7 +150,7 @@ class AgentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $agent)
+    public function edit(Agent $agent)
     {
         $categories = Category::all(['id', 'name'])->map(function ($category) {
             return [
@@ -141,7 +158,7 @@ class AgentController extends Controller
                 'name' => $category->name,
             ];
         });
-        $agent->load('agent.categories');
+        $agent->load(['user', 'categories']);
         return Inertia::render(
             "Dashboard/Agent/Edit",
             [
@@ -156,7 +173,7 @@ class AgentController extends Controller
      */
     public function update(UpdateAgentRequest $request, Agent $agent)
     {
-        dd($request);
+        // dd($request);
         $validated = $request->validated();
         $agent->user->update([
             'name' => $validated['name'],
@@ -171,15 +188,12 @@ class AgentController extends Controller
             'status' => $validated['status'] ?? false,
         ]);
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-
-            $agent->user->update([
-                'profile_photo_path' => $path,
-            ]);
+            $agent->user->updateProfilePhoto($request['avatar']);
         }
+
         $agent->categories()->sync($validated['categories'] ?? []);
 
-        return redirect()->route("agents.index")->with("success", "Agents inserted Successfully.");
+        return redirect()->route("agents.index")->with("success", "Agents updated Successfully.");
     }
 
     /**
@@ -189,5 +203,28 @@ class AgentController extends Controller
     {
         $agent->delete();
         return redirect()->route("agents.index")->with("success", "Agents deleted Successfully.");
+    }
+
+    public function approve(Agent $agent)
+    {
+        if ($agent->status === 0) {
+            $username = UserHelper::generateUniqueUsername($agent->user->name, $agent->user->email);
+
+            $password = UserHelper::generateRandomPassword(12);
+
+            $user = $agent->user;
+            $user->username = $username;
+            $user->password = bcrypt($password);
+            $user->save();
+
+            $agent->status = 1;
+            $agent->save();
+
+            Mail::to($user->email)->send(new AgentApprovedMail($username, $password));
+
+            return redirect()->route('agents.index')->with('success', 'Agent approved and email sent successfully!');
+        }
+
+        return redirect()->route('agents.index')->with('error', 'Agent is already approved.');
     }
 }

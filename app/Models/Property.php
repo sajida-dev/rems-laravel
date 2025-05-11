@@ -32,26 +32,40 @@ class Property extends Model
         'bathrooms',
         'lot_area',
         'floor_area',
+        'year_built',
         'is_water',
+        'stories',
         'is_new_roofing',
         'garage',
         'is_luggage',
+        'latitude',
+        'longitude',
         'image_url',
+
+
     ];
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
     public function conversation()
     {
         return $this->hasOne(Conversation::class);
     }
-    public function category()
+    public function amenities()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Amenity::class)->withTimestamps();
     }
     public function agent()
     {
         return $this->belongsTo(Agent::class);
     }
-    public function upload()
+    public function uploads()
     {
         return $this->hasMany(Upload::class);
+    }
+    public function bookmark()
+    {
+        return $this->hasMany(Bookmark::class);
     }
 }

@@ -2,8 +2,8 @@
 
     <Head :title="category.name" />
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
-        <FormLayout :title="category.name" :method="'put'" :routeName="'categories.update'"
-            :routeParams="{ category: category.id }" :submitLabel="'Update ' + category.name"
+        <FormLayout :title="category.name" :routeName="'categories.update'" :routeParams="{ category: category.id }"
+            :submitLabel="'Update ' + category.name"
             :fields="{ categoryName: category.name, categoryDescription: category.description }">
             <template #fields="{ form, errors }">
                 <div>

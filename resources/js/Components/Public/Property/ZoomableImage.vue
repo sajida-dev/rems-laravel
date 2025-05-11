@@ -1,7 +1,7 @@
 <template>
     <div ref="zoomerBox" class="relative group cursor-zoom-in">
-        <img :src="image" alt="Zoomable" class="w-full h-auto max-h-[90vh] max-w-[90vw]" :data-flip-id="flipId"
-            ref="imgRef" />
+        <img :src="`/storage/${image.image_path}`" alt="Zoomable" class="w-full h-auto max-h-[90vh] max-w-[90vw]"
+            :data-flip-id="flipId" ref="imgRef" />
         <div ref="magnified"
             class="absolute z-50 w-[300px] h-[300px] border-4 border-white rounded-full shadow-md opacity-0 pointer-events-none transition-opacity duration-200">
         </div>
@@ -16,6 +16,11 @@ const props = defineProps({
     flipId: String,
     enabled: Boolean,
 })
+
+console.log('image', props.image)
+console.log('props.flipId', props.flipId)
+console.log('props.enabled', props.enabled)
+
 
 const zoomerBox = ref(null)
 const imgRef = ref(null)
@@ -47,7 +52,7 @@ function handleMouseMove(e) {
 onMounted(() => {
     if (props.enabled) {
         const zoom = magnified.value
-        zoom.style.backgroundImage = `url(${props.image})`
+        zoom.style.backgroundImage = `url(/storage/${props.image.image_path})`
         zoom.style.backgroundSize = `${imgRef.value.offsetWidth * 3.5}px auto`
         zoomerBox.value.addEventListener('mousemove', handleMouseMove)
         zoomerBox.value.addEventListener('mouseenter', () => {

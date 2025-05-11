@@ -29,11 +29,6 @@ const props = defineProps({
         type: String,
         default: 'Submit'
     },
-    method: {
-        type: String,
-        default: 'post',
-        validator: (value) => ['post', 'put', 'patch'].includes(value.toLowerCase()),
-    },
     routeParams: {
         type: Object,
         default: () => ({}),
@@ -48,34 +43,51 @@ const currentEnctype = computed(() =>
     hasFileUpload.value ? 'multipart/form-data' : 'application/json'
 )
 const submit = () => {
-    let method = props.method.toLowerCase()
 
-    const data = form.data()
-    if (['put', 'patch'].includes(method)) {
-        form._method = method
-    }
-    if (hasFileUpload && method === 'put') {
-        method = 'post'
-    }
 
-    form[method](window.route(props.routeName, props.routeParams), {
-        data: { ...data, _method: 'PUT' },
+    form.post(window.route(props.routeName, props.routeParams), {
         preserveScroll: true,
         forceFormData: hasFileUpload.value,
         onSuccess: (response) => {
-            // form.reset()
-            toast.success(response.props.flash.success || 'Submitted successfully')
+            toast.success(response.props?.flash?.success || 'Submitted successfully')
             form.reset(props.fields)
         },
         onError: (errors) => {
-            Object.values(errors)
-                .flat()
-                .forEach(message => {
-                    toast.error(message)
-                })
-
-        },
+            Object.values(errors).flat().forEach(message => {
+                toast.error(message)
+            })
+        }
     })
+
+
+    // let method = props.method.toLowerCase()
+
+    // const data = form.data()
+    // if (['put', 'patch'].includes(method)) {
+    //     form._method = method
+    // }
+    // if (hasFileUpload && method === 'put') {
+    //     method = 'post'
+    // }
+
+    // form[method](window.route(props.routeName, props.routeParams), {
+    //     data: { ...data, _method: 'PUT' },
+    //     preserveScroll: true,
+    //     forceFormData: hasFileUpload.value,
+    //     onSuccess: (response) => {
+    //         // form.reset()
+    //         toast.success(response.props.flash.success || 'Submitted successfully')
+    //         form.reset(props.fields)
+    //     },
+    //     onError: (errors) => {
+    //         Object.values(errors)
+    //             .flat()
+    //             .forEach(message => {
+    //                 toast.error(message)
+    //             })
+
+    //     },
+    // })
 }
 
 

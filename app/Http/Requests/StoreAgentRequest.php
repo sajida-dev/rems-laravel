@@ -24,14 +24,15 @@ class StoreAgentRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'licence_no' => 'nullable|numeric|unique:agents,licence_no',
+            'licence_no' => 'required|numeric|unique:agents,licence_no',
             'agency' => 'required|string|max:255',
-            'contact' => 'nullable|string|max:20',
+            'contact' => 'required|string|max:20',
             'experience' => 'required|integer|min:0',
-            'bio' => 'nullable|string',
+            'bio' => 'required|string',
             'status' => 'nullable|boolean',
-            'categories' => 'nullable|array',
+            'categories' => 'required|array',
             'categories.*' => 'exists:categories,id',
+            'avatar'       => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }

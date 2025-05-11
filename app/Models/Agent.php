@@ -31,6 +31,10 @@ class Agent extends Model
     }
     public function categories()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class)->withTimestamps();
+    }
+    public function properties()
+    {
+        return $this->hasMany(Property::class);
     }
 }

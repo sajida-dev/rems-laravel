@@ -41,7 +41,8 @@
 
                     <div>
                         <InputLabel for="contact" value="Contact Number" />
-                        <TextInput id="contact" v-model="form.contact" type="text" class="mt-1 text-sm block w-full" />
+                        <TextInput id="contact" v-model="form.contact" type="text" autocomplete="tel"
+                            class="mt-1 text-sm block w-full" />
                         <InputError class="mt-2" :message="errors.contact" />
                     </div>
 
@@ -67,7 +68,7 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <SpecializationSelect :categories="categories" v-model="form.categories" />
+                        <SpecializationSelect :list="categories" v-model="form.categories" />
                         <InputError class="mt-2" :message="errors.categories" />
                     </div>
                 </div>

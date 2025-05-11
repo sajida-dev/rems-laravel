@@ -2,7 +2,7 @@
     <div class="tab-content">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div v-for="(img, index) in images" :key="index" class="cursor-pointer" @click="openModal(index)">
-                <img :src="img" alt="Property Image"
+                <img :src="`/storage/${img.image_path}`" alt="Property Image"
                     class="rounded-md w-full h-80 object-cover hover:opacity-80 transition"
                     :data-flip-id="`image-${index}`" />
             </div>
@@ -16,8 +16,7 @@
                     &times;
                 </button>
 
-                <ZoomableImage :image="images[currentImageIndex]" :flipId="`image-${currentImageIndex}`"
-                    :enabled="true" />
+                <ZoomableImage :image="images[currentImageIndex]" :flipId="`${currentImageIndex}`" :enabled="true" />
             </div>
         </div>
     </div>
@@ -31,13 +30,13 @@ import ZoomableImage from './ZoomableImage.vue'
 
 gsap.registerPlugin(Flip)
 
-const props = defineProps({
+const { images } = defineProps({
     images: {
         type: Array,
         required: true,
     },
 })
-
+console.log('images', images)
 const modalOpen = ref(false)
 const currentImageIndex = ref(0)
 let lastState = null

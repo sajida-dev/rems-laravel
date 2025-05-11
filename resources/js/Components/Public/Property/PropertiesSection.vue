@@ -1,13 +1,12 @@
 <script setup>
 import PropertyCard from './PropertyCard.vue'
-import SectionHeading from '@/components/Public/Common/SectionHeading.vue'
+import SectionHeading from '@/Components/Public/Common/SectionHeading.vue'
 
 const { properties } = defineProps({
     properties: {
         type: Array,
         required: true
     },
-
 })
 
 </script>

@@ -17,7 +17,7 @@
                         <div class="w-1/2">
                             <InputLabel for="contact" value="contact" />
                             <TextInput id="contact" v-model="form.contact" type="text" placeholder="+92 (300) 1234567"
-                                class="mt-1 text-sm block w-full" />
+                                class="mt-1 text-sm block w-full" autocomplete="tel" />
                             <InputError class="mt-2" :message="errors.contact" />
                         </div>
                     </div>

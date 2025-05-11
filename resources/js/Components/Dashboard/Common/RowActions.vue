@@ -78,7 +78,7 @@ const handleDelete = () => {
 
 const handleConfirm = () => {
     if (props.deleteHandler) {
-        props.deleteHandler(props.row) // this ensures row is passed
+        props.deleteHandler(props.row)
     }
     showConfirm.value = false
 }

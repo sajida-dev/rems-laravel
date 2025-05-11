@@ -72,8 +72,9 @@ class EndUserController extends Controller
 
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            $avatarPath = '/storage' . '/' . $request->file('avatar')->store('avatars', 'public');
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
         }
+
 
 
         User::create([
@@ -112,7 +113,7 @@ class EndUserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'contact' => 'required|string|min:10|max:20',
-            'avatar' => 'nullable',
+            'avatar'       => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'email' => [
                 'required',
                 'string',
@@ -128,13 +129,9 @@ class EndUserController extends Controller
                 Rule::unique('users', 'username')->ignore($end_user->id)
             ],
         ]);
-        if ($request->hasFile('avatar')) {
-            if ($end_user->profile_photo_path && Storage::disk('public')->exists($end_user->profile_photo_path)) {
-                Storage::disk('public')->delete($end_user->profile_photo_path);
-            }
 
-            $avatarPath = '/storage' . '/' . $request->file('avatar')->store('avatars', 'public');
-            $end_user->profile_photo_path = $avatarPath;
+        if ($request->hasFile('avatar')) {
+            $end_user->updateProfilePhoto($request['avatar']);
         }
 
         $end_user->update([

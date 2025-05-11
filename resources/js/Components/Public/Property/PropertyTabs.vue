@@ -24,7 +24,7 @@
         <div>
             <PropertyFeatures v-if="tab === 'features'" :property="property" />
             <PropertyDescription v-else-if="tab === 'description'" :description="property.description" />
-            <PropertyImages v-else-if="tab === 'images'" :images="property.images" />
+            <PropertyImages v-else-if="tab === 'images'" :images="property.uploads" />
         </div>
     </div>
 </template>
@@ -35,13 +35,13 @@ import PropertyFeatures from './PropertyFeatures.vue'
 import PropertyDescription from './PropertyDescription.vue'
 import PropertyImages from './PropertyImages.vue'
 
-defineProps({
+const { property } = defineProps({
     property: {
         type: Object,
         required: true,
     },
 })
-
+console.log('property.uploads', property.uploads)
 const tab = ref('features')
 
 const tabClass =

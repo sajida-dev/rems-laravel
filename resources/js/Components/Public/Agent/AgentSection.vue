@@ -18,33 +18,38 @@
 <script setup>
 import AgentCard from '@/Components/Public/Agent/AgentCard.vue'
 import SectionHeading from '@/Components/Public/Common/SectionHeading.vue'
-
-const agents = [
-    {
-        id: 1,
-        name: 'John Doe',
-        profile_pic: 'frontend/images/team-1.jpg',
-        property_count: 12,
+const props = defineProps({
+    agents: {
+        type: Object,
+        required: true
     },
-    {
-        id: 2,
-        name: 'Jane Smith',
-        profile_pic: '',
-        property_count: 8,
-    },
-    {
-        id: 3,
-        name: 'Mike Johnson',
-        profile_pic: 'frontend/images/team-2.jpg',
-        property_count: 5,
-    },
-    {
-        id: 4,
-        name: 'Sara Lee',
-        profile_pic: '',
-        property_count: 20,
-    },
-]
+})
+// const agents = [
+//     {
+//         id: 1,
+//         name: 'John Doe',
+//         profile_pic: 'frontend/images/team-1.jpg',
+//         property_count: 12,
+//     },
+//     {
+//         id: 2,
+//         name: 'Jane Smith',
+//         profile_pic: '',
+//         property_count: 8,
+//     },
+//     {
+//         id: 3,
+//         name: 'Mike Johnson',
+//         profile_pic: 'frontend/images/team-2.jpg',
+//         property_count: 5,
+//     },
+//     {
+//         id: 4,
+//         name: 'Sara Lee',
+//         profile_pic: '',
+//         property_count: 20,
+//     },
+// ]
 </script>
 
 <style scoped>

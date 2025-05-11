@@ -22,7 +22,7 @@
       }"
       @update="loadData"
     >
-
+    
     <template #row-actions="{ row }">
   <RowActions
     :row="row"
@@ -66,12 +66,14 @@ const props = defineProps({
 const formattedAgents = computed(() =>
     props.agents.data.map(user => ({
         ...user,
+        id: user.agent.id,
         agency: user.agent?.agency ?? '-',
         licence: user.agent?.licence_no ?? '-',
         experience: user.agent?.experience ?? '-',
         status: user.agent?.status === 1 ? 'Approved' : 'Pending',
     }))
 )
+
 
 const columns = [
     { key: 'id', label: 'ID' },

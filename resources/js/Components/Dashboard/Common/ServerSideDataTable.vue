@@ -5,7 +5,7 @@
             <input v-model="filters.global" @input="debouncedSearch" type="text" placeholder="Search..."
                 class="px-3 py-2 border rounded w-1/3" />
             <div>
-                <Link v-if="createRoute && createLabel" :href="createRoute"
+                <Link v-if="createRoute && createLabel && isShow" :href="createRoute"
                     class="mx-3 px-3 py-2 bg-pink-500 text-white rounded">
                 {{ createLabel }}
                 </Link>
@@ -19,8 +19,8 @@
         </div>
 
         <!-- Horizontal scroll -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full table-auto text-sm">
+        <div class="overflow-x-auto w-full">
+            <table class="min-w-full text-sm ">
                 <thead class="bg-gray-50">
                     <tr>
                         <th v-if="selectable" class="sticky left-0 w-12 bg-gray-50 px-3 py-2 text-left z-20">
@@ -94,13 +94,25 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import debounce from 'lodash.debounce'
-import { Link } from '@inertiajs/vue3'
-
+import { Link, usePage } from '@inertiajs/vue3'
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 
+
+const usepage = usePage()
+
+const isShow = ref(true)
+
+onMounted(() => {
+    if (props.isProperties) {
+        const user = usepage.props.auth.user
+        if (user.role === 'admin' || (user.role === 'agent' && user.status === 0)) {
+            isShow.value = false
+        }
+    }
+})
 
 const props = defineProps({
     columns: { type: Array, required: true },
@@ -115,7 +127,7 @@ const props = defineProps({
     createLabel: { type: String, default: '' },
     hasRowActions: { type: Boolean, default: false },
     pagination: { type: Object, required: true },
-
+    isProperties: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update'])

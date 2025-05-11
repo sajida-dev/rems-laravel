@@ -11,7 +11,7 @@
         </div>
         <div class="w-1/4 text-center ">
             <div class="flex justify-center">
-                <img :src="endUser.profile_photo_path" alt="Avatar"
+                <img :src="'/storage' + '/' + endUser.profile_photo_path" alt="Avatar"
                     class="w-64 h-64 rounded-full shadow-md mb-4 cursor-pointer" />
 
             </div>

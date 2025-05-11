@@ -35,7 +35,7 @@
 
             <div ref="userRef" class="relative">
                 <button @click.stop="toggle('user')" class="focus:outline-none">
-                    <img :src="'/backend/assets/img/profile.jpg'" alt="User Avatar"
+                    <img :src="'/storage' + '/' + user.profile_photo_path" :alt="user.name"
                         class="h-10 w-10 rounded-full object-cover" />
                 </button>
 

@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="tab-content">
         <div class="grid grid-cols-1 md:grid-cols-3 text-base gap-4 space-y-5 m-12">
             <ul class="text-gray-600">
@@ -52,7 +52,6 @@
                 </li>
             </ul>
         </div>
-        <!-- Map -->
 
         <div class="w-full h-96 sm:h-[500px] md:h-[600px] lg:h-[500px]">
             <iframe
@@ -76,4 +75,82 @@ const { property } = defineProps({
 })
 
 const amenityList = computed(() => property.amenity_list.split(','))
+</script> -->
+
+
+
+<template>
+    <div class="tab-content">
+        <div class="grid grid-cols-1 md:grid-cols-3 text-base gap-4 space-y-5 m-12">
+            <!-- Column 1 -->
+            <ul class="text-gray-600 space-y-2">
+                <li v-if="property.lot_area">
+                    <CheckIcon /> Lot Area: {{ property.lot_area }} SQ FT
+                </li>
+                <li v-if="property.floor_area">
+                    <CheckIcon /> Floor Area: {{ property.floor_area }} SQ FT
+                </li>
+                <li v-if="property.bedrooms">
+                    <CheckIcon /> Bed Rooms: {{ property.bedrooms }}
+                </li>
+                <li v-if="property.bathrooms">
+                    <CheckIcon /> Bath Rooms: {{ property.bathrooms }}
+                </li>
+                <li v-if="property.garage">
+                    <CheckIcon /> Garage: {{ property.garage }}
+                </li>
+            </ul>
+
+            <!-- Column 2 -->
+            <ul class="text-gray-600 space-y-2">
+                <li>
+                    <CheckIcon /> Year Built: {{ property.year_built ?? 'N/A' }}
+                </li>
+                <li>
+                    <CheckIcon /> Water: {{ property.is_water ? 'Yes' : 'No' }}
+                </li>
+                <li>
+                    <CheckIcon /> Stories: {{ property.stories ?? 'N/A' }}
+                </li>
+                <li>
+                    <CheckIcon /> Roofing: {{ property.is_new_roofing ? 'New' : 'Old' }}
+                </li>
+                <li>
+                    <CheckIcon /> Luggage: {{ property.is_luggage ? 'Yes' : 'No' }}
+                </li>
+            </ul>
+
+            <!-- Column 3: Amenities -->
+            <ul class="text-gray-600 space-y-2">
+                <li v-for="(amenity, index) in property.amenities" :key="index">
+                    <CheckIcon /> {{ amenity.name }}
+                </li>
+            </ul>
+        </div>
+
+        <!-- Map -->
+        <div class="w-full h-96 sm:h-[500px] md:h-[600px] lg:h-[500px]">
+            <iframe :src="googleMapSrc" class="w-full h-full border-0" allowfullscreen loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import CheckIcon from './CheckIcon.vue';
+import { computed } from 'vue';
+const { property } = defineProps({
+    property: {
+        type: Object,
+        required: true,
+    },
+});
+
+// Optional: Generate dynamic Google Maps embed link using lat/lng
+const googleMapSrc = computed(() => {
+    if (property.latitude && property.longitude) {
+        return `https://www.google.com/maps?q=${property.latitude},${property.longitude}&output=embed`;
+    }
+    return "https://www.google.com/maps/embed?..."; // fallback default
+});
 </script>

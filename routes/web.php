@@ -44,19 +44,26 @@ Route::get('/agents/pending-count', function () {
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::resource('categories', CategoryController::class)->except(['update']);
+    Route::post('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+
     Route::resource('properties', PropertyController::class)->except(['update']);
-    Route::resource('agents', AgentController::class)->except(['update']);
-    Route::resource('amenities', AmenityController::class)->except(['update']);
-    Route::resource('end-users', EndUserController::class)->except(['update']);
     Route::post('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+    Route::delete('/uploads/{upload}', [PropertyController::class, 'destroyUpload'])->name('uploads.destroy');
+
+    Route::resource('agents', AgentController::class)->except(['update']);
+    Route::post('/agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
+    Route::post('/agents/{agent}/approve', [AgentController::class, 'approve'])->name('agents.approve');
+
+
+    Route::resource('amenities', AmenityController::class)->except(['update']);
+    Route::post('/amenities/{amenity}', [AmenityController::class, 'update'])->name('amenities.update');
+
+    Route::resource('end-users', EndUserController::class)->except(['update']);
     Route::post('/end-users/{end_user}', [EndUserController::class, 'update'])->name('end-users.update');
 });
 
-Route::post('/agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
 
-Route::get('/debug-auth', function () {
-    return auth()->user();
-});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

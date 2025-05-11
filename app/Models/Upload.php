@@ -25,6 +25,6 @@ class Upload extends Model
     ];
     public function property()
     {
-        return $this->belongsToMany(Property::class);
+        return $this->belongsToMany(Property::class)->withTimestamps();
     }
 }

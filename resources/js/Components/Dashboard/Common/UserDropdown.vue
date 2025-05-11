@@ -4,7 +4,7 @@
             class="dropdown-menu dropdown-user min-w-fit w-72 overflow-x-scroll bg-white rounded shadow-lg z-50"
             @click.away="$emit('close')">
             <li class="p-4 flex items-center">
-                <img :src="user.profile_photo_url" alt="Profile Image"
+                <img :src="'/storage' + '/' + user.profile_photo_path" :alt="user.name"
                     class="w-12 h-12 rounded-full object-cover mr-3" />
                 <div>
                     <h4 class="font-semibold">{{ user.name }}</h4>

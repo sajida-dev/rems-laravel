@@ -22,4 +22,8 @@ class Category extends Model
         'name',
         'description',
     ];
+    public function agents()
+    {
+        return $this->hasMany(Agent::class);
+    }
 }

@@ -10,6 +10,7 @@ import { createHead } from '@vueuse/head'
 import VirtualList from 'vue3-virtual-scroll-list'
 import Vue3Toastify from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import 'leaflet/dist/leaflet.css'
 
 
 const head = createHead()

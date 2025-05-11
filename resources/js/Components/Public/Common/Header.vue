@@ -127,9 +127,9 @@ export default {
     data() {
         return {
             isOpen: false,
-            isAuthenticated: false,
-            userName: "Guest",
-            role: "",
+            isAuthenticated: this.$page.props.auth?.user !== null,
+            userName: this.$page.props.auth?.user?.name || "Guest",
+            role: this.$page.props.auth?.user?.role || "",
             scrolled: false
         };
     },
@@ -138,7 +138,7 @@ export default {
             return new Date().getFullYear();
         },
         profileUrl() {
-            return this.role === "agent" ? "/profile" : "/profile";
+            return this.role === "agent" ? "/user/profile" : "/user/profile";
         },
         navbarClasses() {
             const base = "w-full h-18 z-50 transition-all duration-300 ease-out bg-white";

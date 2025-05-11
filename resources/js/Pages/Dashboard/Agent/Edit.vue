@@ -1,7 +1,7 @@
 <template>
 
-    <Head :title="agent.name" />
-    <FormLayout :title="agent.name" :method="'post'" :submitLabel="'update ' + agent.name" class="bg-white p-5"
+    <Head :title="agent.user.name" />
+    <FormLayout :title="'Update ' + agent.user.name" :submitLabel="'update ' + agent.user.name" class="bg-white p-5"
         :routeName="'agents.update'" :routeParams="{ agent: agent.id }" :fields="form">
         <template #fields="{ form, errors }">
             <div class="grid md:grid-cols-3 gap-6 w-[95%] mx-auto">
@@ -11,7 +11,8 @@
                         <img :src="avatarPreview || 'https://ui-avatars.com/api/?name=Agent&size=256'" alt="Avatar"
                             class="w-64 h-64 rounded-full shadow-md mb-4 cursor-pointer object-cover"
                             @click="triggerFileInput" />
-                        <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" accept="image/*" />
+                        <input type="file" ref="fileInput" class="hidden" @change="handleFileChange"
+                            @input="form.avatar = $event.target.files[0]" accept="image/*" />
                     </div>
                     <InputError class="text-center" :message="errors.avatar" />
                 </div>
@@ -39,7 +40,8 @@
 
                     <div>
                         <InputLabel for="contact" value="Contact Number" />
-                        <TextInput id="contact" v-model="form.contact" type="text" class="mt-1 text-sm block w-full" />
+                        <TextInput id="contact" v-model="form.contact" type="text" autocomplete="tel"
+                            class="mt-1 text-sm block w-full" />
                         <InputError class="mt-2" :message="errors.contact" />
                     </div>
 
@@ -65,7 +67,7 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <SpecializationSelect :categories="props.categories" v-model="form.categories" />
+                        <SpecializationSelect :list="props.categories" v-model="form.categories" />
                         <InputError class="mt-2" :message="errors.categories" />
                     </div>
                 </div>
@@ -97,21 +99,20 @@ const props = defineProps({
     },
 })
 
-console.log(window.route('agents.update', { agent: props.agent.id }))
 
 const form = reactive({
-    name: props.agent.name,
-    email: props.agent.email,
-    licence_no: props.agent.agent?.licence_no ?? '',
-    agency: props.agent.agent?.agency ?? '',
-    contact: props.agent.contact,
-    experience: props.agent.agent?.experience ?? '',
-    bio: props.agent.agent?.bio ?? '',
-    status: props.agent.agent?.status ?? false,
-    categories: props.agent.agent?.categories?.map(c => c.id) ?? [],
+    name: props.agent.user.name,
+    email: props.agent.user.email,
+    licence_no: props.agent.licence_no ?? '',
+    agency: props.agent.agency ?? '',
+    contact: props.agent?.user.contact,
+    experience: props.agent.experience ?? '',
+    bio: props.agent.bio ?? '',
+    status: props.agent.status ?? false,
+    categories: props.agent.categories?.map(c => c.id) ?? [],
     avatar: null,
 })
-const avatarPreview = ref(props.agent.profile_photo_path)
+const avatarPreview = ref('/storage' + '/' + props.agent.user.profile_photo_path)
 const fileInput = ref(null)
 
 const triggerFileInput = () => fileInput.value.click()

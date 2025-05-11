@@ -6,12 +6,12 @@
 
     <ServerSideDataTable
       :columns="columns"
-      :rows="properties.data"
+      :rows="formattedProperties"
       :selectable="false"
       :expandable="false"
       :filterable="true"
       :perPage="properties.per_page"
-      :virtualScroll="false"
+      :virtualScroll="true"
       createRoute="/properties/create"
       createLabel="Add Property"
       :hasRowActions="true"
@@ -22,11 +22,13 @@
         lastPage: properties.last_page
       }"
       @update="loadData"
+      :isProperties="true"
     >
 
     <template #row-actions="{ row }">
   <RowActions
     :row="row"
+    :viewRoute="row => route('properties.show', row.id)"
     :editRoute="row => route('properties.edit', row.id)"
     :deleteHandler="deleteData"
   />
@@ -44,7 +46,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Head } from '@inertiajs/vue3'
 import { provide } from 'vue'
 import { toast } from 'vue3-toastify'
-import { reactive } from 'vue'
+import { reactive, computed } from 'vue'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -58,18 +60,38 @@ const props = defineProps({
     properties: Object,
 })
 
+
+const formattedProperties = computed(() =>
+    props.properties.data.map(properties => ({
+        ...properties,
+        status: properties.status,
+        category_name: properties.category?.name ?? '-',
+        agent_name: properties.agent.user?.name ?? '-',
+    }))
+)
+
 const columns = [
     { key: 'id', label: 'ID' },
     { key: 'title', label: 'Title' },
-    { key: 'agent', label: 'Agent' },
+    { key: 'category_name', label: 'Category' },
+    { key: 'agent_name', label: 'Agent' },
     { key: 'location', label: 'Location' },
     { key: 'rent_price', label: 'Rent Price' },
     { key: 'purchase_price', label: 'Purchase Price' },
-    { key: 'build_year', label: 'Build Year' },
+    // { key: 'bedrooms', label: 'Bedrooms' },
+    // { key: 'bathrooms', label: 'Bathrooms' },
     { key: 'lot_area', label: 'Lot Area' },
     { key: 'floor_area', label: 'Floor Area' },
+    { key: 'year_built', label: 'Year Built' },
+    // { key: 'is_water', label: 'Water Available' },
+    // { key: 'stories', label: 'Stories' },
+    // { key: 'is_new_roofing', label: 'New Roofing' },
+    // { key: 'garage', label: 'Garage' },
+    // { key: 'is_luggage', label: 'Luggage Space' },
     { key: 'status', label: 'Status' },
-]
+    // { key: 'latitude', label: 'Latitude' },
+    // { key: 'longitude', label: 'Longitude' },
+];
 
 const deleteData = (row) => {
 
