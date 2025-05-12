@@ -48,10 +48,10 @@
                 </template>
 
                 <!-- Search Form -->
-                <form v-if="showSearchForm" :action="formAction" method="POST"
+                <form v-if="showSearchForm" @submit.prevent="submitSearch"
                     class="w-full max-w-3xl mx-auto mt-4 lg:mb-2 mb-9">
                     <div class="relative">
-                        <input type="text" name="search" :placeholder="searchPlaceholder"
+                        <input type="text" v-model="search" :placeholder="searchPlaceholder"
                             class="w-full h-[70px] rounded-full px-6 pr-[70px] shadow-lg border-none focus:ring-2 focus:ring-pink-400" />
                         <button type="submit"
                             class="absolute top-1/2 right-0 transform -translate-y-1/2 w-[70px] h-[70px] rounded-br-full rounded-tr-full rounded-bl-full bg-pink-400 flex items-center justify-center">
@@ -103,10 +103,19 @@ defineProps({
         type: String,
         default: 'Search location, price, or area',
     },
-    formAction: {
-        type: String,
-        default: '/filter-properties',
-    },
+
 });
+import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+
+const search = ref('')
+
+
+const submitSearch = () => {
+    router.get('/all-properties', { search: search.value }, {
+        preserveState: true,
+        replace: true,
+    })
+}
 const bgImgUrl = "/frontend/images/bg_1.jpg";
 </script>

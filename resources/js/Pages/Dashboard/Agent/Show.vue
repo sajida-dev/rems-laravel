@@ -86,7 +86,9 @@ const props = defineProps({
 });
 const profile_pic = ref(`/storage/${props.agent.user.profile_photo_path}`)
 const approveAgent = () => {
-    Inertia.post(`/agents/${props.agent.id}/approve`, {}, {
+    Inertia.post(route('agents.approve', props.agent.id), {}, {
+        preserveScroll: true,
+        only: [],
         onSuccess: () => {
             this.agent.status = 1;
             toast.success($page.props.flash.success || "Agent approved successfully!");

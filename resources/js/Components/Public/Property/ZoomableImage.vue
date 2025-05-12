@@ -17,9 +17,6 @@ const props = defineProps({
     enabled: Boolean,
 })
 
-console.log('image', props.image)
-console.log('props.flipId', props.flipId)
-console.log('props.enabled', props.enabled)
 
 
 const zoomerBox = ref(null)

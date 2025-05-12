@@ -17,18 +17,47 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
-        Validator::make($input, [
+
+        $isAgent = $user->role === 'agent';
+
+        // Validation rules
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'contact' => ['nullable', 'string', 'max:20'],
+            'username' => [$isAgent ? 'nullable' : 'required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'contact' => ['required', 'string', 'max:20'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
-        ])->validateWithBag('updateProfileInformation');
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:2024'],
+        ];
+
+        // Additional rules for agents
+        if ($user->role === 'agent') {
+            $rules = array_merge($rules, [
+                'agency' => ['required', 'string', 'max:255'],
+                'licence_no' => ['required', 'string', 'max:255'],
+                'experience' => ['required', 'numeric', 'min:0'],
+                'bio' => ['required', 'string', 'max:1000'],
+                'categories' => ['required', 'array'],
+                'categories.*' => ['integer', 'exists:categories,id'],
+            ]);
+        }
+
+        Validator::make($input, $rules)->validateWithBag('updateProfileInformation');
+
 
         if (isset($input['photo'])) {
             $user->updateProfilePhoto($input['photo']);
         }
-
+        if ($user->role === 'agent') {
+            $user->agent()->updateOrCreate([], [
+                'agency' => $input['agency'] ?? null,
+                'licence_no' => intval($input['licence_no']) ?? null,
+                'experience' => $input['experience'] ?? null,
+                'bio' => $input['bio'] ?? null,
+            ]);
+            if (!empty($input['categories']) && is_array($input['categories'])) {
+                $user->agent->categories()->sync($input['categories']);
+            }
+        }
         if (
             $input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail

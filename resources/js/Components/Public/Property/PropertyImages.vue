@@ -36,7 +36,6 @@ const { images } = defineProps({
         required: true,
     },
 })
-console.log('images', images)
 const modalOpen = ref(false)
 const currentImageIndex = ref(0)
 let lastState = null

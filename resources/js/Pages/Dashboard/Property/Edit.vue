@@ -140,18 +140,7 @@
                         <InputError class="mt-2" :message="errors.main_image" />
                     </div>
 
-                    <!-- <div class="mt-6">
-                        <InputLabel value="Other Images" />
-                        <input type="file" @change="handleOtherImages"
-                            @input="form.other_images = Array.from($event.target.files)" accept="image/*" multiple />
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            <div v-for="(img, i) in otherImagePreviews" :key="i"
-                                class="w-32 h-24 border rounded-md overflow-hidden">
-                                <img :src="img" class="object-cover w-full h-full" />
-                            </div>
-                        </div>
-                        <InputError class="mt-2" :message="errors.other_images" />
-                    </div> -->
+
 
                     <div class="sm:col-span-2 mt-4">
                         <InputLabel value="Other Images" />

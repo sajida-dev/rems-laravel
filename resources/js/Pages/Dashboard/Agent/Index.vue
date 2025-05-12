@@ -63,17 +63,21 @@ const props = defineProps({
     flash: Object
 })
 
-const formattedAgents = computed(() =>
-    props.agents.data.map(user => ({
-        ...user,
-        id: user.agent.id,
-        agency: user.agent?.agency ?? '-',
-        licence: user.agent?.licence_no ?? '-',
-        experience: user.agent?.experience ?? '-',
-        status: user.agent?.status === 1 ? 'Approved' : 'Pending',
-    }))
-)
 
+
+const formattedAgents = computed(() =>
+    props.agents.data
+        .filter(user => user.agent !== null)
+        .map(user => ({
+            id: user.agent.id,
+            name: user.name,
+            email: user.email,
+            agency: user.agent.agency,
+            licence: user.agent.licence_no,
+            experience: user.agent.experience,
+            status: user.agent.status === 1 ? 'Approved' : 'Pending',
+        }))
+)
 
 const columns = [
     { key: 'id', label: 'ID' },

@@ -19,7 +19,7 @@
                         <Link :href="'/'" :class="getNavLinkClasses('/')">Home</Link>
                     </li>
                     <li v-if="isAuthenticated">
-                        <Link :href="profileUrl" :class="getNavLinkClasses(profileUrl)">Profile</Link>
+                        <Link :href="'/dashboard'" :class="getNavLinkClasses('/dashboard')">Dashboard</Link>
                     </li>
                     <li>
                         <Link :href="'/about'" :class="getNavLinkClasses('/about')">About</Link>
@@ -49,7 +49,8 @@
                             <span :class="navLinkClasses">{{ userName }}</span>
                         </li>
                         <li>
-                            <Link :href="'/logout'" :class="getButtonLinkClasses('/logout')">Logout</Link>
+                            <Link :href="route('logout')" method="post" :class="getButtonLinkClasses('/logout')"> Logout
+                            </Link>
                         </li>
                     </template>
                 </ul>
@@ -71,7 +72,8 @@
                                 <Link :href="'/'" :class="getNavLinkMobileClasses('/')">Home</Link>
                             </li>
                             <li v-if="isAuthenticated">
-                                <Link :href="profileUrl" :class="getNavLinkMobileClasses(profileUrl)">Profile</Link>
+                                <Link :href="'/dashboard'" :class="getNavLinkMobileClasses('/dashboard')">Dashboard
+                                </Link>
                             </li>
                             <li>
                                 <Link :href="'/about'" :class="getNavLinkMobileClasses('/about')">About</Link>
@@ -104,7 +106,8 @@
                                     <span :class="navLinkMobileClasses">{{ userName }}</span>
                                 </li>
                                 <li>
-                                    <Link :href="'/logout'" :class="getButtonLinkMobileClasses('/logout')">Logout</Link>
+                                    <Link :href="route('logout')" method="post"
+                                        :class="getButtonLinkMobileClasses('/logout')"> Logout </Link>
                                 </li>
                             </template>
                         </ul>

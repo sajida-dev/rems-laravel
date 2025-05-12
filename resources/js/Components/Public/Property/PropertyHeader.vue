@@ -10,13 +10,7 @@
             </span>
             <h2 class="text-5xl text-gray-700 font-bold mt-2">{{ property.title }}</h2>
             <div class="mt-4">
-                <!-- <button v-if="property.status === 'available'" @click="$emit('buy')"
-                    class="py-2.5 px-5 mx-auto no-underline text-base rounded transition-all font-semibold bg-[rgb(255,97,221)] text-white border-0 hover:scale-[1.03] hover:border hover:border-[rgb(255,97,221)] hover:bg-transparent hover:text-[rgb(255,97,221)]  duration-500 flex items-center">
-                    <i class="mr-2 fas fa-shopping-cart"></i> Buy Now
-                </button> -->
-                <Button :property="property" />
-
-
+                <Button :property="property" @buy="handleBuy(property)" @rent="handleRent(property)" />
             </div>
         </div>
     </div>
@@ -24,12 +18,48 @@
 
 <script setup>
 import Button from '@Components/Public/Property/Button.vue';
+import { toast } from 'vue3-toastify';
+import { router } from '@inertiajs/vue3';
 defineProps({
     property: {
         type: Object,
         required: true,
     },
 })
+
+const handleBuy = (property) => {
+    console.log("Buying property:", property.id);
+    router.post('/application', {
+        property_id: property.id,
+        type: 'buy'
+    }, {
+        onSuccess: (res) => {
+            if (res.props.flash.success) {
+                toast.success("Successfully applied for buying the property.");
+            }
+        },
+        onError: (errors) => {
+            toast.error("Error applying for buying:", errors);
+        }
+    });
+};
+
+const handleRent = (property) => {
+    console.log("Renting property:", property.id);
+    router.post('/application', {
+        property_id: property.id,
+        type: 'rent'
+    }, {
+        onSuccess: (res) => {
+            if (res.props.flash.success) {
+                toast.success("Successfully applied for renting the property.");
+            }
+        },
+        onError: (errors) => {
+            toast.error("Error applying for renting:", errors);
+        }
+    });
+};
 </script>
 
 <script>

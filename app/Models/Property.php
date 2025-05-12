@@ -68,4 +68,8 @@ class Property extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
 }

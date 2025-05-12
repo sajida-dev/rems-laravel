@@ -29,7 +29,7 @@ class PropertyController extends Controller
 
         // Agent can only see their own properties
         if ($user->role === 'agent') {
-            $query->where('agent_id', $user->id);
+            $query->where('agent_id', $user->agent->id);
         }
 
         // Global search
@@ -84,7 +84,8 @@ class PropertyController extends Controller
         DB::beginTransaction();
 
         try {
-            $validated['agent_id'] = Auth::id();
+            $user = Auth::user();
+            $validated['agent_id'] = $user->agent->id;
             if ($request->hasFile('main_image')) {
                 $mainImagePath = $request->file('main_image')->store('property_images', 'public');
                 $validated['image_url'] = $mainImagePath;

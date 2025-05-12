@@ -22,7 +22,11 @@
                 <Link v-for="item in section.items" :key="item.title" :href="item.href"
                     class="flex items-center p-2 rounded hover:bg-gray-800">
                 <i :class="`${item.icon} w-5`"></i><span class="ml-3">{{ item.title }}</span>
+                <span v-if="item?.badgeCount > 0" class="ml-2 bg-red-600 text-white text-xs rounded-full px-2 py-0.5">
+                    {{ item?.badgeCount }}
+                </span>
                 </Link>
+
             </template>
         </nav>
 
@@ -44,9 +48,10 @@
                     <Link href="/user/profile" class="flex items-center p-2 rounded hover:bg-gray-800">
                     <i class="fas fa-user w-5"></i><span class="ml-3">Profile</span>
                     </Link>
-                    <Link href="/logout" class="flex items-center p-2 rounded hover:bg-gray-800">
+                    <Link :href="route('logout')" method="post" class="flex items-center p-2 rounded hover:bg-gray-800">
                     <i class="fas fa-sign-out-alt w-5"></i><span class="ml-3">Logout</span>
                     </Link>
+
                 </div>
             </transition>
         </div>
@@ -54,19 +59,20 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import ApplicationLogo from './ApplicationLogo.vue'
 
-const { user } = defineProps(['open', 'user'])
-defineEmits(['close'])
 
+const { open, user, pendingCount } = defineProps(['open', 'user', 'pendingCount'])
+defineEmits(['close'])
 const userMenuOpen = ref(false)
+
 function toggleUserMenu() {
     userMenuOpen.value = !userMenuOpen.value
 }
 
-// Role-based sidebar menu
+
 const menu = computed(() => {
     const commonItems = [
         { title: 'Profile', href: '/user/profile', icon: 'fas fa-user' },
@@ -81,8 +87,12 @@ const menu = computed(() => {
                     { title: 'Categories', href: '/categories', icon: 'fas fa-th-large' },
                     { title: 'Amenities', href: '/amenities', icon: 'fas fa-cogs' },
                     { title: 'End-users', href: '/end-users', icon: 'fas fa-users' },
-                    { title: 'Agents', href: '/agents', icon: 'fas fa-user-tie' },
+                    {
+                        title: 'Agents', href: '/agents', icon: 'fas fa-user-tie',
+                        showPendingCount: true, badgeCount: pendingCount
+                    },
                     { title: 'Properties', href: '/properties', icon: 'fas fa-building' },
+                    { title: 'Applications', href: '/all-applications', icon: 'fas fa-file-signature' },
                 ],
             },
         ];
@@ -95,6 +105,7 @@ const menu = computed(() => {
                     ...commonItems,
                     { title: 'Hiring Requests', href: '/hiring-requests', icon: 'fas fa-briefcase' },
                     { title: 'Payments', href: '/payments', icon: 'fas fa-credit-card' },
+                    { title: 'Applications', href: '/all-applications', icon: 'fas fa-credit-card' },
 
                 ],
             },

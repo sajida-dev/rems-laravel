@@ -75,10 +75,8 @@ function goToPage(page) {
     }
 }
 
-// Reset page on filtering (filter logic to be implemented)
 function applyFilters(newFilters) {
     currentPage.value = 1;
-    // TODO: Apply filter logic to 'properties' array
 }
 </script>
 

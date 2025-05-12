@@ -64,7 +64,7 @@ const props = defineProps({
 const formattedProperties = computed(() =>
     props.properties.data.map(properties => ({
         ...properties,
-        status: properties.status,
+        status: properties.status.charAt(0).toUpperCase() + properties.status.slice(1),
         category_name: properties.category?.name ?? '-',
         agent_name: properties.agent.user?.name ?? '-',
     }))

@@ -9,10 +9,12 @@
                     class="mx-3 px-3 py-2 bg-pink-500 text-white rounded">
                 {{ createLabel }}
                 </Link>
-                <button @click="exportCSV" class="px-3 py-1 bg-black text-white rounded">
+                <button v-if="paginatedData.length > 0" @click="exportCSV"
+                    class="px-3 py-1 bg-black text-white rounded">
                     Export CSV
                 </button>
-                <button @click="exportPDF" class=" mx-3 px-3 py-1 bg-yellow-600 text-white rounded">
+                <button v-if="paginatedData.length > 0" @click="exportPDF"
+                    class=" mx-3 px-3 py-1 bg-yellow-600 text-white rounded">
                     Export PDF
                 </button>
             </div>
@@ -20,7 +22,7 @@
 
         <!-- Horizontal scroll -->
         <div class="overflow-x-auto w-full">
-            <table class="min-w-full text-sm ">
+            <table class="min-w-full text-sm">
                 <thead class="bg-gray-50">
                     <tr>
                         <th v-if="selectable" class="sticky left-0 w-12 bg-gray-50 px-3 py-2 text-left z-20">
@@ -108,7 +110,7 @@ const isShow = ref(true)
 onMounted(() => {
     if (props.isProperties) {
         const user = usepage.props.auth.user
-        if (user.role === 'admin' || (user.role === 'agent' && user.status === 0)) {
+        if (user.role === 'admin' || (user.role === 'agent' && user.agent?.status === 0)) {
             isShow.value = false
         }
     }

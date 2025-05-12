@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,12 +37,30 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $savedCategoryIds = null;
+        if ($user && $user->role == 'agent') {
+            $user->loadMissing(['agent.categories:id,name']);
+            $savedCategoryIds = $user->agent
+                ? $user->agent->categories()->pluck('categories.id')->toArray()
+                : [];
+        }
+
+
         return array_merge(parent::share($request), [
 
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),
             ],
+            'auth' => [
+                'user' => fn() => $user
+                    ? $user->toArray()
+                    : null,
+            ],
+            'allCategories' => fn() => Category::all(['id', 'name']),
+            'savedCategories' => $savedCategoryIds,
+
         ]);
     }
 }

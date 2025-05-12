@@ -41,7 +41,6 @@ const { property } = defineProps({
         required: true,
     },
 })
-console.log('property.uploads', property.uploads)
 const tab = ref('features')
 
 const tabClass =

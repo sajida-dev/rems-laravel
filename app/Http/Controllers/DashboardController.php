@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Property;
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -13,7 +16,31 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Dashboard/Home');
+        $user = Auth::user();
+
+        $sharedStats = [];
+
+        if ($user->role === 'agent') {
+            $sharedStats = [
+                'totalProperties'     => Property::where('agent_id', $user->agent->id)->count(),
+                'availableProperties' => Property::where('agent_id', $user->agent->id)->where('status', 'available')->count(),
+                'soldProperties'      => Property::where('agent_id', $user->agent->id)->where('status', 'sold')->count(),
+                'rentedProperties'    => Property::where('agent_id', $user->agent->id)->where('status', 'rented')->count(),
+            ];
+        }
+
+        if ($user->role === 'admin') {
+            $sharedStats = [
+                'agentsCount'     => User::where('role', 'agent')->count(),
+                'endUsersCount'   => User::where('role', 'user')->count(),
+                'propertiesCount' => Property::count(),
+                'ordersCount'     => Transaction::where('transaction_type', 'buy')->count(),
+            ];
+        }
+
+        // return response()->json([]);
+
+        return Inertia::render('Dashboard/Home', ['stats' => $sharedStats,]);
     }
 
     /**
@@ -43,14 +70,7 @@ class DashboardController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit()
-    {
-        $user = Auth::user();
-
-        return Inertia::render('Profile/Show', [
-            'user' => $user
-        ]);
-    }
+    public function edit() {}
 
     /**
      * Update the specified resource in storage.

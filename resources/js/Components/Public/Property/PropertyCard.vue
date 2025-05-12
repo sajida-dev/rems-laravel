@@ -75,8 +75,6 @@ const { property, initialBookmarkStatus } = defineProps({
         default: false,
     }
 })
-console.log('property bookmark', property.bookmark?.length)
-// const isBookmarked = ref(initialBookmarkStatus)
 const isBookmarked = ref(property.bookmark?.length)
 
 const imageUrl = computed(() => `/storage/${property.image_url}`)

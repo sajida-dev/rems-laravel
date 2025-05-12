@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
+use App\Models\Property;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -49,18 +50,48 @@ class TransactionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function createBuy(Property $property)
     {
-        //
+        if ($property->status !== 'available') {
+            return redirect()->back()->with('error', 'Property is not available for purchase.');
+        }
+
+        return Inertia::render('Properties/Buy/Create', [
+            'property' => $property,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTransactionRequest $request)
+    public function storeBuy(StoreTransactionRequest $request)
     {
         //
     }
+
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function createRent(Property $property)
+    {
+        if ($property->status !== 'available') {
+            return redirect()->back()->with('error', 'Property is not available for purchase.');
+        }
+
+        return Inertia::render('Properties/Rent/Create', [
+            'property' => $property,
+        ]);
+    }
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function storeRent(StoreTransactionRequest $request)
+    {
+        //
+    }
+
 
     /**
      * Display the specified resource.

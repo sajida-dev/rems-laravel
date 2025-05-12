@@ -9,18 +9,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AgentApprovedMail extends Mailable
+class NewApplicationNotification extends Mailable
 {
     use Queueable, SerializesModels;
-    public $username;
-    public $password;
+    public $property;
+    public $type;
+    public $user;
     /**
      * Create a new message instance.
      */
-    public function __construct($username, $password)
+    public function __construct($property, $type, $user)
     {
-        $this->username = $username;
-        $this->password = $password;
+        $this->property = $property;
+        $this->type = $type;
+        $this->user = $user;
     }
 
     /**
@@ -29,17 +31,21 @@ class AgentApprovedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Agent Account has been Approved!',
+            subject: $this->property->title . ' Application for ' . $this->type,
         );
     }
-
+    public function build()
+    {
+        return $this->subject($this->property->title . ' Application for ' . $this->type)
+            ->view('emails.new_application');
+    }
     /**
      * Get the message content definition.
      */
     public function content(): Content
     {
         return new Content(
-            view: 'emails.agent_approved',
+            view: 'emails.new_application',
         );
     }
 
@@ -51,11 +57,5 @@ class AgentApprovedMail extends Mailable
     public function attachments(): array
     {
         return [];
-    }
-
-    public function build()
-    {
-        return $this->subject('Your Agent Account has been Approved!')
-            ->view('emails.agent_approved');
     }
 }
