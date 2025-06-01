@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('data')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

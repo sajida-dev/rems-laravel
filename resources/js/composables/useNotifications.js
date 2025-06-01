@@ -1,47 +1,86 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Echo from 'laravel-echo'
+import { router } from '@inertiajs/vue3'
 
 export function useNotifications(userId) {
     const notifications = ref([])
     const unreadCount = ref(0)
+    const loading = ref(false)
+    const error = ref(null)
     let echo = null
 
     const fetchNotifications = async () => {
+        loading.value = true
+        error.value = null
         try {
-            const response = await fetch('/notifications')
+            const response = await fetch('/notifications', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
             const data = await response.json()
             notifications.value = data.notifications
             unreadCount.value = data.unread_count
-        } catch (error) {
-            console.error('Error fetching notifications:', error)
+        } catch (err) {
+            console.error('Error fetching notifications:', err)
+            error.value = err.message
+        } finally {
+            loading.value = false
         }
     }
 
     const markAsRead = async (id) => {
         try {
-            await fetch(`/notifications/${id}/read`, {
+            const response = await fetch(`/notifications/${id}/read`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
             })
-            await fetchNotifications()
-        } catch (error) {
-            console.error('Error marking notification as read:', error)
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            // Update local state
+            const notification = notifications.value.find(n => n.id === id)
+            if (notification && !notification.read_at) {
+                notification.read_at = new Date().toISOString()
+                unreadCount.value = Math.max(0, unreadCount.value - 1)
+            }
+        } catch (err) {
+            console.error('Error marking notification as read:', err)
         }
     }
 
     const markAllAsRead = async () => {
         try {
-            await fetch('/notifications/read-all', {
+            const response = await fetch('/notifications/read-all', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
             })
-            await fetchNotifications()
-        } catch (error) {
-            console.error('Error marking all notifications as read:', error)
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            // Update local state
+            notifications.value.forEach(n => n.read_at = new Date().toISOString())
+            unreadCount.value = 0
+        } catch (err) {
+            console.error('Error marking all notifications as read:', err)
         }
     }
 
@@ -68,7 +107,7 @@ export function useNotifications(userId) {
         // Initial fetch
         fetchNotifications()
 
-        // Fetch notifications every 30 seconds
+        // Fetch notifications every 30 seconds as backup
         const interval = setInterval(fetchNotifications, 30000)
 
         // Cleanup
@@ -83,8 +122,10 @@ export function useNotifications(userId) {
     return {
         notifications,
         unreadCount,
+        loading,
+        error,
+        fetchNotifications,
         markAsRead,
-        markAllAsRead,
-        fetchNotifications
+        markAllAsRead
     }
 } 

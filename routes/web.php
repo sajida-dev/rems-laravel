@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MessageController;
 use App\Models\Agent;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -98,6 +99,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
+
+    // Message Routes
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
+    Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
+    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+    Route::post('/messages/{message}/attachments', [MessageController::class, 'storeAttachment'])->name('messages.attachments.store');
+    Route::delete('/messages/{message}/attachments/{attachment}', [MessageController::class, 'destroyAttachment'])->name('messages.attachments.destroy');
+    Route::get('/messages/search', [MessageController::class, 'search'])->name('messages.search');
+    Route::get('/messages/notifications', [MessageController::class, 'notifications'])->name('messages.notifications');
+    Route::post('/messages/mark-all-read', [MessageController::class, 'markAllAsRead'])->name('messages.mark-all-read');
 });
 
 // Property routes for both agents and admins

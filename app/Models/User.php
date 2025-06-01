@@ -12,6 +12,9 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Notification;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\DatabaseNotification;
 
 class User extends Authenticatable
 {
@@ -21,6 +24,7 @@ class User extends Authenticatable
     use TwoFactorAuthenticatable;
     use SoftDeletes;
     use CanResetPassword;
+    use Notifiable;
 
     protected $dates = ['deleted_at'];
 
@@ -60,6 +64,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     /**
@@ -86,10 +91,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
     }
-    public function conversation()
-    {
-        return $this->hasMany(Conversation::class);
-    }
+
     public function applications()
     {
         return $this->hasMany(Application::class);
@@ -97,5 +99,21 @@ class User extends Authenticatable
     public function hiringRequests()
     {
         return $this->hasMany(HiringRequest::class);
+    }
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'recipient_id');
+    }
+    public function unreadMessages()
+    {
+        return $this->receivedMessages()->whereNull('read_at');
+    }
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
     }
 }

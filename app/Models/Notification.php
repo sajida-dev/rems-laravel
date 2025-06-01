@@ -4,16 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Notification extends Model
 {
     use HasFactory;
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+
 
     protected $fillable = [
         'user_id',
+        'title',
         'type',
         'message',
-        'title',
         'data',
         'read_at'
     ];
@@ -30,7 +34,14 @@ class Notification extends Model
 
     public function markAsRead()
     {
-        $this->update(['read_at' => now()]);
+        if (!$this->read_at) {
+            $this->update(['read_at' => now()]);
+        }
+    }
+
+    public function isRead(): bool
+    {
+        return !is_null($this->read_at);
     }
 
     public function scopeUnread($query)

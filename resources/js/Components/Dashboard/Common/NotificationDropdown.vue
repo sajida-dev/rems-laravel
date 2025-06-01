@@ -8,8 +8,8 @@
             </button>
         </div>
 
-        <div v-if="unreadNotifications.length" class="space-y-2">
-            <div v-for="notification in unreadNotifications" :key="notification.id"
+        <div v-if="notifications.length" class="space-y-2">
+            <div v-for="notification in notifications" :key="notification.id"
                 class="p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
                 :class="{ 'bg-blue-50': !notification.read_at }" @click="handleNotificationClick(notification)">
                 <div class="flex items-start">
@@ -36,7 +36,7 @@
         </div>
 
         <div v-else class="text-center py-4 text-gray-500">
-            No notifications
+            No unread notifications
         </div>
     </div>
 </template>
@@ -44,17 +44,12 @@
 <script setup>
 import { formatDistanceToNow } from 'date-fns'
 import { router } from '@inertiajs/vue3'
-import { computed } from 'vue'
 
 const props = defineProps({
     notifications: {
         type: Array,
         required: true
     }
-})
-
-const unreadNotifications = computed(() => {
-    return props.notifications.filter(notification => !notification.read_at)
 })
 
 const emit = defineEmits(['mark-as-read', 'mark-all-as-read', 'close'])
