@@ -1,53 +1,95 @@
 <template>
-    <transition name="fade">
-        <div v-if="notifications.length !== null" class="dropdown-menu w-80 bg-white rounded shadow-lg z-50"
-            @click.away="$emit('close')">
-            <div class="border-b px-4 py-2 font-semibold text-gray-800">
-                You have {{ notifications.length }} new notification
-                <span v-if="notifications.length !== 1">s</span>
-            </div>
-            <div class="max-h-64 overflow-y-auto">
-                <div v-for="(n, i) in notifications" :key="i"
-                    class="flex items-start gap-3 px-4 py-3 hover:bg-gray-100">
-                    <div v-if="n.icon" :class="['text-white rounded p-1', n.bg]">
-                        <i :class="['fa', n.icon]"></i>
+    <div class="bg-white rounded-lg shadow-lg p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Notifications</h3>
+            <button v-if="notifications.length" @click="$emit('mark-all-as-read')"
+                class="text-sm text-blue-600 hover:text-blue-800">
+                Mark all as read
+            </button>
+        </div>
+
+        <div v-if="unreadNotifications.length" class="space-y-2">
+            <div v-for="notification in unreadNotifications" :key="notification.id"
+                class="p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                :class="{ 'bg-blue-50': !notification.read_at }" @click="handleNotificationClick(notification)">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i :class="notification.data?.icon || 'fa-bell'" class="text-gray-500"></i>
                     </div>
-                    <img v-else-if="n.image" :src="n.image" alt="profile" class="w-8 h-8 rounded-full object-cover" />
-                    <div class="flex-1 text-sm">
-                        <p class="text-gray-700">{{ n.text }}</p>
-                        <p class="text-xs text-gray-500">{{ n.time }}</p>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-gray-900">
+                            {{ notification.data?.title || 'Notification' }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            {{ notification.data?.message || notification.message }}
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            {{ formatDate(notification.created_at) }}
+                        </p>
                     </div>
+                    <button v-if="!notification.read_at" @click.stop="$emit('mark-as-read', notification.id)"
+                        class="ml-2 text-sm text-blue-600 hover:text-blue-800">
+                        Mark as read
+                    </button>
                 </div>
-                <div v-if="notifications.length === 0" class="px-4 py-2 text-gray-500">
-                    No notifications
-                </div>
-            </div>
-            <div class="border-t text-center px-4 py-2">
-                <a href="#" class="text-sm text-blue-600 hover:underline">
-                    See all notifications <i class="fa fa-angle-right ml-1"></i>
-                </a>
             </div>
         </div>
-    </transition>
+
+        <div v-else class="text-center py-4 text-gray-500">
+            No notifications
+        </div>
+    </div>
 </template>
 
 <script setup>
+import { formatDistanceToNow } from 'date-fns'
+import { router } from '@inertiajs/vue3'
+import { computed } from 'vue'
+
 const props = defineProps({
     notifications: {
         type: Array,
-        default: () => []
+        required: true
     }
 })
+
+const unreadNotifications = computed(() => {
+    return props.notifications.filter(notification => !notification.read_at)
+})
+
+const emit = defineEmits(['mark-as-read', 'mark-all-as-read', 'close'])
+
+const formatDate = (date) => {
+    return formatDistanceToNow(new Date(date), { addSuffix: true })
+}
+
+const handleNotificationClick = (notification) => {
+    if (!notification.read_at) {
+        emit('mark-as-read', notification.id)
+    }
+
+    if (notification.data?.link) {
+        router.visit(notification.data.link)
+        emit('close')
+    }
+}
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.2s ease;
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 </style>

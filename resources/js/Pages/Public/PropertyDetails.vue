@@ -5,7 +5,7 @@
             { label: 'Home', link: '/' },
             { label: 'Property Details' }
         ]" />
-        <section class="py-8">
+            <section class="py-8">
                 <div class="container mx-auto px-4">
                     <PropertyHeader :property="property" @buy="buyNow" />
                     <PropertyTabs :property="property" />

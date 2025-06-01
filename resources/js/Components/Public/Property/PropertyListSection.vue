@@ -2,7 +2,7 @@
     <section class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div v-if="properties.length">
-                <SectionHeading subheading="Properties" title="Our Properties" />
+                <SectionHeading v-if="!isAgentProperties" subheading="Properties" title="Our Properties" />
                 <div class="flex flex-wrap -mx-4">
                     <div v-for="property in properties" :key="property.id" class="w-full px-4 mb-10"
                         :class="getColumnClass(columns)">
@@ -35,6 +35,10 @@ const props = defineProps({
         type: Number,
         default: 3,
     },
+    isAgentProperties: {
+        type: Boolean,
+        default: false,
+    }
 })
 
 const emit = defineEmits(['updatePage'])

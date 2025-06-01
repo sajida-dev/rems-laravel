@@ -28,12 +28,12 @@ class Transaction extends Model
     {
         return $this->hasMany(Payment::class);
     }
-    public function users()
+    public function user()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(User::class);
     }
     public function property()
     {
-        return $this->belongsToMany(Property::class);
+        return $this->belongsTo(Property::class);
     }
 }

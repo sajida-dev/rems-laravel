@@ -19,7 +19,7 @@
 
 <script setup>
 import { usePage } from '@inertiajs/vue3'
-import { ref, inject, onMounted } from 'vue';
+import { ref, inject, onMounted, provide } from 'vue';
 import Sidebar from '@Components/Dashboard/Common/Sidebar.vue'
 import Footer from '@Components/Dashboard/Common/Footer.vue'
 import Header from '@Components/Dashboard/Common/Header.vue'
@@ -29,7 +29,13 @@ import axios from 'axios'
 const { props } = usePage()
 const user = props.auth?.user
 const sidebarOpen = ref(false)
-let pendingCount = ref(0)
+const pendingCount = ref(props.pendingCount || 0)
+
+const updatePendingCount = (newCount) => {
+    pendingCount.value = newCount;
+}
+
+provide('updatePendingCount', updatePendingCount);
 
 onMounted(() => {
     if (user.role === 'admin') {

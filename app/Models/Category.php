@@ -26,4 +26,8 @@ class Category extends Model
     {
         return $this->hasMany(Agent::class);
     }
+    public function hiringRequest()
+    {
+        return $this->hasMany(HiringRequest::class);
+    }
 }

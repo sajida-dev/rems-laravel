@@ -7,18 +7,17 @@ namespace App\Models;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Notification;
 
 class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
-    use Notifiable;
     use TwoFactorAuthenticatable;
     use SoftDeletes;
     use CanResetPassword;
@@ -83,6 +82,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Agent::class);
     }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
+    }
     public function conversation()
     {
         return $this->hasMany(Conversation::class);
@@ -90,5 +93,9 @@ class User extends Authenticatable
     public function applications()
     {
         return $this->hasMany(Application::class);
+    }
+    public function hiringRequests()
+    {
+        return $this->hasMany(HiringRequest::class);
     }
 }

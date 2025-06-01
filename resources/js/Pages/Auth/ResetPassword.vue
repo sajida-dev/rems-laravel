@@ -6,7 +6,7 @@ import InputError from '@/Components/Default/InputError.vue';
 import InputLabel from '@/Components/Default/InputLabel.vue';
 import PrimaryButton from '@/Components/Default/PrimaryButton.vue';
 import TextInput from '@/Components/Default/TextInput.vue';
-import { toast } from 'vue3-toastify/index';
+import { toast } from 'vue3-toastify';
 
 const props = defineProps({
     email: String,

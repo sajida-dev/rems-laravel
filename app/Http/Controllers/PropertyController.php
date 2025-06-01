@@ -123,7 +123,10 @@ class PropertyController extends Controller
      */
     public function show(Property $property)
     {
-        //
+        $property->load(['category', 'amenities', 'uploads']);
+        return Inertia::render('Dashboard/Property/Show', [
+            'property' => $property
+        ]);
     }
 
     /**

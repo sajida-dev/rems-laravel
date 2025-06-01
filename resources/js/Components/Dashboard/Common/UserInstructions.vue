@@ -15,7 +15,7 @@
                 <p>✔️ You can now <strong>add and manage property listings</strong>.</p>
             </template>
 
-            <template v-else-if="user.role === 'endUser'">
+            <template v-else-if="user.role === 'user'">
                 <p>✔️ Browse available properties listed by trusted agents.</p>
                 <p>✔️ Use filters to narrow down properties based on your preferences.</p>
                 <p>✔️ You can create an account to save properties, contact agents, and leave reviews.</p>

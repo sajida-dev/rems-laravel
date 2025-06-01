@@ -8,6 +8,10 @@
             <div ref="emailRef" class="relative">
                 <button @click.stop="toggle('email')" class="focus:outline-none relative">
                     <i class="fa fa-envelope text-xl"></i>
+                    <span v-if="messages.length"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                        {{ messages.length }}
+                    </span>
                 </button>
 
                 <transition name="fade">
@@ -20,15 +24,16 @@
             <div ref="notifRef" class="relative">
                 <button @click.stop="toggle('notification')" class="focus:outline-none relative">
                     <i class="fa fa-bell text-xl"></i>
-                    <span v-if="notifications.length"
-                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                        {{ notifications.length }}
+                    <span v-if="unreadCount"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full min-w-[1.25rem] flex items-center justify-center">
+                        {{ unreadCount }}
                     </span>
                 </button>
 
                 <transition name="fade">
                     <div v-if="open === 'notification'" class="dropdown-wrapper">
-                        <NotificationDropdown :notifications="notifications" @close="open = null" />
+                        <NotificationDropdown :notifications="notifications" @close="open = null"
+                            @mark-as-read="markAsRead" @mark-all-as-read="markAllAsRead" />
                     </div>
                 </transition>
             </div>
@@ -51,20 +56,29 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+import Echo from 'laravel-echo'
 import MessageDropdown from './MessageDropdown.vue'
 import NotificationDropdown from './NotificationDropdown.vue'
 import UserDropdown from './UserDropdown.vue'
+import { useNotifications } from '@/composables/useNotifications'
 
 const props = defineProps({
     user: { type: Object, required: true },
     messages: { type: Array, default: () => [] },
-    notifications: { type: Array, default: () => [] },
 })
 
 const open = ref(null)
 const emailRef = ref(null)
 const notifRef = ref(null)
 const userRef = ref(null)
+
+const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead
+} = useNotifications(props.user.id)
 
 function toggle(menu) {
     open.value = open.value === menu ? null : menu
@@ -80,8 +94,38 @@ function onClickOutside(e) {
     }
 }
 
-onMounted(() => document.addEventListener('click', onClickOutside))
-onUnmounted(() => document.removeEventListener('click', onClickOutside))
+let echo
+
+onMounted(() => {
+    document.addEventListener('click', onClickOutside)
+
+    // Initialize Laravel Echo
+    echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'mt1',
+        wsHost: import.meta.env.VITE_PUSHER_HOST ? import.meta.env.VITE_PUSHER_HOST : `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
+        wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
+        wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
+        forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
+        enabledTransports: ['ws', 'wss'],
+    })
+
+    // Listen for messages
+    echo.private(`messages.${props.user.id}`)
+        .listen('NewMessage', (message) => {
+            if (open.value === 'email') {
+                messages.value.unshift(message)
+            }
+        })
+})
+
+onUnmounted(() => {
+    document.removeEventListener('click', onClickOutside)
+    if (echo) {
+        echo.leave(`messages.${props.user.id}`)
+    }
+})
 </script>
 
 <style scoped>

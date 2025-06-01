@@ -1,6 +1,5 @@
 <template>
-    <Link :href="`/property/${property.id}-${slugify(property.title)}`"
-        class="group overflow-hidden ftco-animate cursor-pointer relative block">
+    <Link :href="url" class="group overflow-hidden ftco-animate cursor-pointer relative block">
     <!-- Property image -->
     <div class="block w-full h-[270px] bg-cover bg-center" :style="{ backgroundImage: `url(${imageUrl})` }"></div>
 
@@ -63,8 +62,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
-
+import { Link, usePage } from '@inertiajs/vue3'
 const { property, initialBookmarkStatus } = defineProps({
     property: {
         type: Object,
@@ -75,6 +73,14 @@ const { property, initialBookmarkStatus } = defineProps({
         default: false,
     }
 })
+let url = ref(null)
+const page = usePage();
+if (page.props.auth.user.role == 'admin') {
+    url = `/properties/${property.id}`;
+} else {
+    url = `/property/${property.id}-${slugify(property.title)}`
+}
+
 const isBookmarked = ref(property.bookmark?.length)
 
 const imageUrl = computed(() => `/storage/${property.image_url}`)

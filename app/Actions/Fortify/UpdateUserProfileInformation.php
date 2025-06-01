@@ -48,12 +48,14 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user->updateProfilePhoto($input['photo']);
         }
         if ($user->role === 'agent') {
-            $user->agent()->updateOrCreate([], [
+            $agent = $user->agent()->updateOrCreate([], [
                 'agency' => $input['agency'] ?? null,
-                'licence_no' => intval($input['licence_no']) ?? null,
+                'licence_no' => $input['licence_no'] ?? null,
                 'experience' => $input['experience'] ?? null,
                 'bio' => $input['bio'] ?? null,
             ]);
+            $user->setRelation('agent', $agent);
+
             if (!empty($input['categories']) && is_array($input['categories'])) {
                 $user->agent->categories()->sync($input['categories']);
             }
@@ -64,12 +66,16 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         ) {
             $this->updateVerifiedUser($user, $input);
         } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'username' => $input['username'],
-                'contact' => $input['contact'] ?? null,
-                'email' => $input['email'],
-            ])->save();
+            $fields = [
+                'name'    => $input['name'] ?? $user->name,
+                'contact' => $input['contact'] ?? $user->contact,
+                'email'   => $input['email'] ?? $user->email,
+            ];
+            if ($user->role !== 'agent' && isset($input['username'])) {
+                $fields['username'] = $input['username'];
+            }
+
+            $user->forceFill($fields)->save();
         }
     }
 

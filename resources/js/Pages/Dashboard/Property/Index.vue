@@ -81,7 +81,7 @@ const columns = [
     // { key: 'bedrooms', label: 'Bedrooms' },
     // { key: 'bathrooms', label: 'Bathrooms' },
     { key: 'lot_area', label: 'Lot Area' },
-    { key: 'floor_area', label: 'Floor Area' },
+    //{ key: 'floor_area', label: 'Floor Area' },
     { key: 'year_built', label: 'Year Built' },
     // { key: 'is_water', label: 'Water Available' },
     // { key: 'stories', label: 'Stories' },

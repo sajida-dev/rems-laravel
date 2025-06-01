@@ -30,12 +30,16 @@ class HiringRequest extends Model
         'requirements',
         'description',
     ];
-    public function users()
+    public function user()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(User::class);
     }
-    public function agents()
+    public function agent()
     {
-        return $this->belongsToMany(Agent::class);
+        return $this->belongsTo(Agent::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

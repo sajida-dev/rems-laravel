@@ -6,10 +6,13 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EndUserController;
+use App\Http\Controllers\HiringRequestController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Agent;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -36,9 +39,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
 // Properties Listing
 Route::get('/all-properties', [PageController::class, 'properties'])->name('properties');
-// Route::get('/filter-properties', [PageController::class, 'filterProperties'])->name('properties.filter');
 Route::get('/property/{id}-{title}', [PageController::class, 'propertyDetails'])->name('property-details');
-
 
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
@@ -66,17 +67,15 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 });
 
 
-// Route::middleware(['auth', 'verified', 'agent'])->group(function () {});
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payment.index');
+    Route::post('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
+    Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
+    Route::post('/payment/createIntent', [PaymentController::class, 'create'])->name('payment.createIntent');
 
-
-Route::middleware('auth')->group(function () {
     Route::post('/application', [ApplicationController::class, 'store'])->name('application.store');
     Route::get('/all-applications', [ApplicationController::class, 'index'])->name('application.index');
-    Route::post('/application/{application}/approve', [Application::class, 'update'])->name('application.update');
-
-    Route::resource('properties', PropertyController::class)->except(['update']);
-    Route::post('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
-    Route::delete('/uploads/{upload}', [PropertyController::class, 'destroyUpload'])->name('uploads.destroy');
+    Route::post('/application/{application}/approve', [ApplicationController::class, 'update'])->name('application.update');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/bookmarks', [PropertyController::class, 'updateBookMark'])->name('property-bookmark-update');
@@ -86,4 +85,26 @@ Route::middleware('auth')->group(function () {
     Route::post('/property/{property}/buy', [TransactionController::class, 'storeBuy'])->name('buy.store');
     Route::get('/property/{property}/rent', [TransactionController::class, 'createRent'])->name('rent.create');
     Route::post('/property/{property}/rent', [TransactionController::class, 'storeRent'])->name('rent.store');
+
+    Route::get('/hiring-requests', [HiringRequestController::class, 'index'])->name('hiring-requests.index');
+    Route::get('/hiring-requests/{id}-{name}', [HiringRequestController::class, 'create'])->name('hiring-requests.create');
+    Route::post('/hiring-requests', [HiringRequestController::class, 'store'])->name('hiring-requests.store');
+    Route::get('/hiring-requests/{hiringRequest}', [HiringRequestController::class, 'show'])->name('hiring-requests.show');
+    Route::post('/accept-hiring-requests/{hiringRequest}', [HiringRequestController::class, 'accept'])->name('hiring-requests.accept');
+    Route::post('/reject-hiring-requests/{hiringRequest}', [HiringRequestController::class, 'reject'])->name('hiring-requests.reject');
+
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
+});
+
+// Property routes for both agents and admins
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware(['role:admin|agent'])->group(function () {
+        Route::resource('properties', PropertyController::class)->except(['update']);
+        Route::post('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+        Route::delete('/uploads/{upload}', [PropertyController::class, 'destroyUpload'])->name('uploads.destroy');
+    });
 });

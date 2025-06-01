@@ -76,31 +76,6 @@ class PageController extends Controller
         return Inertia::render('Public/Services');
     }
 
-    // public function properties()
-    // {
-    //     $allAmenities = Amenity::all();
-    //     $categories = Category::all();
-    //     $properties = Property::with([
-    //         'amenities',
-    //         'category',
-    //         'bookmark' => function ($query) {
-    //             $query->where('user_id', Auth::id());
-    //         }
-    //     ])
-    //         ->latest()
-    //         ->take(12)
-    //         ->get();
-    //     return Inertia::render(
-    //         'Public/Properties',
-    //         [
-    //             'properties' => $properties,
-    //             'categories' => $categories,
-    //             'allAmenities' => $allAmenities,
-    //         ]
-    //     );
-    // }
-
-
 
     public function properties(Request $request)
     {
@@ -198,11 +173,9 @@ class PageController extends Controller
 
     public function propertyDetails($id, $slug)
     {
-        // $property = Property::findOrFail($id);
         $property = Property::with(['category', 'amenities', 'uploads'])->findOrFail($id);
 
 
-        // Optional: Validate slug
         $expectedSlug = strtolower(str_replace(' ', '-', $property->title));
         if ($slug !== $expectedSlug) {
             return redirect()->route('properties');
@@ -215,10 +188,7 @@ class PageController extends Controller
         );
     }
 
-    public function filterProperties()
-    {
-        return Inertia::render('Public/PropertyFilter');
-    }
+
 
     public function contact()
     {

@@ -1,8 +1,9 @@
 <template>
     <div>
-        <PageLoader :loading="loading" />
+
         <Header />
         <main class="">
+            <PageLoader :loading="loading" />
             <slot />
         </main>
         <Footer />
@@ -17,11 +18,21 @@ import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 
 const loading = ref(false)
+const { props } = usePage()
+
+// Watch for page visits to show/hide loader
+const page = usePage()
+page.on('start', () => {
+    loading.value = true
+})
+page.on('finish', () => {
+    loading.value = false
+})
+
 defineProps({
     isHomePage: {
         type: Boolean,
         default: false
     }
 })
-
 </script>

@@ -27,5 +27,8 @@ const { agent } = defineProps({
 })
 
 
-const hireLink = `/request-services?agent_id=1`
+const hireLink = `/hiring-requests/${agent?.id}-${slugify(agent?.user?.name)}`
+function slugify(name) {
+    return name.toLowerCase().replace(/\s+/g, '-')
+}
 </script>

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('location');
+            $table->enum('type', ['rent', 'buy', 'sell']);
             $table->decimal('rent_price', 10, 2);
             $table->decimal('purchase_price', 10, 2);
             $table->decimal('old_rent_price', 10, 2)->nullable();

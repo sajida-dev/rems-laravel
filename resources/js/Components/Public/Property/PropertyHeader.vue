@@ -20,7 +20,7 @@
 import Button from '@Components/Public/Property/Button.vue';
 import { toast } from 'vue3-toastify';
 import { router } from '@inertiajs/vue3';
-defineProps({
+const props = defineProps({
     property: {
         type: Object,
         required: true,
@@ -28,7 +28,7 @@ defineProps({
 })
 
 const handleBuy = (property) => {
-    console.log("Buying property:", property.id);
+
     router.post('/application', {
         property_id: property.id,
         type: 'buy'
@@ -45,7 +45,6 @@ const handleBuy = (property) => {
 };
 
 const handleRent = (property) => {
-    console.log("Renting property:", property.id);
     router.post('/application', {
         property_id: property.id,
         type: 'rent'

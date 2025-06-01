@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'stripe' => [
+        'key' => env('APP_ENV') === 'production' ? env('STRIPE_LIVE_KEY') : env('STRIPE_TEST_KEY'),
+        'secret' => env('APP_ENV') === 'production' ? env('STRIPE_LIVE_SECRET') : env('STRIPE_TEST_SECRET'),
+        'webhook_secret' => env('APP_ENV') === 'production' ? env('STRIPE_LIVE_WEBHOOK_SECRET') : env('STRIPE_TEST_WEBHOOK_SECRET'),
+        'mode' => env('APP_ENV') === 'production' ? 'live' : 'test',
+    ],
 ];

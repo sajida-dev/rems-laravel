@@ -83,7 +83,7 @@
         <!-- Pagination -->
         <div class="flex justify-between items-center p-4 border-t bg-gray-50">
             <div>
-                Showing {{ pageStart }} to {{ pageEnd }} of {{ props.pagination.total }}
+                Showing {{ pageStart }} to {{ pageEnd }} of {{ props.pagination.total ?? 0 }}
             </div>
             <div class="flex items-center gap-2">
                 <button @click="prevPage" :disabled="props.pagination.currentPage === 1"
@@ -117,8 +117,8 @@ onMounted(() => {
 })
 
 const props = defineProps({
-    columns: { type: Array, required: true },
-    rows: { type: Array, required: true },
+    columns: { type: Array, required: true, default: () => [] },
+    rows: { type: Array, required: true, default: () => [] },
     selectable: { type: Boolean, default: false },
     expandable: { type: Boolean, default: false },
     filterable: { type: Boolean, default: false },
@@ -187,11 +187,19 @@ const paginatedData = computed(() => {
     const start = (page.value - 1) * props.perPage
     return filteredData.value.slice(start, start + props.perPage)
 })
+const pageStart = computed(() => {
+    if (!props.pagination || !props.pagination.perPage || !props.pagination.currentPage) return 0;
+    return (props.pagination.perPage * (props.pagination.currentPage - 1)) + 1;
+});
 
-const pageStart = computed(() => (props.pagination.perPage * (props.pagination.currentPage - 1)) + 1)
-const pageEnd = computed(() => Math.min(props.pagination.currentPage * props.pagination.perPage, props.pagination.total))
-const totalPages = computed(() => props.pagination.lastPage)
+const pageEnd = computed(() => {
+    if (!props.pagination || !props.pagination.perPage || !props.pagination.currentPage || !props.pagination.total) return 0;
+    return Math.min(props.pagination.currentPage * props.pagination.perPage, props.pagination.total);
+});
 
+const totalPages = computed(() => {
+    return props.pagination?.lastPage ?? 0;
+});
 
 const sort = key => {
     if (sortBy.value === key) sortDesc.value = !sortDesc.value

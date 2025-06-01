@@ -11,7 +11,7 @@
                 <p><strong>Experience:</strong> {{ agent?.experience }} years</p>
                 <p><strong>Bio:</strong> {{ agent?.bio }}</p>
                 <p><strong>Contact Number:</strong> {{ agent?.user?.contact ?? 'N/A' }}</p>
-                <p><strong>Specialties:</strong>
+                <p><strong>Specializations:</strong>
                     {{agent.categories && agent.categories.length
                         ? agent.categories.map(cat => cat.name).join(', ')
                         : 'Residential, Commercial'

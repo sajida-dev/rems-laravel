@@ -18,8 +18,8 @@ class AgentMiddleware
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'agent') {
-            abort(403, 'Access denied. Agents only.');
+        if (!$user || $user->role !== 'agent' || !$user->agent || $user->agent->status !== 1) {
+            return redirect()->route('dashboard');
         }
         return $next($request);
     }

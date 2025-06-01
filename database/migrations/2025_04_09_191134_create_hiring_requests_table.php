@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('max_budget', 10, 2)->nullable();
             $table->integer('bedrooms')->nullable();
             $table->text('requirements');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');

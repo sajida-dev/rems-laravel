@@ -1,20 +1,6 @@
-<!-- <template>
-
-    <Head title="Details Agent" />
-
-</template>
-<script setup>
-import { Head } from '@inertiajs/vue3'
-import DashboardLayout from '@/Layouts/DashboardLayout.vue';
-defineOptions({ layout: DashboardLayout })
-</script>
-<style></style> -->
-
-
 <template>
 
     <Head :title="agent.user.name" />
-
     <div class="container mx-auto py-8 px-4">
         <!-- Agent Card -->
         <div class="bg-white shadow-md rounded-lg p-6 mb-6 flex flex-col md:flex-row items-center gap-6">
@@ -28,12 +14,12 @@ defineOptions({ layout: DashboardLayout })
                 <p class="text-gray-700"><strong>Email:</strong> {{ agent.user.email }}</p>
                 <p class="text-gray-700"><strong>Bio:</strong> {{ agent.bio }}</p>
 
-                <div v-if="agent.status === 0" class="mt-4">
-                    <button @click="approveAgent" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                <div v-if="agentStatus === 0" class="mt-4">
+                    <button @click="approveAgent" class="bg-green-700 text-white py-2 px-4 rounded hover:bg-green-800">
                         Approve Agent
                     </button>
                 </div>
-                <div v-if="agent.status === 1" class="mt-4">
+                <div v-if="agentStatus === 1" class="mt-4">
                     <span class="text-green-600 font-bold">Approved</span>
                 </div>
             </div>
@@ -45,56 +31,62 @@ defineOptions({ layout: DashboardLayout })
             <h3 class="text-xl font-semibold border-b border-gray-300 pb-2 mb-4">
                 Properties by {{ agent.user.name }}
             </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div v-if="properties?.length" v-for="property in properties" :key="property.id"
-                    class="bg-white rounded-lg shadow hover:shadow-lg transition">
-                    <img :src="`/storage/${property.image_url}`" alt="Property Cover"
-                        class="w-full h-48 object-cover rounded-t-lg" />
-                    <div class="p-4">
-                        <h4 class="text-lg font-semibold">{{ property.title }}</h4>
-                        <p class="text-sm text-gray-600"><strong>Location:</strong> {{ property.location }}</p>
-                        <p class="text-sm text-gray-600">
-                            <strong>Rent Price:</strong> ${{ Number(property.rent_price).toFixed(2) }} / mo
-                        </p>
-                        <p class="text-sm text-gray-600">
-                            <strong>Purchase Price:</strong> ${{ Number(property.purchase_price).toFixed(2) }} / mo
-                        </p>
-                        <p class="text-sm text-gray-600"><strong>Category:</strong> {{ property.category_name }}</p>
-                        <p v-if="property.amenities" class="text-sm text-gray-500">
-                            <strong>Amenities:</strong> {{ property.amenities }}
-                        </p>
-                    </div>
-                </div>
-                <p v-else class="col-span-3 text-gray-500">No properties found for this agent.</p>
-            </div>
+            <PropertyListSection :properties="paginatedProperties"
+                :message="!paginatedProperties.length ? 'No properties found.' : ''" :currentPage="currentPage"
+                :totalPages="totalPages" :columns="2" @updatePage="goToPage" :isAgentProperties="true" />
         </div>
     </div>
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue';
-import { Head } from '@inertiajs/vue3'
+import { defineProps, ref, computed, inject } from 'vue';
+import { Head, router } from '@inertiajs/vue3'
+import PropertyListSection from '@/Components/Public/Property/PropertyListSection.vue'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
-import { Inertia } from '@inertiajs/inertia';
 import { toast } from 'vue3-toastify'
-
+import { usePage } from '@inertiajs/vue3'
 defineOptions({ layout: DashboardLayout })
 const props = defineProps({
     agent: Object,
-    properties: Array
+    properties: Array,
+    pendingCount: {
+        type: Number,
+        required: true
+    }
 });
+const currentPage = ref(1)
+const perPage = 9
+const totalPages = computed(() => Math.ceil(props.properties.length / perPage))
+
+const paginatedProperties = computed(() => {
+    const start = (currentPage.value - 1) * perPage
+    return props.properties.slice(start, start + perPage)
+})
+
+const page = usePage();
+const agentStatus = ref(props.agent.status);
+const updatePendingCount = inject('updatePendingCount');
+
+const emit = defineEmits(['update:pendingCount']);
+
+function goToPage(page) {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page
+    }
+}
 const profile_pic = ref(`/storage/${props.agent.user.profile_photo_path}`)
 const approveAgent = () => {
-    Inertia.post(route('agents.approve', props.agent.id), {}, {
+    router.post(route('agents.approve', props.agent.id), {}, {
         preserveScroll: true,
-        only: [],
-        onSuccess: () => {
-            this.agent.status = 1;
-            toast.success($page.props.flash.success || "Agent approved successfully!");
+        onSuccess: (response) => {
+            agentStatus.value = 1;
+            if (updatePendingCount) {
+                updatePendingCount(page.props.pendingCount - 1);
+            }
+            toast.success(response.props.flash.success || "Agent approved successfully!");
         },
         onError: () => {
-            toast.error($page.props.flash.error || "Agent is already approved or something went wrong.");
+            toast.error(page.props.flash.error || "Something went wrong!");
         }
     });
 }

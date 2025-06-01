@@ -1,6 +1,6 @@
 <template>
     <aside
-        class="bg-gray-900 text-white w-64 fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0"
+        class="bg-gray-900 text-white w-64 fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 flex flex-col h-full"
         :class="{ '-translate-x-full': !open }">
 
         <div class="flex items-center justify-between p-4 border-b border-gray-800">
@@ -10,50 +10,54 @@
             </button>
         </div>
 
-        <nav class="mt-4 px-4">
-            <Link href="/dashboard" class="flex items-center p-2 rounded hover:bg-gray-800">
-            <i class="fas fa-home w-5"></i><span class="ml-3">Dashboard</span>
-            </Link>
-
-            <template v-for="(section, index) in menu" :key="index">
-                <div v-if="section.label" class="text-gray-400 text-xs uppercase mt-6 mb-2">
-                    {{ section.label }}
-                </div>
-                <Link v-for="item in section.items" :key="item.title" :href="item.href"
-                    class="flex items-center p-2 rounded hover:bg-gray-800">
-                <i :class="`${item.icon} w-5`"></i><span class="ml-3">{{ item.title }}</span>
-                <span v-if="item?.badgeCount > 0" class="ml-2 bg-red-600 text-white text-xs rounded-full px-2 py-0.5">
-                    {{ item?.badgeCount }}
-                </span>
+        <div class="flex-1 overflow-y-auto">
+            <nav class="mt-4 px-4">
+                <Link href="/dashboard" class="flex items-center p-2 rounded hover:bg-gray-800">
+                <i class="fas fa-home w-5"></i><span class="ml-3">Dashboard</span>
                 </Link>
 
-            </template>
-        </nav>
+                <template v-for="(section, index) in menu" :key="index">
+                    <div v-if="section.label" class="text-gray-400 text-xs uppercase mt-6 mb-2">
+                        {{ section.label }}
+                    </div>
+                    <Link v-for="item in section.items" :key="item.title" :href="item.href"
+                        class="flex items-center p-2 rounded hover:bg-gray-800">
+                    <i :class="`${item.icon} w-5`"></i><span class="ml-3">{{ item.title }}</span>
+                    <span v-if="item?.badgeCount > 0"
+                        class="ml-2 bg-red-600 text-white text-xs rounded-full px-2 py-0.5">
+                        {{ item?.badgeCount }}
+                    </span>
+                    </Link>
+                </template>
+            </nav>
+        </div>
 
-        <div class="absolute bottom-0 w-full p-4 border-t border-gray-800">
-            <div class="flex items-center space-x-3">
-                <img :src="'/storage' + '/' + user.profile_photo_path" alt="User Avatar"
-                    class="h-12 w-12 rounded-full object-cover cursor-pointer" @click="toggleUserMenu" />
-                <div>
-                    <p class="text-sm font-semibold text-white">{{ user.name }}</p>
-                    <p class="text-xs text-gray-400">{{ user.role || 'User' }}</p>
+        <div class="border-t border-gray-800 bg-gray-900">
+            <div class="p-4">
+                <div class="flex items-center space-x-3">
+                    <img :src="'/storage' + '/' + user.profile_photo_path" alt="User Avatar"
+                        class="h-12 w-12 rounded-full object-cover cursor-pointer" @click="toggleUserMenu" />
+                    <div>
+                        <p class="text-sm font-semibold text-white">{{ user.name }}</p>
+                        <p class="text-xs text-gray-400">{{ user.role || 'User' }}</p>
+                    </div>
                 </div>
+
+                <transition name="fade">
+                    <div v-if="userMenuOpen" class="mt-4 bg-gray-900 space-y-2 max-h-[200px] overflow-y-auto">
+                        <Link href="/settings" class="flex items-center p-2 rounded hover:bg-gray-800">
+                        <i class="fas fa-cogs w-5"></i><span class="ml-3">Settings</span>
+                        </Link>
+                        <Link href="/user/profile" class="flex items-center p-2 rounded hover:bg-gray-800">
+                        <i class="fas fa-user w-5"></i><span class="ml-3">Profile</span>
+                        </Link>
+                        <Link :href="route('logout')" method="post"
+                            class="flex items-center p-2 rounded hover:bg-gray-800">
+                        <i class="fas fa-sign-out-alt w-5"></i><span class="ml-3">Logout</span>
+                        </Link>
+                    </div>
+                </transition>
             </div>
-
-            <transition name="fade">
-                <div v-if="userMenuOpen" class="mt-4 space-y-2">
-                    <Link href="/settings" class="flex items-center p-2 rounded hover:bg-gray-800">
-                    <i class="fas fa-cogs w-5"></i><span class="ml-3">Settings</span>
-                    </Link>
-                    <Link href="/user/profile" class="flex items-center p-2 rounded hover:bg-gray-800">
-                    <i class="fas fa-user w-5"></i><span class="ml-3">Profile</span>
-                    </Link>
-                    <Link :href="route('logout')" method="post" class="flex items-center p-2 rounded hover:bg-gray-800">
-                    <i class="fas fa-sign-out-alt w-5"></i><span class="ml-3">Logout</span>
-                    </Link>
-
-                </div>
-            </transition>
         </div>
     </aside>
 </template>
@@ -76,14 +80,17 @@ function toggleUserMenu() {
 const menu = computed(() => {
     const commonItems = [
         { title: 'Profile', href: '/user/profile', icon: 'fas fa-user' },
-        { title: 'Messages', href: '/messages', icon: 'fas fa-envelope' },
-    ];
+        { title: 'Hiring Requests', href: '/hiring-requests', icon: 'fas fa-briefcase' },
+        { title: 'Applications', href: '/all-applications', icon: 'fas fa-file-signature' },
+        { title: 'Payments', href: '/payments', icon: 'fas fa-credit-card' },
 
+    ];
     if (user.role === 'admin') {
         return [
             {
                 label: 'Management',
                 items: [
+                    ...commonItems,
                     { title: 'Categories', href: '/categories', icon: 'fas fa-th-large' },
                     { title: 'Amenities', href: '/amenities', icon: 'fas fa-cogs' },
                     { title: 'End-users', href: '/end-users', icon: 'fas fa-users' },
@@ -92,7 +99,6 @@ const menu = computed(() => {
                         showPendingCount: true, badgeCount: pendingCount
                     },
                     { title: 'Properties', href: '/properties', icon: 'fas fa-building' },
-                    { title: 'Applications', href: '/all-applications', icon: 'fas fa-file-signature' },
                 ],
             },
         ];
@@ -103,9 +109,7 @@ const menu = computed(() => {
                 items: [
                     { title: 'My Properties', href: '/properties', icon: 'fas fa-building' },
                     ...commonItems,
-                    { title: 'Hiring Requests', href: '/hiring-requests', icon: 'fas fa-briefcase' },
-                    { title: 'Payments', href: '/payments', icon: 'fas fa-credit-card' },
-                    { title: 'Applications', href: '/all-applications', icon: 'fas fa-credit-card' },
+                    { title: 'Messages', href: '/messages', icon: 'fas fa-envelope' },
 
                 ],
             },
@@ -116,8 +120,7 @@ const menu = computed(() => {
                 label: 'User Panel',
                 items: [
                     ...commonItems,
-                    { title: 'Hire an Agent', href: '/hire-agent', icon: 'fas fa-handshake' },
-                    { title: 'Payments', href: '/payments', icon: 'fas fa-credit-card' },
+                    { title: 'Messages', href: '/messages', icon: 'fas fa-envelope' },
 
                 ],
             },
@@ -135,5 +138,30 @@ const menu = computed(() => {
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+/* Custom scrollbar styles */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Ensure the sidebar takes full height on mobile */
+@media (max-width: 1024px) {
+    aside {
+        height: 100vh;
+    }
 }
 </style>

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('property_id');
-            $table->enum('transaction_type', ['hire', 'buy', 'sell']);
+            $table->enum('transaction_type', ['hire', 'buy', 'rent']);
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamps();
             $table->softDeletes();

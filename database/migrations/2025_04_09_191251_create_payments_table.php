@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('transaction_id');
             $table->decimal('amount', 10, 2);
             $table->enum('payment_method', ['credit_card', 'bank_transfer', 'paypal']);
+            $table->string('environment')->default('test')->after('status');
             $table->string('stripe_payment_id')->nullable();
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamps();

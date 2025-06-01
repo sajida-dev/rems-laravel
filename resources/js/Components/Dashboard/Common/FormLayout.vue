@@ -60,34 +60,6 @@ const submit = () => {
     })
 
 
-    // let method = props.method.toLowerCase()
-
-    // const data = form.data()
-    // if (['put', 'patch'].includes(method)) {
-    //     form._method = method
-    // }
-    // if (hasFileUpload && method === 'put') {
-    //     method = 'post'
-    // }
-
-    // form[method](window.route(props.routeName, props.routeParams), {
-    //     data: { ...data, _method: 'PUT' },
-    //     preserveScroll: true,
-    //     forceFormData: hasFileUpload.value,
-    //     onSuccess: (response) => {
-    //         // form.reset()
-    //         toast.success(response.props.flash.success || 'Submitted successfully')
-    //         form.reset(props.fields)
-    //     },
-    //     onError: (errors) => {
-    //         Object.values(errors)
-    //             .flat()
-    //             .forEach(message => {
-    //                 toast.error(message)
-    //             })
-
-    //     },
-    // })
 }
 
 
