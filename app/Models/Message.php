@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\MessageEncryptionService;
+use Illuminate\Support\Facades\Storage;
 
 class Message extends Model
 {
@@ -35,6 +36,8 @@ class Message extends Model
         'read_at' => 'datetime'
     ];
 
+    protected $with = ['attachments'];
+
     protected static function boot()
     {
         parent::boot();
@@ -42,6 +45,14 @@ class Message extends Model
         static::creating(function ($message) {
             $encryptionService = app(MessageEncryptionService::class);
             $message->content = $encryptionService->encrypt($message->content);
+        });
+
+        static::deleting(function ($message) {
+            // Delete all attachments when message is deleted
+            foreach ($message->attachments as $attachment) {
+                Storage::delete($attachment->path);
+                $attachment->delete();
+            }
         });
     }
 

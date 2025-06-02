@@ -49,33 +49,35 @@
                 </thead>
 
                 <tbody class="bg-white">
-                    <tr v-for="(row, index) in paginatedData" :key="row.id" class="hover:bg-gray-50 transition">
-                        <td v-if="selectable" class="sticky left-0 bg-white w-12 px-3 py-2 z-10">
-                            <input type="checkbox" v-model="selectedRows" :value="row.id" />
-                        </td>
-                        <td v-for="column in columns" :key="column.key" class="px-3 py-2 whitespace-nowrap">
-                            <template v-if="$slots['cell-' + column.key]">
-                                <slot :name="'cell-' + column.key" :row="row" />
-                            </template>
-                            <template v-else>
-                                {{ row[column.key] }}
-                            </template>
-                        </td>
-                        <td v-if="hasRowActions" class="px-3 py-2 whitespace-nowrap">
-                            <slot name="row-actions" :row="row" />
-                        </td>
-                        <td v-if="expandable" class="text-center px-3 py-2">
-                            <button @click="toggleExpand(row.id)">
-                                {{ expandedRows.includes(row.id) ? '−' : '+' }}
-                            </button>
-                        </td>
-                    </tr>
+                    <template v-for="(row, index) in paginatedData" :key="row?.id || index">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td v-if="selectable" class="sticky left-0 bg-white w-12 px-3 py-2 z-10">
+                                <input type="checkbox" v-model="selectedRows" :value="row?.id" />
+                            </td>
+                            <td v-for="column in columns" :key="column.key" class="px-3 py-2 whitespace-nowrap">
+                                <template v-if="$slots['cell-' + column.key]">
+                                    <slot :name="'cell-' + column.key" :value="row?.[column.key]" :row="row" />
+                                </template>
+                                <template v-else>
+                                    {{ row?.[column.key] }}
+                                </template>
+                            </td>
+                            <td v-if="hasRowActions" class="px-3 py-2 whitespace-nowrap">
+                                <slot name="row-actions" :row="row" />
+                            </td>
+                            <td v-if="expandable" class="text-center px-3 py-2">
+                                <button @click="toggleExpand(row?.id)">
+                                    {{ expandedRows.includes(row?.id) ? '−' : '+' }}
+                                </button>
+                            </td>
+                        </tr>
 
-                    <tr v-if="expandable && expandedRows.includes(row.id)" class="bg-gray-50">
-                        <td :colspan="columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0)" class="p-3">
-                            <slot name="expand" :row="row" />
-                        </td>
-                    </tr>
+                        <tr v-if="expandable && row && expandedRows.includes(row.id)" class="bg-gray-50">
+                            <td :colspan="columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0)" class="p-3">
+                                <slot name="expanded-row" :row="row" />
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
@@ -101,7 +103,6 @@ import debounce from 'lodash.debounce'
 import { Link, usePage } from '@inertiajs/vue3'
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
-
 
 const usepage = usePage()
 
@@ -143,21 +144,22 @@ const filters = ref({ global: '', columns: {} })
 const debouncedSearch = debounce(() => { page.value = 1 }, 400)
 
 const toggleExpand = id => {
+    if (!id) return
     const idx = expandedRows.value.indexOf(id)
     if (idx > -1) expandedRows.value.splice(idx, 1)
     else expandedRows.value.push(id)
 }
 
 const toggleAllSelection = () => {
-    selectedRows.value = allSelected.value ? [] : props.rows.map(r => r.id)
+    selectedRows.value = allSelected.value ? [] : props.rows.filter(r => r?.id).map(r => r.id)
 }
 
 const allSelected = computed(() =>
-    props.rows.length > 0 && selectedRows.value.length === props.rows.length
+    props.rows.length > 0 && selectedRows.value.length === props.rows.filter(r => r?.id).length
 )
 
 const sortedData = computed(() => {
-    let data = [...props.rows]
+    let data = [...props.rows].filter(row => row)
     if (sortBy.value) {
         data.sort((a, b) => {
             const aVal = a[sortBy.value]
@@ -172,6 +174,7 @@ const sortedData = computed(() => {
 
 const filteredData = computed(() => {
     return sortedData.value.filter(row => {
+        if (!row) return false
         const globalMatch = Object.values(row).some(val =>
             val?.toString().toLowerCase().includes(filters.value.global.toLowerCase())
         )
@@ -187,6 +190,7 @@ const paginatedData = computed(() => {
     const start = (page.value - 1) * props.perPage
     return filteredData.value.slice(start, start + props.perPage)
 })
+
 const pageStart = computed(() => {
     if (!props.pagination || !props.pagination.perPage || !props.pagination.currentPage) return 0;
     return (props.pagination.perPage * (props.pagination.currentPage - 1)) + 1;
@@ -205,11 +209,13 @@ const sort = key => {
     if (sortBy.value === key) sortDesc.value = !sortDesc.value
     else { sortBy.value = key; sortDesc.value = false }
 }
+
 const prevPage = () => {
     if (props.pagination.currentPage > 1) {
         emit('update', { page: props.pagination.currentPage - 1 })
     }
 }
+
 const nextPage = () => {
     if (props.pagination.currentPage < props.pagination.lastPage) {
         emit('update', { page: props.pagination.currentPage + 1 })
@@ -230,7 +236,7 @@ const exportCSV = () => {
     const csvRows = []
     const headers = props.columns.map(col => col.label)
     csvRows.push(headers.join(','))
-    props.rows.forEach(row => {
+    props.rows.filter(row => row).forEach(row => {
         const values = props.columns.map(col => `"${row[col.key] ?? ''}"`)
         csvRows.push(values.join(','))
     })
@@ -245,7 +251,7 @@ const exportPDF = () => {
     const doc = new jsPDF()
 
     const headers = props.columns.map(col => col.label)
-    const data = props.rows.map(row =>
+    const data = props.rows.filter(row => row).map(row =>
         props.columns.map(col => row[col.key] ?? '')
     )
 

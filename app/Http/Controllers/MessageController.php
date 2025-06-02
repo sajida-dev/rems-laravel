@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Events\NewMessage;
 use App\Services\NotificationService;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
@@ -66,7 +68,8 @@ class MessageController extends Controller
                         'content' => $lastMessage->decrypted_content ?? $lastMessage->content,
                         'created_at' => $lastMessage->created_at,
                         'sender_id' => $lastMessage->sender_id,
-                        'is_sent_by_me' => $lastMessage->sender_id === Auth::id()
+                        'is_sent_by_me' => $lastMessage->sender_id === Auth::id(),
+                        'read_at' => $lastMessage->read_at
                     ] : null,
                     'unread_count' => $unreadCount
                 ];
@@ -100,20 +103,30 @@ class MessageController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
+        $formattedMessages = $messages->map(function ($message) {
+            return [
+                'id' => $message->id,
+                'sender_id' => $message->sender_id,
+                'recipient_id' => $message->recipient_id,
+                'content' => $message->decrypted_content,
+                'created_at' => $message->created_at,
+                'read_at' => $message->read_at,
+                'sender' => [
+                    'id' => $message->sender->id,
+                    'name' => $message->sender->name,
+                    'profile_photo_path' => $message->sender->profile_photo_path
+                ],
+                'recipient' => [
+                    'id' => $message->recipient->id,
+                    'name' => $message->recipient->name,
+                    'profile_photo_path' => $message->recipient->profile_photo_path
+                ],
+                'attachments' => $message->attachments
+            ];
+        });
+
         return response()->json([
-            'messages' => $messages->map(function ($message) {
-                return [
-                    'id' => $message->id,
-                    'sender_id' => $message->sender_id,
-                    'recipient_id' => $message->recipient_id,
-                    'content' => $message->decrypted_content,
-                    'created_at' => $message->created_at,
-                    'read_at' => $message->read_at,
-                    'sender' => $message->sender,
-                    'recipient' => $message->recipient,
-                    'attachments' => $message->attachments
-                ];
-            })
+            'messages' => $formattedMessages
         ]);
     }
 
@@ -125,44 +138,66 @@ class MessageController extends Controller
         }
 
         $validated = $request->validate([
-            'content' => 'required|string|max:5000'
+            'content' => 'nullable|string|max:5000',
+            'attachments.*' => 'nullable|file|max:10240' // 10MB max per file
         ]);
 
-        $message = Message::create([
-            'sender_id' => Auth::id(),
-            'recipient_id' => $user->id,
-            'content' => $validated['content']
-        ]);
+        DB::beginTransaction();
 
-        $message->load(['sender', 'recipient']);
+        try {
+            $message = Message::create([
+                'sender_id' => Auth::id(),
+                'recipient_id' => $user->id,
+                'content' => $validated['content'] ?? ''
+            ]);
 
-        // Notify recipient
-        $this->notificationService->notify(
-            $user,
-            'message',
-            "New message from " . Auth::user()->name,
-            [
-                'title' => 'New Message',
-                'message' => $validated['content'],
-                'link' => route('messages.index')
-            ]
-        );
+            // Handle attachments
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $path = $file->store('message-attachments');
 
-        // Broadcast new message event
-        broadcast(new NewMessage($message))->toOthers();
+                    $message->attachments()->create([
+                        'filename' => $file->getClientOriginalName(),
+                        'path' => $path,
+                        'mime_type' => $file->getMimeType(),
+                        'size' => $file->getSize()
+                    ]);
+                }
+            }
 
-        return response()->json([
-            'message' => [
-                'id' => $message->id,
-                'sender_id' => $message->sender_id,
-                'recipient_id' => $message->recipient_id,
-                'content' => $message->decrypted_content,
-                'created_at' => $message->created_at,
-                'read_at' => $message->read_at,
-                'sender' => $message->sender,
-                'recipient' => $message->recipient
-            ]
-        ]);
+            // Load relationships immediately
+            $message->load(['sender', 'recipient', 'attachments']);
+
+            // Broadcast new message event
+            broadcast(new NewMessage($message))->toOthers();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => [
+                    'id' => $message->id,
+                    'sender_id' => $message->sender_id,
+                    'recipient_id' => $message->recipient_id,
+                    'content' => $message->decrypted_content,
+                    'created_at' => $message->created_at,
+                    'read_at' => $message->read_at,
+                    'sender' => $message->sender,
+                    'recipient' => $message->recipient,
+                    'attachments' => $message->attachments->map(function ($attachment) {
+                        return [
+                            'id' => $attachment->id,
+                            'name' => $attachment->filename,
+                            'type' => $attachment->mime_type,
+                            'size' => $attachment->size,
+                            'url' => Storage::url($attachment->path)
+                        ];
+                    })
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to send message: ' . $e->getMessage()], 500);
+        }
     }
 
     public function destroy(Message $message)
@@ -243,14 +278,32 @@ class MessageController extends Controller
 
     public function notifications()
     {
+        // Get all unread messages grouped by sender
         $unreadMessages = Message::where('recipient_id', Auth::id())
             ->whereNull('read_at')
             ->with(['sender'])
-            ->latest()
-            ->paginate(20);
+            ->get()
+            ->groupBy('sender_id')
+            ->map(function ($messages, $senderId) {
+                $sender = $messages->first()->sender;
+                return [
+                    'id' => $sender->id,
+                    'name' => $sender->name,
+                    'profile_photo_path' => $sender->profile_photo_path,
+                    'last_message' => [
+                        'content' => $messages->last()->decrypted_content,
+                        'created_at' => $messages->last()->created_at
+                    ],
+                    'unread_count' => $messages->count(),
+                    'type' => 'message',
+                    'link' => route('messages.index', ['user' => $sender->id])
+                ];
+            })
+            ->values();
 
         return response()->json([
-            'messages' => $unreadMessages
+            'messages' => $unreadMessages,
+            'total_unread' => $unreadMessages->sum('unread_count')
         ]);
     }
 
@@ -299,5 +352,70 @@ class MessageController extends Controller
             ->update(['read_at' => now()]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function getLatestChats()
+    {
+        // Get all users the current user has chatted with
+        $chats = User::whereHas('sentMessages', function ($query) {
+            $query->where('recipient_id', Auth::id());
+        })->orWhereHas('receivedMessages', function ($query) {
+            $query->where('sender_id', Auth::id());
+        })
+            ->with(['sentMessages' => function ($query) {
+                $query->where('recipient_id', Auth::id())
+                    ->latest()
+                    ->limit(1);
+            }, 'receivedMessages' => function ($query) {
+                $query->where('sender_id', Auth::id())
+                    ->latest()
+                    ->limit(1);
+            }])
+            ->get()
+            ->map(function ($user) {
+                // Get the latest message between the two users
+                $lastMessage = Message::where(function ($query) use ($user) {
+                    $query->where('sender_id', Auth::id())
+                        ->where('recipient_id', $user->id);
+                })->orWhere(function ($query) use ($user) {
+                    $query->where('sender_id', $user->id)
+                        ->where('recipient_id', Auth::id());
+                })
+                    ->latest()
+                    ->first();
+
+                // Get unread count for this specific chat
+                $unreadCount = Message::where('sender_id', $user->id)
+                    ->where('recipient_id', Auth::id())
+                    ->whereNull('read_at')
+                    ->count();
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'profile_photo_path' => $user->profile_photo_path,
+                    'is_online' => $user->isOnline(),
+                    'last_seen' => $user->lastSeen(),
+                    'last_message' => $lastMessage ? [
+                        'content' => $lastMessage->decrypted_content ?? $lastMessage->content,
+                        'created_at' => $lastMessage->created_at,
+                        'sender_id' => $lastMessage->sender_id,
+                        'is_sent_by_me' => $lastMessage->sender_id === Auth::id(),
+                        'read_at' => $lastMessage->read_at
+                    ] : null,
+                    'unread_count' => $unreadCount
+                ];
+            })
+            ->sortByDesc(function ($chat) {
+                return $chat['last_message']['created_at'] ?? null;
+            })
+            ->values();
+
+        return response()->json([
+            'chats' => $chats,
+            'total_unread' => Message::where('recipient_id', Auth::id())
+                ->whereNull('read_at')
+                ->count()
+        ]);
     }
 }

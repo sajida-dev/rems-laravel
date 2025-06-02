@@ -45,10 +45,13 @@ class PaymentController extends Controller
                     });
                 }
             } elseif (auth()->user()->role === 'agent') {
-                $propertyIds = auth()->user()->properties->pluck('id');
-                $query->whereHas('transaction', function ($q) use ($propertyIds) {
-                    $q->whereIn('property_id', $propertyIds);
-                });
+                $user = auth()->user();
+                if ($user->properties) {
+                    $propertyIds = auth()->user()->properties->pluck('id');
+                    $query->whereHas('transaction', function ($q) use ($propertyIds) {
+                        $q->whereIn('property_id', $propertyIds);
+                    });
+                }
             } else {
                 $query->whereHas('transaction', function ($q) {
                     $q->where('user_id', auth()->id());

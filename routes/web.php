@@ -102,6 +102,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Message Routes
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/latest-chats', [MessageController::class, 'getLatestChats'])->name('messages.latest-chats');
     Route::get('/messages/search-users', [MessageController::class, 'searchUsers'])->name('messages.search-users');
     Route::get('/messages/search', [MessageController::class, 'search'])->name('messages.search');
     Route::get('/messages/notifications', [MessageController::class, 'notifications'])->name('messages.notifications');

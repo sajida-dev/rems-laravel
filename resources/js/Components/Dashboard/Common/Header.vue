@@ -8,9 +8,9 @@
             <div ref="emailRef" class="relative">
                 <button @click.stop="toggle('email')" class="focus:outline-none relative">
                     <i class="fa fa-envelope text-xl"></i>
-                    <span v-if="messages.length"
-                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                        {{ messages.length }}
+                    <span v-if="totalUnread > 0"
+                        class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full min-w-[1.25rem] flex items-center justify-center">
+                        {{ totalUnread }}
                     </span>
                 </button>
 
@@ -65,14 +65,17 @@ import { useNotifications } from '@/composables/useNotifications'
 import axios from 'axios'
 
 const props = defineProps({
-    user: { type: Object, required: true },
-    messages: { type: Array, default: () => [] },
+    user: { type: Object, required: true }
 })
 
 const open = ref(null)
 const emailRef = ref(null)
 const notifRef = ref(null)
 const userRef = ref(null)
+const messages = ref([])
+const totalUnread = ref(0)
+let echo = null
+let messageUpdateTimeout = null
 
 const {
     notifications,
@@ -80,9 +83,6 @@ const {
     markAsRead,
     markAllAsRead
 } = useNotifications(props.user.id)
-
-const unreadMessages = ref(0)
-const unreadNotifications = ref(0)
 
 function toggle(menu) {
     open.value = open.value === menu ? null : menu
@@ -98,12 +98,55 @@ function onClickOutside(e) {
     }
 }
 
-let echo
+const fetchUnreadMessages = async () => {
+    try {
+        const response = await axios.get(route('messages.notifications'), {
+            params: {
+                last_message_id: messages.value[0]?.id || 0,
+                limit: 20,
+                cache: true,
+                include_read: false
+            }
+        })
+
+        if (response.data.messages) {
+            const existingIds = new Set(messages.value.map(m => m.id))
+            const newMessages = response.data.messages.filter(
+                newMsg => !existingIds.has(newMsg.id)
+            )
+
+            if (newMessages.length > 0) {
+                messages.value = [...newMessages, ...messages.value]
+            }
+        }
+        totalUnread.value = response.data.total_unread
+    } catch (error) {
+        console.error('Error fetching unread messages:', error)
+    }
+}
+
+// Handle new message from WebSocket
+const handleNewMessage = (message) => {
+    // Update messages array
+    const existingIndex = messages.value.findIndex(m => m.id === message.id)
+    if (existingIndex === -1) {
+        messages.value.unshift(message)
+        totalUnread.value++
+    }
+
+    // Update total unread count
+    if (message.unread_count !== undefined) {
+        totalUnread.value = message.unread_count
+    }
+}
 
 onMounted(() => {
     document.addEventListener('click', onClickOutside)
 
-    // Initialize Laravel Echo
+    // Initial fetch
+    fetchUnreadMessages()
+
+    // Set up Echo listener for new messages
     echo = new Echo({
         broadcaster: 'pusher',
         key: import.meta.env.VITE_PUSHER_APP_KEY,
@@ -115,31 +158,38 @@ onMounted(() => {
         enabledTransports: ['ws', 'wss'],
     })
 
-    // Listen for messages
+    // Listen for new messages
     echo.private(`messages.${props.user.id}`)
-        .listen('NewMessage', (message) => {
-            if (open.value === 'email') {
-                messages.value.unshift(message)
+        .listen('NewMessage', (e) => {
+            // Clear any existing timeout
+            if (messageUpdateTimeout) {
+                clearTimeout(messageUpdateTimeout)
+            }
+
+            // Set new timeout to batch updates
+            messageUpdateTimeout = setTimeout(() => {
+                handleNewMessage(e.message)
+            }, 100) // Reduced debounce time since we're not polling
+        })
+
+    // Listen for message read status updates
+    echo.private(`messages.${props.user.id}`)
+        .listen('MessageRead', (e) => {
+            const messageIndex = messages.value.findIndex(m => m.id === e.message_id)
+            if (messageIndex !== -1) {
+                messages.value[messageIndex].read_at = e.read_at
+                if (e.unread_count !== undefined) {
+                    totalUnread.value = e.unread_count
+                }
             }
         })
 })
 
-onMounted(async () => {
-    try {
-        // Fetch unread messages count
-        const messagesResponse = await axios.get(route('messages.notifications'))
-        unreadMessages.value = messagesResponse.data.messages.total
-
-        // Fetch unread notifications count
-        const notificationsResponse = await axios.get(route('notifications.unreadCount'))
-        unreadNotifications.value = notificationsResponse.data.count
-    } catch (error) {
-        console.error('Error fetching notifications:', error)
-    }
-})
-
 onUnmounted(() => {
     document.removeEventListener('click', onClickOutside)
+    if (messageUpdateTimeout) {
+        clearTimeout(messageUpdateTimeout)
+    }
     if (echo) {
         echo.leave(`messages.${props.user.id}`)
     }
