@@ -15,6 +15,8 @@ use App\Models\Notification;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -115,5 +117,39 @@ class User extends Authenticatable
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at');
+    }
+
+    public function isOnline()
+    {
+        return Cache::has('user-is-online-' . $this->id);
+    }
+
+    public function lastSeen()
+    {
+        if ($this->isOnline()) {
+            return 'Online';
+        }
+
+        $lastActivity = DB::table('sessions')
+            ->where('user_id', $this->id)
+            ->orderBy('last_activity', 'desc')
+            ->first();
+
+        if (!$lastActivity) {
+            return 'Never active';
+        }
+
+        $lastSeen = \Carbon\Carbon::createFromTimestamp($lastActivity->last_activity);
+        $now = \Carbon\Carbon::now();
+
+        if ($lastSeen->diffInMinutes($now) < 1) {
+            return 'Just now';
+        } elseif ($lastSeen->diffInMinutes($now) < 60) {
+            return $lastSeen->diffInMinutes($now) . ' minutes ago';
+        } elseif ($lastSeen->diffInHours($now) < 24) {
+            return $lastSeen->diffInHours($now) . ' hours ago';
+        } else {
+            return $lastSeen->format('M d, Y H:i');
+        }
     }
 }

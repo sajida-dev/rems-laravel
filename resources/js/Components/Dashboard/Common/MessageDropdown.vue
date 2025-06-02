@@ -2,41 +2,52 @@
     <div class="p-4">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Messages</h3>
-            <button v-if="messages.length > 0" @click="markAllAsRead" class="text-sm text-blue-600 hover:text-blue-800">
-                Mark all as read
-            </button>
+            <Link :href="route('messages.index')" class="text-sm text-blue-600 hover:text-blue-800">
+            View all
+            </Link>
         </div>
 
         <div v-if="messages.length === 0" class="text-center text-gray-500 py-4">
-            No messages
+            No new messages
         </div>
 
-        <div v-else class="space-y-2 max-h-[400px] overflow-y-auto">
-            <div v-for="message in messages" :key="message.id" class="p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+        <div v-else class="space-y-3 max-h-[400px] overflow-y-auto">
+            <Link v-for="message in messages" :key="message.id"
+                :href="route('messages.index', { user: message.sender_id })"
+                class="block p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                 :class="{ 'bg-blue-50': !message.read_at }" @click="handleMessageClick(message)">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <img :src="'/storage' + '/' + message.sender.profile_photo_path" :alt="message.sender.name"
-                            class="h-8 w-8 rounded-full object-cover" />
-                    </div>
-                    <div class="ml-3 flex-1">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-gray-900">{{ message.sender.name }}</p>
-                            <p class="text-xs text-gray-400">{{ formatTime(message.created_at) }}</p>
-                        </div>
-                        <p class="text-sm text-gray-500 truncate">{{ message.content }}</p>
-                    </div>
-                    <div v-if="!message.read_at" class="ml-2">
-                        <span class="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+            <div class="flex items-start space-x-3">
+                <!-- Avatar with unread indicator -->
+                <div class="relative flex-shrink-0">
+                    <img :src="'/storage/' + message.sender.profile_photo_path" :alt="message.sender.name"
+                        class="h-10 w-10 rounded-full object-cover border-2"
+                        :class="{ 'border-blue-500': !message.read_at, 'border-transparent': message.read_at }" />
+                    <div v-if="message.unread_count > 0"
+                        class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-white text-xs flex items-center justify-center">
+                        {{ message.unread_count }}
                     </div>
                 </div>
+
+                <!-- Message Content -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-gray-900">{{ message.sender.name }}</p>
+                        <p class="text-xs text-gray-500 whitespace-nowrap ml-2">
+                            {{ formatTime(message.created_at) }}
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-600 truncate mt-1">
+                        {{ message.content }}
+                    </p>
+                </div>
             </div>
+            </Link>
         </div>
     </div>
 </template>
 
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { router, Link } from '@inertiajs/vue3'
 import { formatDistanceToNow } from 'date-fns'
 
 const props = defineProps({
@@ -62,22 +73,7 @@ const handleMessageClick = (message) => {
             }
         })
     }
-
-    // Navigate to the message thread
-    router.visit(route('messages.show', message.id))
     emit('close')
-}
-
-const markAllAsRead = () => {
-    router.post(route('messages.mark-all-as-read'), {}, {
-        preserveScroll: true,
-        onSuccess: () => {
-            // Update local state
-            props.messages.forEach(message => {
-                message.read_at = new Date().toISOString()
-            })
-        }
-    })
 }
 </script>
 

@@ -20,9 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-
-    // User search for messaging
-    Route::get('/users/search', [MessageController::class, 'searchUsers']);
 });
 
 // Stripe Webhook Route

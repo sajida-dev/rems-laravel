@@ -7,7 +7,7 @@
         <div class="flex-1 flex flex-col">
             <Header @toggle-sidebar="sidebarOpen = !sidebarOpen" :user="user" />
 
-            <PageHeader :title="header.title" :mainPage="header.mainPage" :page="header.page" />
+            <!-- <PageHeader :title="header.title" :mainPage="header.mainPage" :page="header.page" /> -->
             <main class="flex-1 overflow-y-auto p-6">
                 <slot />
             </main>
@@ -25,11 +25,13 @@ import Footer from '@Components/Dashboard/Common/Footer.vue'
 import Header from '@Components/Dashboard/Common/Header.vue'
 import PageHeader from '@Components/Dashboard/Common/PageHeader.vue'
 import axios from 'axios'
+import { Link } from '@inertiajs/vue3'
 
 const { props } = usePage()
 const user = props.auth?.user
 const sidebarOpen = ref(false)
 const pendingCount = ref(props.pendingCount || 0)
+const unreadCount = ref(0)
 
 const updatePendingCount = (newCount) => {
     pendingCount.value = newCount;
@@ -42,6 +44,16 @@ onMounted(() => {
         fetchPendingCount()
     }
 })
+
+onMounted(async () => {
+    try {
+        const response = await axios.get(route('messages.notifications'))
+        unreadCount.value = response.data.messages.total
+    } catch (error) {
+        console.error('Error fetching unread messages:', error)
+    }
+})
+
 function fetchPendingCount() {
     axios.get('/agents/pending-count')
         .then(response => {

@@ -28,7 +28,7 @@ class PropertyController extends Controller
         $query = Property::with(['category', 'agent.user']);
 
         // Agent can only see their own properties
-        if ($user->role === 'agent') {
+        if ($user->role === 'agent' && $user->agent) {
             $query->where('agent_id', $user->agent->id);
         }
 

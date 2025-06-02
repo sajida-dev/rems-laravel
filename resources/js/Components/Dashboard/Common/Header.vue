@@ -56,12 +56,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, Link } from '@inertiajs/vue3'
 import Echo from 'laravel-echo'
 import MessageDropdown from './MessageDropdown.vue'
 import NotificationDropdown from './NotificationDropdown.vue'
 import UserDropdown from './UserDropdown.vue'
 import { useNotifications } from '@/composables/useNotifications'
+import axios from 'axios'
 
 const props = defineProps({
     user: { type: Object, required: true },
@@ -79,6 +80,9 @@ const {
     markAsRead,
     markAllAsRead
 } = useNotifications(props.user.id)
+
+const unreadMessages = ref(0)
+const unreadNotifications = ref(0)
 
 function toggle(menu) {
     open.value = open.value === menu ? null : menu
@@ -118,6 +122,20 @@ onMounted(() => {
                 messages.value.unshift(message)
             }
         })
+})
+
+onMounted(async () => {
+    try {
+        // Fetch unread messages count
+        const messagesResponse = await axios.get(route('messages.notifications'))
+        unreadMessages.value = messagesResponse.data.messages.total
+
+        // Fetch unread notifications count
+        const notificationsResponse = await axios.get(route('notifications.unreadCount'))
+        unreadNotifications.value = notificationsResponse.data.count
+    } catch (error) {
+        console.error('Error fetching notifications:', error)
+    }
 })
 
 onUnmounted(() => {

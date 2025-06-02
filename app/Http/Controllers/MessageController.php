@@ -40,7 +40,17 @@ class MessageController extends Controller
             }])
             ->get()
             ->map(function ($user) {
-                $lastMessage = $user->sentMessages->first() ?? $user->receivedMessages->first();
+                // Get the latest message between the two users
+                $lastMessage = Message::where(function ($query) use ($user) {
+                    $query->where('sender_id', Auth::id())
+                        ->where('recipient_id', $user->id);
+                })->orWhere(function ($query) use ($user) {
+                    $query->where('sender_id', $user->id)
+                        ->where('recipient_id', Auth::id());
+                })
+                    ->latest()
+                    ->first();
+
                 $unreadCount = Message::where('sender_id', $user->id)
                     ->where('recipient_id', Auth::id())
                     ->whereNull('read_at')
@@ -50,12 +60,19 @@ class MessageController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'profile_photo_path' => $user->profile_photo_path,
-                    'last_message' => $lastMessage,
+                    'is_online' => $user->isOnline(),
+                    'last_seen' => $user->lastSeen(),
+                    'last_message' => $lastMessage ? [
+                        'content' => $lastMessage->decrypted_content ?? $lastMessage->content,
+                        'created_at' => $lastMessage->created_at,
+                        'sender_id' => $lastMessage->sender_id,
+                        'is_sent_by_me' => $lastMessage->sender_id === Auth::id()
+                    ] : null,
                     'unread_count' => $unreadCount
                 ];
             })
             ->sortByDesc(function ($chat) {
-                return $chat['last_message']?->created_at;
+                return $chat['last_message']['created_at'] ?? null;
             })
             ->values();
 
@@ -74,7 +91,7 @@ class MessageController extends Controller
 
         $messages = Message::betweenUsers(Auth::id(), $user->id)
             ->with(['sender', 'recipient', 'attachments'])
-            ->latest()
+            ->orderBy('created_at', 'asc')
             ->paginate(20);
 
         // Mark messages as read
@@ -248,21 +265,39 @@ class MessageController extends Controller
 
     public function searchUsers(Request $request)
     {
-        $validated = $request->validate([
-            'query' => 'required|string|min:2'
-        ]);
+        try {
+            $validated = $request->validate([
+                'query' => 'required|string|min:2'
+            ]);
+            $users = User::where('id', '!=', Auth::id())
+                ->where(function ($query) use ($validated) {
+                    $query->where('name', 'like', '%' . $validated['query'] . '%')
+                        ->orWhere('email', 'like', '%' . $validated['query'] . '%');
+                })
+                ->select('id', 'name', 'email', 'profile_photo_path')
+                ->limit(10)
+                ->get();
 
-        $users = User::where('id', '!=', Auth::id())
-            ->where(function ($query) use ($validated) {
-                $query->where('name', 'like', '%' . $validated['query'] . '%')
-                    ->orWhere('email', 'like', '%' . $validated['query'] . '%');
-            })
-            ->select('id', 'name', 'email', 'profile_photo_path')
-            ->limit(10)
-            ->get();
+            return response()->json([
+                'success' => true,
+                'users' => $users
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to search users: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
-        return response()->json([
-            'users' => $users
-        ]);
+    public function markChatAsRead(User $user)
+    {
+        // Mark all unread messages from this user as read
+        Message::where('sender_id', $user->id)
+            ->where('recipient_id', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return response()->json(['success' => true]);
     }
 }
