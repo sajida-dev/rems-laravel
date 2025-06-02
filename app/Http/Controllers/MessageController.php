@@ -87,47 +87,57 @@ class MessageController extends Controller
 
     public function show(User $user)
     {
-        // Check if user is authorized to view messages
-        if ($user->id === Auth::id()) {
-            return response()->json(['error' => 'Cannot chat with yourself'], 403);
+        try {
+            // Check if user is authorized to view messages
+            if ($user->id === Auth::id()) {
+                return response()->json(['error' => 'Cannot chat with yourself'], 403);
+            }
+
+            // Check if user exists
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+
+            $messages = Message::betweenUsers(Auth::id(), $user->id)
+                ->with(['sender', 'recipient', 'attachments'])
+                ->orderBy('created_at', 'asc')
+                ->paginate(20);
+
+            // Mark messages as read
+            Message::where('recipient_id', Auth::id())
+                ->where('sender_id', $user->id)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+
+            $formattedMessages = $messages->map(function ($message) {
+                return [
+                    'id' => $message->id,
+                    'sender_id' => $message->sender_id,
+                    'recipient_id' => $message->recipient_id,
+                    'content' => $message->decrypted_content,
+                    'created_at' => $message->created_at,
+                    'read_at' => $message->read_at,
+                    'sender' => [
+                        'id' => $message->sender->id,
+                        'name' => $message->sender->name,
+                        'profile_photo_path' => $message->sender->profile_photo_path
+                    ],
+                    'recipient' => [
+                        'id' => $message->recipient->id,
+                        'name' => $message->recipient->name,
+                        'profile_photo_path' => $message->recipient->profile_photo_path
+                    ],
+                    'attachments' => $message->attachments
+                ];
+            });
+
+            return response()->json([
+                'messages' => $formattedMessages
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching messages: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch messages'], 500);
         }
-
-        $messages = Message::betweenUsers(Auth::id(), $user->id)
-            ->with(['sender', 'recipient', 'attachments'])
-            ->orderBy('created_at', 'asc')
-            ->paginate(20);
-
-        // Mark messages as read
-        Message::where('recipient_id', Auth::id())
-            ->where('sender_id', $user->id)
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
-        $formattedMessages = $messages->map(function ($message) {
-            return [
-                'id' => $message->id,
-                'sender_id' => $message->sender_id,
-                'recipient_id' => $message->recipient_id,
-                'content' => $message->decrypted_content,
-                'created_at' => $message->created_at,
-                'read_at' => $message->read_at,
-                'sender' => [
-                    'id' => $message->sender->id,
-                    'name' => $message->sender->name,
-                    'profile_photo_path' => $message->sender->profile_photo_path
-                ],
-                'recipient' => [
-                    'id' => $message->recipient->id,
-                    'name' => $message->recipient->name,
-                    'profile_photo_path' => $message->recipient->profile_photo_path
-                ],
-                'attachments' => $message->attachments
-            ];
-        });
-
-        return response()->json([
-            'messages' => $formattedMessages
-        ]);
     }
 
     public function store(Request $request, User $user)

@@ -33,8 +33,8 @@
                         No conversations yet
                     </div>
                     <div v-else class="divide-y divide-gray-200">
-                        <button v-for="chat in chats" :key="chat.id" @click="selectChat(chat)"
-                            class="w-full p-2 hover:bg-gray-50 transition-colors duration-200 flex items-center"
+                        <button v-for="chat in chats" :key="chat.id" @click.stop="selectChat(chat)"
+                            class="w-full p-2 hover:bg-gray-50 transition-colors duration-200 flex items-center cursor-pointer"
                             :class="{ 'bg-gray-50': selectedChat?.id === chat.id }">
                             <!-- Avatar -->
                             <div class="flex-shrink-0 relative">
@@ -172,17 +172,31 @@
                                         <div v-if="message.attachments && message.attachments.length > 0"
                                             class="mt-2 space-y-2">
                                             <div v-for="(attachment, index) in message.attachments" :key="index"
-                                                class="flex items-center gap-2 bg-white bg-opacity-10 rounded p-2">
-                                                <i :class="[
-                                                    getFileIcon(attachment.type),
-                                                    message.sender_id === user.id ? 'text-pink-100' : 'text-gray-500'
-                                                ]">
-                                                </i>
-                                                <a :href="attachment.url" target="_blank"
-                                                    class="text-sm truncate hover:underline"
-                                                    :class="message.sender_id === user.id ? 'text-pink-100' : 'text-gray-700'">
-                                                    {{ attachment.name }}
-                                                </a>
+                                                class="flex flex-col gap-2 bg-white bg-opacity-10 rounded p-2">
+                                                <!-- File Preview -->
+                                                <div v-if="getFilePreview(attachment)" class="w-full">
+                                                    <a :href="attachment?.url" target="_blank" class="block">
+                                                        <component :is="getFilePreview(attachment).component"
+                                                            v-bind="getFilePreview(attachment).props"
+                                                            @load="onFileLoad" />
+                                                    </a>
+                                                </div>
+                                                <!-- File Info -->
+                                                <div class="flex items-center gap-2">
+                                                    <i :class="[
+                                                        getFileIcon(attachment?.type),
+                                                        message.sender_id === user.id ? 'text-pink-100' : 'text-gray-500'
+                                                    ]">
+                                                    </i>
+                                                    <a :href="attachment?.url" target="_blank"
+                                                        class="text-sm truncate hover:underline"
+                                                        :class="message.sender_id === user.id ? 'text-pink-100' : 'text-gray-700'">
+                                                        {{ attachment?.name || 'Unnamed file' }}
+                                                    </a>
+                                                    <span class="text-xs text-gray-500">
+                                                        {{ formatFileSize(attachment?.size) }}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -208,14 +222,14 @@
                     <!-- Message Input -->
                     <div class="p-2 border-t border-gray-200 bg-white flex-shrink-0">
                         <form @submit.prevent="sendMessage" class="flex items-end space-x-2">
-                            <div class="relative">
+                            <div class="relative attachment-menu">
                                 <button type="button" @click="openAttachmentMenu"
-                                    class="text-gray-500 hover:text-gray-700 flex-shrink-0">
+                                    class="text-gray-500 hover:text-gray-700 flex-shrink-0 p-2">
                                     <i class="fas fa-paperclip text-lg"></i>
                                 </button>
                                 <!-- Attachment Menu -->
                                 <div v-if="showAttachmentMenu"
-                                    class="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 w-48">
+                                    class="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 w-48 z-50">
                                     <input type="file" ref="fileInput" @change="handleFileSelect" class="hidden"
                                         multiple accept="image/*,.pdf,.doc,.docx,.txt">
                                     <button type="button" @click="triggerFileInput"
@@ -231,7 +245,7 @@
                                     @keydown.enter.prevent="handleEnterKey" rows="1"></textarea>
                             </div>
                             <button type="submit"
-                                class="text-pink-500 hover:text-pink-700 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                class="text-pink-500 hover:text-pink-700 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 p-2"
                                 :disabled="!selectedChat || (!newMessage.trim() && !selectedFiles.length)">
                                 <i class="fas fa-paper-plane text-lg"></i>
                             </button>
@@ -300,6 +314,13 @@ let searchTimeout = null
 let chatUpdateInterval = null
 let notificationInterval = null
 
+const handleClickOutside = (event) => {
+    const attachmentMenu = document.querySelector('.attachment-menu')
+    if (showAttachmentMenu.value && attachmentMenu && !attachmentMenu.contains(event.target)) {
+        showAttachmentMenu.value = false
+    }
+}
+
 const formatDate = (date) => {
     const messageDate = new Date(date)
     const today = new Date()
@@ -331,38 +352,59 @@ const selectChat = async (chat) => {
             return
         }
 
-        // Update URL without full page reload
-        router.visit(route('messages.index', { user: chat.id }), {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['initialSelectedUser']
-        })
+        console.log('Selecting chat:', chat)
 
-        selectedChat.value = chat
+        // Set loading state and selected chat immediately
         messagesLoading.value = true
+        selectedChat.value = chat
         messages.value = []
 
-        // Fetch messages for the chat
-        const response = await axios.get(route('messages.show', chat.id))
-        if (response.data.messages) {
-            messages.value = response.data.messages
+        try {
+            // Fetch messages for the chat
+            console.log('Fetching messages for chat:', chat.id)
+            const response = await axios.get(route('messages.show', chat.id))
+            console.log('Messages response:', response.data)
+
+            if (response.data.messages) {
+                messages.value = response.data.messages
+            }
+
+            // Mark messages as read
+            await axios.post(route('messages.mark-chat-read', chat.id))
+
+            // Update unread count in the chat list
+            const chatIndex = chats.value.findIndex(c => c.id === chat.id)
+            if (chatIndex !== -1) {
+                chats.value[chatIndex].unread_count = 0
+            }
+
+            // Update URL without full page reload
+            router.visit(route('messages.index', { user: chat.id }), {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['initialSelectedUser']
+            })
+
+            // Scroll to bottom after messages are loaded
+            await nextTick()
+            scrollToBottom()
+        } catch (error) {
+            console.error('Error fetching messages:', error)
+            if (error.response) {
+                console.error('Error response data:', error.response.data)
+                console.error('Error response status:', error.response.status)
+            }
+            throw error // Re-throw to be caught by outer try-catch
         }
-
-        // Mark messages as read
-        await axios.post(route('messages.mark-chat-read', chat.id))
-
-        // Update unread count in the chat list
-        const chatIndex = chats.value.findIndex(c => c.id === chat.id)
-        if (chatIndex !== -1) {
-            chats.value[chatIndex].unread_count = 0
-        }
-
-        await nextTick()
-        scrollToBottom()
     } catch (error) {
-        console.error('Error fetching messages:', error)
-        // Don't clear the selected chat on error
-        messagesLoading.value = false
+        console.error('Error in selectChat:', error)
+        console.error('Error details:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        })
+        // Show error message to user
+        alert('Failed to load messages: ' + (error.response?.data?.error || error.message || 'Unknown error'))
     } finally {
         messagesLoading.value = false
     }
@@ -472,11 +514,13 @@ const scrollToBottom = () => {
     }
 }
 
-const openAttachmentMenu = () => {
+const openAttachmentMenu = (event) => {
+    event.stopPropagation()
     showAttachmentMenu.value = !showAttachmentMenu.value
 }
 
-const triggerFileInput = () => {
+const triggerFileInput = (event) => {
+    event.stopPropagation()
     fileInput.value.click()
     showAttachmentMenu.value = false
 }
@@ -492,10 +536,18 @@ const removeFile = (index) => {
 }
 
 const getFileIcon = (type) => {
-    if (type.startsWith('image/')) return 'fas fa-image'
-    if (type.includes('pdf')) return 'fas fa-file-pdf'
+    if (!type) return 'fas fa-file'
+
+    if (isImageFile(type)) return 'fas fa-image'
+    if (isPdfFile(type)) return 'fas fa-file-pdf'
+    if (isVideoFile(type)) return 'fas fa-file-video'
+    if (isAudioFile(type)) return 'fas fa-file-audio'
+    if (isTextFile(type)) return 'fas fa-file-alt'
     if (type.includes('word')) return 'fas fa-file-word'
-    if (type.includes('text')) return 'fas fa-file-alt'
+    if (type.includes('excel') || type.includes('sheet')) return 'fas fa-file-excel'
+    if (type.includes('powerpoint') || type.includes('presentation')) return 'fas fa-file-powerpoint'
+    if (type.includes('zip') || type.includes('archive')) return 'fas fa-file-archive'
+
     return 'fas fa-file'
 }
 
@@ -696,6 +748,7 @@ const toggleNotifications = async () => {
 
 // Watch for route changes with optimized chat selection
 watch(() => props.initialSelectedUser, (newUser) => {
+    console.log('Initial selected user changed:', newUser) // Debug log
     if (newUser) {
         const chat = chats.value.find(c => c.id === newUser.id)
         if (chat) {
@@ -717,7 +770,7 @@ watch(() => props.initialSelectedUser, (newUser) => {
     }
 }, { immediate: true })
 
-// Update the onMounted section
+// Update onMounted
 onMounted(() => {
     // Initialize Laravel Echo
     const echo = new Echo({
@@ -826,20 +879,15 @@ onMounted(() => {
     fetchNotifications()
 
     // Add click outside handler for attachment menu
-    const handleClickOutside = (event) => {
-        if (showAttachmentMenu.value && !event.target.closest('.attachment-menu')) {
-            showAttachmentMenu.value = false
-        }
-    }
-
     document.addEventListener('click', handleClickOutside)
 })
 
-// Clean up intervals when component is unmounted
+// Update onUnmounted
 onUnmounted(() => {
     if (chatUpdateInterval) {
         clearInterval(chatUpdateInterval)
     }
+    // Remove click outside handler
     document.removeEventListener('click', handleClickOutside)
 })
 
@@ -853,6 +901,7 @@ const autoResize = (event) => {
 
 // Add a watch for selectedChat to ensure it persists
 watch(selectedChat, (newChat) => {
+    console.log('Selected chat changed:', newChat) // Debug log
     if (newChat) {
         // Ensure the chat exists in the chat list
         const chatExists = chats.value.some(chat => chat.id === newChat.id)
@@ -901,9 +950,109 @@ const groupedMessages = computed(() => {
     })
     return groups
 })
+
+// Add these functions to handle file previews
+const isImageFile = (type) => {
+    return type && type.startsWith('image/')
+}
+
+const isPdfFile = (type) => {
+    return type && type.includes('pdf')
+}
+
+const isVideoFile = (type) => {
+    return type && type.startsWith('video/')
+}
+
+const isAudioFile = (type) => {
+    return type && type.startsWith('audio/')
+}
+
+const isTextFile = (type) => {
+    return type && (type.includes('text/') || type.includes('application/json') || type.includes('application/javascript'))
+}
+
+const getFilePreview = (attachment) => {
+    if (!attachment?.type) return null
+
+    if (isImageFile(attachment.type)) {
+        return {
+            type: 'image',
+            component: 'img',
+            props: {
+                src: attachment.url,
+                alt: attachment.name || 'Image attachment',
+                class: 'max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity',
+                style: 'max-height: 200px; object-fit: contain;'
+            }
+        }
+    }
+
+    if (isPdfFile(attachment.type)) {
+        return {
+            type: 'pdf',
+            component: 'iframe',
+            props: {
+                src: attachment.url,
+                class: 'w-full h-64 rounded-lg border-0',
+                style: 'max-height: 400px;'
+            }
+        }
+    }
+
+    if (isVideoFile(attachment.type)) {
+        return {
+            type: 'video',
+            component: 'video',
+            props: {
+                src: attachment.url,
+                controls: true,
+                class: 'max-w-full rounded-lg',
+                style: 'max-height: 300px;'
+            }
+        }
+    }
+
+    if (isAudioFile(attachment.type)) {
+        return {
+            type: 'audio',
+            component: 'audio',
+            props: {
+                src: attachment.url,
+                controls: true,
+                class: 'w-full'
+            }
+        }
+    }
+
+    if (isTextFile(attachment.type)) {
+        return {
+            type: 'text',
+            component: 'div',
+            props: {
+                class: 'bg-white bg-opacity-10 p-2 rounded-lg max-h-40 overflow-y-auto'
+            }
+        }
+    }
+
+    return null
+}
+
+const formatFileSize = (bytes) => {
+    if (!bytes) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const onFileLoad = (event) => {
+    event.target.classList.add('loaded')
+}
 </script>
 
 <style scoped>
+/* Existing styles */
 .overflow-y-auto::-webkit-scrollbar {
     width: 4px;
 }
@@ -934,11 +1083,42 @@ textarea:focus {
 /* Message bubble styles */
 .message-bubble {
     word-break: break-word;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.message-bubble.justify-end {
+    align-items: flex-end;
 }
 
 .overflow-wrap-anywhere {
     overflow-wrap: anywhere;
     word-break: break-word;
+}
+
+/* Image styles */
+.message-bubble img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+}
+
+.message-bubble img:hover {
+    transform: scale(1.02);
+}
+
+.message-bubble img.loaded {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Ensure proper spacing for image attachments */
+.message-bubble .mt-2 {
+    margin-top: 0.5rem;
 }
 
 /* Ensure proper text truncation */
@@ -968,5 +1148,56 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+/* Add these styles */
+.message-bubble iframe,
+.message-bubble video,
+.message-bubble audio {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.message-bubble iframe.loaded,
+.message-bubble video.loaded,
+.message-bubble audio.loaded {
+    opacity: 1;
+}
+
+/* Ensure proper spacing for file previews */
+.message-bubble .mt-2 {
+    margin-top: 0.5rem;
+}
+
+/* Add a subtle shadow to previews */
+.message-bubble img,
+.message-bubble iframe,
+.message-bubble video {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure proper alignment of file info */
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+/* Add hover effect for file links */
+.file-link:hover {
+    text-decoration: underline;
+}
+
+/* Style for text file previews */
+.text-preview {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    max-height: 200px;
+    overflow-y: auto;
 }
 </style>
