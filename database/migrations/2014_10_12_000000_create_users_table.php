@@ -21,7 +21,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->enum('role', ['admin', 'user', 'agent'])->default('user');
             $table->foreignId('current_team_id')->nullable();
-            $table->string('profile_photo_path', 2048)->default('/backend/assets/img/avatar.png');
+            $table->string('profile_photo_path', 2048)->default('default/avatar.png');
             $table->string('contact')->nullable();
             $table->softDeletes();
             $table->timestamps();
