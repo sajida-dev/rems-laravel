@@ -19,11 +19,11 @@
             </div>
 
             <div class="mt-4">
-                <button v-if="property.type === 'rent'" @click="handleRent(property)"
+                <button v-if="property.type === 'rent' && auth?.user?.role === 'user'" @click="handleRent(property)"
                     class="bg-pink-500 text-white px-6 py-2 rounded hover:bg-pink-600 transition-colors">
                     Apply for Rent
                 </button>
-                <button v-else-if="property.type === 'buy'" @click="handleBuy(property)"
+                <button v-else-if="property.type === 'buy' && auth?.user?.role === 'user'" @click="handleBuy(property)"
                     class="bg-pink-500 text-white px-6 py-2 rounded hover:bg-pink-600 transition-colors">
                     Request to Buy
                 </button>
@@ -34,7 +34,7 @@
 
 <script setup>
 import { toast } from 'vue3-toastify';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     property: {
@@ -42,6 +42,8 @@ const props = defineProps({
         required: true,
     },
 })
+
+const auth = usePage().props.auth;
 
 const handleBuy = (property) => {
     router.post('/application', {

@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Mail;
 use App\Services\EmailNotificationService;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Property;
+use App\Models\Application;
+use App\Models\HiringRequest;
+use App\Models\Transaction;
 
 class AgentController extends Controller
 {
@@ -67,8 +71,28 @@ class AgentController extends Controller
 
         $agents = $query->paginate($perPage, ['*'], 'page', $page)
             ->appends($request->all());
+
+        // Get stats
+        $stats = [
+            'totalAgents' => User::where('role', 'agent')->count(),
+            'pendingAgents' => User::whereHas('agent', function ($q) {
+                $q->where('status', 0);
+            })->where('role', 'agent')->count(),
+            'approvedAgents' => User::whereHas('agent', function ($q) {
+                $q->where('status', 1);
+            })->where('role', 'agent')->count(),
+            'rejectedAgents' => User::whereHas('agent', function ($q) {
+                $q->where('status', 2);
+            })->where('role', 'agent')->count(),
+            'totalProperties' => Property::whereHas('agent')->count(),
+            'totalApplications' => Application::whereHas('property.agent')->count(),
+            'totalHiringRequests' => HiringRequest::whereHas('agent')->count(),
+            'totalTransactions' => Transaction::whereHas('property.agent')->count(),
+        ];
+
         return Inertia::render("Dashboard/Agent/Index", [
             'agents' => $agents,
+            'stats' => $stats,
         ]);
     }
 
@@ -133,26 +157,142 @@ class AgentController extends Controller
             'properties.amenities',
             'properties.uploads',
         ]);
-        $properties = $agent && $agent->properties
-            ? $agent->properties->map(function ($property) {
+
+        // Get counts
+        $counts = [
+            'properties' => $agent->properties()->count(),
+            'applications' => Application::whereHas('property', function ($query) use ($agent) {
+                $query->where('agent_id', $agent->id);
+            })->count(),
+            'hiringRequests' => HiringRequest::where('agent_id', $agent->id)->count(),
+            'transactions' => Transaction::whereHas('property', function ($query) use ($agent) {
+                $query->where('agent_id', $agent->id);
+            })->count(),
+        ];
+
+        // Get paginated data based on the active tab
+        $properties = $agent->properties()
+            ->with(['category', 'amenities', 'uploads'])
+            ->latest()
+            ->get()
+            ->map(function ($property) {
                 return [
                     'id' => $property->id,
                     'title' => $property->title,
+                    'price' => $property->type === 'rent' ? $property->rent_price : $property->purchase_price,
+                    'status' => $property->status,
+                    'created_at' => $property->created_at,
                     'location' => $property->location,
-                    'rent_price' => $property->rent_price,
-                    'purchase_price' => $property->purchase_price,
-                    'category_name' => $property->category->name ?? 'N/A',
-                    'image_url' => $property->image_url,
+                    'type' => $property->type,
+                    'bedrooms' => $property->bedrooms,
+                    'bathrooms' => $property->bathrooms,
+                    'garage' => $property->garage,
+                    'lot_area' => $property->lot_area,
+                    'floor_area' => $property->floor_area,
+                    'year_built' => $property->year_built,
+                    'category' => $property->category->name,
                     'amenities' => $property->amenities->pluck('name')->join(', '),
+                    'description' => $property->description,
+                    'image_url' => $property->image_url,
                 ];
-            })
-            : [];
+            });
+
+        $applications = Application::whereHas('property', function ($query) use ($agent) {
+            $query->where('agent_id', $agent->id);
+        })
+            ->with(['property', 'user'])
+            ->latest()
+            ->get()
+            ->map(function ($application) {
+                return [
+                    'id' => $application->id,
+                    'property_title' => $application->property->title,
+                    'type' => $application->type,
+                    'status' => $application->status,
+                    'created_at' => $application->created_at,
+                    'user' => $application->user->name,
+                    'user_email' => $application->user->email,
+                    'user_contact' => $application->user->contact,
+                    'property_location' => $application->property->location,
+                    'property_type' => $application->property->type,
+                    'property_price' => $application->property->type === 'rent' ?
+                        $application->property->rent_price :
+                        $application->property->purchase_price,
+                ];
+            });
+
+        $hiringRequests = HiringRequest::where('agent_id', $agent->id)
+            ->latest()
+            ->get()
+            ->map(function ($request) {
+                return [
+                    'id' => $request->id,
+                    'request_type' => $request->request_type,
+                    'location' => $request->location,
+                    'status' => $request->status,
+                    'created_at' => $request->created_at,
+                    'description' => $request->description,
+                    'budget' => $request->budget,
+                    'timeline' => $request->timeline,
+                    'additional_requirements' => $request->additional_requirements,
+                ];
+            });
+
+        $transactions = Transaction::whereHas('property', function ($query) use ($agent) {
+            $query->where('agent_id', $agent->id);
+        })
+            ->with(['property', 'user'])
+            ->latest()
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'amount' => $transaction->amount,
+                    'payment_method' => $transaction->payment_method,
+                    'status' => $transaction->status,
+                    'created_at' => $transaction->created_at,
+                    'user' => $transaction->user->name,
+                    'user_email' => $transaction->user->email,
+                    'property_title' => $transaction->property->title,
+                    'property_location' => $transaction->property->location,
+                    'transaction_type' => $transaction->transaction_type,
+                    'reference_number' => $transaction->reference_number,
+                ];
+            });
 
         return Inertia::render(
             "Dashboard/Agent/Show",
             [
                 'agent' => $agent,
-                'properties' => $properties,
+                'properties' => [
+                    'data' => $properties,
+                    'total' => $properties->count(),
+                    'per_page' => 10,
+                    'current_page' => 1,
+                    'last_page' => 1
+                ],
+                'applications' => [
+                    'data' => $applications,
+                    'total' => $applications->count(),
+                    'per_page' => 10,
+                    'current_page' => 1,
+                    'last_page' => 1
+                ],
+                'hiringRequests' => [
+                    'data' => $hiringRequests,
+                    'total' => $hiringRequests->count(),
+                    'per_page' => 10,
+                    'current_page' => 1,
+                    'last_page' => 1
+                ],
+                'transactions' => [
+                    'data' => $transactions,
+                    'total' => $transactions->count(),
+                    'per_page' => 10,
+                    'current_page' => 1,
+                    'last_page' => 1
+                ],
+                'counts' => $counts,
             ]
         );
     }
@@ -217,7 +357,7 @@ class AgentController extends Controller
 
     public function approve(Agent $agent)
     {
-        $agent->status = 'approved';
+        $agent->status = 1; // 1 for approved
         $agent->save();
 
         // Generate username and password
@@ -241,7 +381,7 @@ class AgentController extends Controller
             [
                 'title' => 'Agent Account Approved',
                 'icon' => 'fa-check-circle',
-                'link' => route('agent.dashboard')
+                'link' => route('agents.index')
             ]
         );
 
@@ -250,7 +390,7 @@ class AgentController extends Controller
 
     public function reject(Agent $agent)
     {
-        $agent->status = 'rejected';
+        $agent->status = 2; // 2 for rejected
         $agent->save();
 
         // Send real-time notification

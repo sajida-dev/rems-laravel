@@ -67,6 +67,8 @@ const formattedProperties = computed(() =>
         status: properties.status.charAt(0).toUpperCase() + properties.status.slice(1),
         category_name: properties.category?.name ?? '-',
         agent_name: properties.agent.user?.name ?? '-',
+        rent_price: properties.rent_price ?? 'Nill',
+        purchase_price: properties.purchase_price ?? 'Nill',
     }))
 )
 

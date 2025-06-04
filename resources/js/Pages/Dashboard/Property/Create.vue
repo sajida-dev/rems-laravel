@@ -4,7 +4,7 @@
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
         <FormLayout title="Add Property" :method="'post'" :enctype="'multipart/form-data'"
             :routeName="'properties.store'" :fields="{
-                title: '', description: '', location: '', rent_price: null,
+                title: '', description: '', location: '', rent_price: null, type: '',
                 purchase_price: null, bedrooms: null, bathrooms: null, lot_area: null,
                 floor_area: null, garage: null, year_built: null, stories: null,
                 is_water: false, is_luggage: false, is_new_roofing: false,
@@ -28,8 +28,9 @@
                         <InputLabel for="type" value="Property Type" />
                         <select id="type" v-model="form.type"
                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="">Select Property type</option>
                             <option value="rent">For Rent</option>
-                            <option value="buy">For Sale</option>
+                            <option value="buy">For Buy</option>
                         </select>
                         <InputError class="mt-2" :message="errors.type" />
                     </div>
@@ -205,7 +206,7 @@ const form = reactive({
     title: '',
     description: '',
     location: '',
-    type: 'rent',
+    type: '',
     rent_price: null,
     purchase_price: null,
     bedrooms: null,

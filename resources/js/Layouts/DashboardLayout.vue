@@ -55,7 +55,7 @@ onMounted(() => {
 onMounted(async () => {
     try {
         const response = await axios.get(route('messages.notifications'))
-        unreadCount.value = response.data.messages.total
+        unreadCount.value = response.data.total_unread || 0
         messageNotifications.value = response.data
     } catch (error) {
         console.error('Error fetching unread messages:', error)

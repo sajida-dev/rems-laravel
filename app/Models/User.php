@@ -18,6 +18,10 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserLog;
+use App\Models\Transaction;
+use App\Models\Bookmark;
+use App\Models\Application;
+use App\Models\HiringRequest;
 
 class User extends Authenticatable
 {
@@ -152,5 +156,15 @@ class User extends Authenticatable
         } else {
             return $lastSeen->format('M d, Y H:i');
         }
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
     }
 }

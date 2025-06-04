@@ -130,6 +130,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/messages/{message}/attachments', [MessageController::class, 'storeAttachment'])->name('messages.attachments.store');
         Route::delete('/messages/{message}/attachments/{attachment}', [MessageController::class, 'destroyAttachment'])->name('messages.attachments.destroy');
     });
+
+    // End User Details Routes
+    Route::get('/end-users/{end_user}/applications', [EndUserController::class, 'applications'])->name('end-users.applications');
+    Route::get('/end-users/{end_user}/hiring-requests', [EndUserController::class, 'hiringRequests'])->name('end-users.hiring-requests');
+    Route::get('/end-users/{end_user}/transactions', [EndUserController::class, 'transactions'])->name('end-users.transactions');
+    Route::get('/end-users/{end_user}/bookmarks', [EndUserController::class, 'bookmarks'])->name('end-users.bookmarks');
 });
 
 // Property routes for both agents and admins
