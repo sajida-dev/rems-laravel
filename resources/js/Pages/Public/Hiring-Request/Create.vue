@@ -20,7 +20,6 @@
                             <option disabled value=""> Select Request Type </option>
                             <option value="rent">Rent</option>
                             <option value="buy">Buy</option>
-                            <option value="sell">Sell</option>
                         </select>
                         <InputError class="mt-2" :message="errors.request_type" />
                     </div>

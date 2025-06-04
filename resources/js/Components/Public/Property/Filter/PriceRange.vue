@@ -1,47 +1,58 @@
 <template>
-    <div class="grid grid-cols-2 gap-2">
-        <div>
-            <label class="block text-xs font-medium mb-1">Rent Min Price ($)</label>
-            <input type="number" :value="rentMin" @input="$emit('update:rentMin', $event.target.value)"
-                class="form-input w-full px-2 py-1 text-xs border-gray-300 focus:border-gray-100 h-9 rounded-md"
-                placeholder="0" />
+    <div class="space-y-3">
+        <label class="block text-sm font-medium text-gray-700">Price Range</label>
+
+        <!-- Rent Price Range -->
+        <div v-if="type === 'rent' || !type" class="space-y-2">
+            <div class="flex items-center space-x-2">
+                <input type="number" :value="rentMin" @input="$emit('update:rentMin', $event.target.value)"
+                    placeholder="Min Rent"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50" />
+                <span class="text-gray-500">to</span>
+                <input type="number" :value="rentMax" @input="$emit('update:rentMax', $event.target.value)"
+                    placeholder="Max Rent"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50" />
+            </div>
         </div>
-        <div>
-            <label class="block text-xs font-medium mb-1">Rent Max Price ($)</label>
-            <input type="number" :value="rentMax" @input="$emit('update:rentMax', $event.target.value)"
-                class="form-input w-full px-2 py-1 text-xs border-gray-300 focus:border-gray-100 h-9 rounded-md"
-                placeholder="500000" />
-        </div>
-    </div>
-    <div class="grid grid-cols-2 gap-2">
-        <div>
-            <label class="block text-xs font-medium mb-1">Purchase Min Price ($)</label>
-            <input type="number" :value="purchaseMin" @input="$emit('update:purchaseMin', $event.target.value)"
-                class="form-input w-full px-2 py-1 text-xs border-gray-300 focus:border-gray-100 h-9 rounded-md"
-                placeholder="0" />
-        </div>
-        <div>
-            <label class="block text-xs font-medium mb-1">Purchase Max Price ($)</label>
-            <input type="number" :value="purchaseMax" @input="$emit('update:purchaseMax', $event.target.value)"
-                class="form-input w-full px-2 py-1 text-xs border-gray-300 focus:border-gray-100 h-9 rounded-md"
-                placeholder="500000" />
+
+        <!-- Purchase Price Range -->
+        <div v-if="type === 'buy' || !type" class="space-y-2">
+            <div class="flex items-center space-x-2">
+                <input type="number" :value="purchaseMin" @input="$emit('update:purchaseMin', $event.target.value)"
+                    placeholder="Min Purchase Price"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50" />
+                <span class="text-gray-500">to</span>
+                <input type="number" :value="purchaseMax" @input="$emit('update:purchaseMax', $event.target.value)"
+                    placeholder="Max Purchase Price"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50" />
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-defineProps({
-    rentMin: [String, Number],
-    rentMax: [String, Number],
-    purchaseMin: [String, Number],
-    purchaseMax: [String, Number],
+const props = defineProps({
+    rentMin: {
+        type: [Number, String],
+        default: null
+    },
+    rentMax: {
+        type: [Number, String],
+        default: null
+    },
+    purchaseMin: {
+        type: [Number, String],
+        default: null
+    },
+    purchaseMax: {
+        type: [Number, String],
+        default: null
+    },
+    type: {
+        type: String,
+        default: ''
+    }
 })
-defineEmits(
-    [
-        'update:rentMin',
-        'update:rentMax',
-        'update:purchaseMin',
-        'update:purchaseMax',
-    ]
-)
+
+defineEmits(['update:rentMin', 'update:rentMax', 'update:purchaseMin', 'update:purchaseMax'])
 </script>

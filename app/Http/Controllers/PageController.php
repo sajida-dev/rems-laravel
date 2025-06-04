@@ -33,12 +33,7 @@ class PageController extends Controller
         );
     }
 
-    // , [
-    //         'canLogin' => Route::has('login'),
-    //         'canRegister' => Route::has('register'),
-    //         'laravelVersion' => Application::VERSION,
-    //         'phpVersion' => PHP_VERSION,
-    //     ]
+
 
     public function about()
     {
@@ -90,6 +85,11 @@ class PageController extends Controller
             }
         ]);
 
+        // Type filter
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%$search%");
         }
@@ -102,17 +102,37 @@ class PageController extends Controller
             $query->where('location', 'like', "%$location%");
         }
 
-        if ($request->filled('rent_min_price')) {
-            $query->where('rent_price', '>=', $request->rent_min_price);
-        }
-        if ($request->filled('rent_max_price')) {
-            $query->where('rent_price', '<=', $request->rent_max_price);
-        }
-        if ($request->filled('purchase_min_price')) {
-            $query->where('purchase_price', '>=', $request->purchase_min_price);
-        }
-        if ($request->filled('purchase_max_price')) {
-            $query->where('purchase_price', '<=', $request->purchase_max_price);
+        // Price filters based on type
+        if ($request->filled('type')) {
+            if ($request->type === 'rent') {
+                if ($request->filled('rent_min_price')) {
+                    $query->where('rent_price', '>=', $request->rent_min_price);
+                }
+                if ($request->filled('rent_max_price')) {
+                    $query->where('rent_price', '<=', $request->rent_max_price);
+                }
+            } elseif ($request->type === 'buy') {
+                if ($request->filled('purchase_min_price')) {
+                    $query->where('purchase_price', '>=', $request->purchase_min_price);
+                }
+                if ($request->filled('purchase_max_price')) {
+                    $query->where('purchase_price', '<=', $request->purchase_max_price);
+                }
+            }
+        } else {
+            // If no type is selected, check both rent and purchase prices
+            if ($request->filled('rent_min_price')) {
+                $query->where('rent_price', '>=', $request->rent_min_price);
+            }
+            if ($request->filled('rent_max_price')) {
+                $query->where('rent_price', '<=', $request->rent_max_price);
+            }
+            if ($request->filled('purchase_min_price')) {
+                $query->where('purchase_price', '>=', $request->purchase_min_price);
+            }
+            if ($request->filled('purchase_max_price')) {
+                $query->where('purchase_price', '<=', $request->purchase_max_price);
+            }
         }
 
         if ($bedrooms = $request->input('bedrooms')) {
@@ -173,7 +193,7 @@ class PageController extends Controller
 
     public function propertyDetails($id, $slug)
     {
-        $property = Property::with(['category', 'amenities', 'uploads'])->findOrFail($id);
+        $property = Property::with(['agent.user', 'category', 'amenities', 'uploads'])->findOrFail($id);
 
 
         $expectedSlug = strtolower(str_replace(' ', '-', $property->title));

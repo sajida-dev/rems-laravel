@@ -41,17 +41,18 @@ class Property extends Model
         'latitude',
         'longitude',
         'image_url',
-
-
+        'type',
     ];
+
+    protected $casts = [
+        'type' => 'string',
+    ];
+
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-    public function conversation()
-    {
-        return $this->hasOne(Conversation::class);
-    }
+
     public function amenities()
     {
         return $this->belongsToMany(Amenity::class)->withTimestamps();
@@ -71,5 +72,15 @@ class Property extends Model
     public function applications()
     {
         return $this->hasMany(Application::class);
+    }
+
+    public function isForRent()
+    {
+        return $this->type === 'rent';
+    }
+
+    public function isForBuy()
+    {
+        return $this->type === 'buy';
     }
 }

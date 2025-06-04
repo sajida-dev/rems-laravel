@@ -5,14 +5,7 @@
         { label: 'Home', link: '/' },
         { label: 'Properties' }
     ]" />
-     <!-- <PropertyListSection
-    :properties="paginatedProperties"
-    :message="message"
-    :currentPage="currentPage"
-    :totalPages="totalPages"
-    @updatePage="goToPage"
-    :columns="3"
-  /> -->
+     
   <section class="py-12">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">

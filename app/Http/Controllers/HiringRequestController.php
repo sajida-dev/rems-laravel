@@ -15,9 +15,18 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use App\Mail\NewHiringRequestNotification;
 use App\Mail\HiringRequestStatusUpdated;
+use App\Services\EmailNotificationService;
+use App\Services\NotificationService;
 
 class HiringRequestController extends Controller
 {
+    protected $emailService;
+
+    public function __construct(EmailNotificationService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -62,8 +71,6 @@ class HiringRequestController extends Controller
         ]);
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      * to fill request form by user for hiring agent
@@ -105,12 +112,21 @@ class HiringRequestController extends Controller
 
         $agent = Agent::with('user')->findOrFail($request->agent_id);
 
-        // Send email notification
-        Mail::to($agent->user->email)->send(new HiringRequestNotification($hiringRequest));
+        // Send email notification using service
+        $this->emailService->sendHiringRequestNotification($hiringRequest);
 
         // Send real-time notification
-        $notificationService = new \App\Services\NotificationService();
-        $notificationService->notifyHiringRequest($agent->user, $hiringRequest);
+        $notificationService = new NotificationService();
+        $notificationService->notify(
+            $agent->user,
+            'new_hiring_request',
+            "New hiring request from " . auth()->user()->name,
+            [
+                'title' => 'New Hiring Request',
+                'icon' => 'fa-user-plus',
+                'link' => route('hiring-requests.show', $hiringRequest->id)
+            ]
+        );
 
         return redirect()->route('hiring-requests.index')->with('success', 'Hiring request sent successfully.');
     }
@@ -168,16 +184,26 @@ class HiringRequestController extends Controller
         //
     }
 
-    public function accept(HiringRequest $hiringRequest)
+    public function approve(HiringRequest $hiringRequest)
     {
         $hiringRequest->status = 'accepted';
         $hiringRequest->save();
 
-        // Send notification to user
-        $notificationService = new \App\Services\NotificationService();
-        $notificationService->notifyHiringRequestStatus($hiringRequest->user, $hiringRequest);
+        // Send notification using service
+        $this->emailService->sendHiringRequestStatusUpdate($hiringRequest);
 
-        Mail::to($hiringRequest->user->email)->send(new HiringRequestStatusUpdate($hiringRequest));
+        // Send real-time notification
+        $notificationService = new NotificationService();
+        $notificationService->notify(
+            $hiringRequest->user,
+            'hiring_request_status',
+            "Your hiring request has been accepted",
+            [
+                'title' => 'Hiring Request Accepted',
+                'icon' => 'fa-check-circle',
+                'link' => route('hiring-requests.show', $hiringRequest->id)
+            ]
+        );
 
         return redirect()->back()->with('success', 'Hiring request has been accepted and the user has been notified.');
     }
@@ -187,11 +213,21 @@ class HiringRequestController extends Controller
         $hiringRequest->status = 'rejected';
         $hiringRequest->save();
 
-        // Send notification to user
-        $notificationService = new \App\Services\NotificationService();
-        $notificationService->notifyHiringRequestStatus($hiringRequest->user, $hiringRequest);
+        // Send notification using service
+        $this->emailService->sendHiringRequestRejection($hiringRequest);
 
-        Mail::to($hiringRequest->user->email)->send(new HiringRequestReject($hiringRequest));
+        // Send real-time notification
+        $notificationService = new NotificationService();
+        $notificationService->notify(
+            $hiringRequest->user,
+            'hiring_request_status',
+            "Your hiring request has been rejected",
+            [
+                'title' => 'Hiring Request Rejected',
+                'icon' => 'fa-times-circle',
+                'link' => route('hiring-requests.show', $hiringRequest->id)
+            ]
+        );
 
         return redirect()->back()->with('success', 'Hiring request has been rejected and the user has been notified.');
     }

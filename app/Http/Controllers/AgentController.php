@@ -13,9 +13,19 @@ use Inertia\Inertia;
 use Illuminate\Support\Str;
 use App\Mail\AgentApprovedMail;
 use Illuminate\Support\Facades\Mail;
+use App\Services\EmailNotificationService;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Hash;
 
 class AgentController extends Controller
 {
+    protected $emailService;
+
+    public function __construct(EmailNotificationService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -207,24 +217,55 @@ class AgentController extends Controller
 
     public function approve(Agent $agent)
     {
-        if ($agent->status === 0) {
-            $username = UserHelper::generateUniqueUsername($agent->user->name, $agent->user->email);
+        $agent->status = 'approved';
+        $agent->save();
 
-            $password = UserHelper::generateRandomPassword(12);
+        // Generate username and password
+        $username = UserHelper::generateUniqueUsername($agent->user->name, $agent->user->email);
+        $password = UserHelper::generateRandomPassword(12);
 
-            $user = $agent->user;
-            $user->username = $username;
-            $user->password = bcrypt($password);
-            $user->save();
+        // Update user credentials
+        $agent->user->username = $username;
+        $agent->user->password = Hash::make($password);
+        $agent->user->save();
 
-            $agent->status = 1;
-            $agent->save();
+        // Send email notification using service
+        $this->emailService->sendAgentApprovalNotification($agent->user, $username, $password);
 
-            Mail::to($user->email)->send(new AgentApprovedMail($username, $password));
+        // Send real-time notification
+        $notificationService = new NotificationService();
+        $notificationService->notify(
+            $agent->user,
+            'agent_status',
+            "Your agent account has been approved",
+            [
+                'title' => 'Agent Account Approved',
+                'icon' => 'fa-check-circle',
+                'link' => route('agent.dashboard')
+            ]
+        );
 
-            return redirect()->route('agents.index')->with('success', 'Agent approved and email sent successfully!');
-        }
+        return redirect()->back()->with('success', 'Agent has been approved successfully.');
+    }
 
-        return redirect()->route('agents.index')->with('error', 'Agent is already approved.');
+    public function reject(Agent $agent)
+    {
+        $agent->status = 'rejected';
+        $agent->save();
+
+        // Send real-time notification
+        $notificationService = new NotificationService();
+        $notificationService->notify(
+            $agent->user,
+            'agent_status',
+            "Your agent account has been rejected",
+            [
+                'title' => 'Agent Account Rejected',
+                'icon' => 'fa-times-circle',
+                'link' => route('agent.profile')
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Agent has been rejected.');
     }
 }

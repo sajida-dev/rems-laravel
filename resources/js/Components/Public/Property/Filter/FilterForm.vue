@@ -2,11 +2,23 @@
     <div class="w-full p-4 bg-white sticky top-24 h-[calc(100vh-5rem)] overflow-y-auto rounded-lg shadow-md">
         <h4 class="text-lg font-semibold mb-4">Filter Properties</h4>
         <form @submit.prevent="submitFilter" class="flex flex-col space-y-3">
+            <!-- Type Filter -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                <select v-model="filters.type"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-300 focus:ring focus:ring-pink-200 focus:ring-opacity-50">
+                    <option value="">All Types</option>
+                    <option value="rent">For Rent</option>
+                    <option value="buy">For Sale</option>
+                </select>
+            </div>
+
             <SearchInput v-model="filters.search" />
             <CategorySelect :categories="categories" v-model="filters.category_id" />
             <LocationInput v-model="filters.location" />
             <PriceRange v-model:rentMin="filters.rent_min_price" v-model:rentMax="filters.rent_max_price"
-                v-model:purchaseMin="filters.purchase_min_price" v-model:purchaseMax="filters.purchase_max_price" />
+                v-model:purchaseMin="filters.purchase_min_price" v-model:purchaseMax="filters.purchase_max_price"
+                :type="filters.type" />
             <div class="grid grid-cols-2 gap-2">
                 <!-- <BedroomSelect v-model="filters.bedrooms" /> -->
                 <NumberInput label="Bedrooms" v-model="filters.bedrooms" />
@@ -37,7 +49,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 
 import SearchInput from '@Components/Public/Property/Filter/SearchInput.vue'
@@ -56,7 +68,22 @@ const props = defineProps({
     allAmenities: Array,
     initialFilters: Object
 })
-const filters = reactive({ ...props.initialFilters })
+
+const filters = reactive({
+    type: props.initialFilters?.type || '',
+    ...props.initialFilters
+})
+
+// Watch for type changes to reset price fields
+watch(() => filters.type, (newType) => {
+    if (newType === 'rent') {
+        filters.purchase_min_price = null;
+        filters.purchase_max_price = null;
+    } else if (newType === 'buy') {
+        filters.rent_min_price = null;
+        filters.rent_max_price = null;
+    }
+});
 
 const submitFilter = () => {
     router.get('/all-properties', filters, {

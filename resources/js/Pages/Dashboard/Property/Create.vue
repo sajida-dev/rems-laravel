@@ -25,12 +25,21 @@
                         <InputError class="mt-2" :message="errors.location" />
                     </div>
                     <div>
+                        <InputLabel for="type" value="Property Type" />
+                        <select id="type" v-model="form.type"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="rent">For Rent</option>
+                            <option value="buy">For Sale</option>
+                        </select>
+                        <InputError class="mt-2" :message="errors.type" />
+                    </div>
+                    <div v-if="form.type === 'rent'">
                         <InputLabel for="rent-price" value="Rent Price" />
                         <TextInput id="rent-price" v-model="form.rent_price" placeholder="129000.0" type="number"
                             class="mt-1 block w-full" />
                         <InputError class="mt-2" :message="errors.rent_price" />
                     </div>
-                    <div>
+                    <div v-if="form.type === 'buy'">
                         <InputLabel for="purchase-price" value="Purchase Price" />
                         <TextInput id="purchase-price" v-model="form.purchase_price" placeholder="129000.0"
                             type="number" class="mt-1 block w-full" />
@@ -196,6 +205,7 @@ const form = reactive({
     title: '',
     description: '',
     location: '',
+    type: 'rent',
     rent_price: null,
     purchase_price: null,
     bedrooms: null,

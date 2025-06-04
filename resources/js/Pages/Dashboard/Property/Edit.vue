@@ -18,12 +18,21 @@
                         <InputError class="mt-2" :message="errors.location" />
                     </div>
                     <div>
+                        <InputLabel for="type" value="Property Type" />
+                        <select id="type" v-model="form.type"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="rent">For Rent</option>
+                            <option value="buy">For Sale</option>
+                        </select>
+                        <InputError class="mt-2" :message="errors.type" />
+                    </div>
+                    <div v-if="form.type === 'rent'">
                         <InputLabel for="rent-price" value="Rent Price" />
                         <TextInput id="rent-price" v-model="form.rent_price" placeholder="129000.0" type="number"
                             class="mt-1 block w-full" />
                         <InputError class="mt-2" :message="errors.rent_price" />
                     </div>
-                    <div>
+                    <div v-if="form.type === 'buy'">
                         <InputLabel for="purchase-price" value="Purchase Price" />
                         <TextInput id="purchase-price" v-model="form.purchase_price" placeholder="129000.0"
                             type="number" class="mt-1 block w-full" />
@@ -215,6 +224,7 @@ const initialFields = computed(() => ({
     title: props.property.title,
     description: props.property.description,
     location: props.property.location,
+    type: props.property.type || 'rent',
     rent_price: props.property.rent_price,
     purchase_price: props.property.purchase_price,
     bedrooms: props.property.bedrooms,
@@ -228,7 +238,6 @@ const initialFields = computed(() => ({
     is_new_roofing: props.property.is_new_roofing,
     is_luggage: props.property.is_luggage,
     category_id: props.property.category_id,
-    // amenities: props.property.amenities.map(a => a.id) || [],
     amenities: Array.isArray(props.property.amenities)
         ? props.property.amenities.map(a => a.id)
         : [],
@@ -302,35 +311,6 @@ async function handleConfirmDelete() {
 }
 
 
-// const mainImagePreview = ref(
-//     props.property.image_url
-//         ? `/storage/${props.property.image_url}`
-//         : null
-// )
-// const otherImagePreviews = ref(
-//     (props.property.uploads || []).map((u) => `/storage/${u.image_path}`)
-// )
-
-// const handleMainImage = (e) => {
-//     const file = e.target.files[0]
-//     if (!file) return
-
-//     form.main_image = file
-//     mainImagePreview.value = URL.createObjectURL(file)
-// }
-
-// const handleOtherImages = (e) => {
-//     const files = Array.from(e.target.files || [])
-//     if (!files.length) return
-
-//     form.other_images = files
-
-//     const newPreviews = files.map(f => URL.createObjectURL(f))
-//     otherImagePreviews.value = [
-//         ...otherImagePreviews.value,
-//         ...newPreviews,
-//     ]
-// }
 
 provide('layoutHeader', {
     title: 'Property Management',

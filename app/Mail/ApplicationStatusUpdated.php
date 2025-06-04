@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ApplicationStatusUpdated extends Mailable
+class ApplicationStatusUpdated extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
     public $application;
@@ -31,7 +31,7 @@ class ApplicationStatusUpdated extends Mailable
         $status = ucfirst($this->application->status);
         $type = ucfirst($this->application->type);
         return new Envelope(
-            subject: "Your $type Application Has Been $status"
+            subject: "Your {$type} Application Has Been {$status}"
         );
     }
 

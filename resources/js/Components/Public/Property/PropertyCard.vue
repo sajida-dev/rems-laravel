@@ -5,10 +5,10 @@
 
     <button aria-label="Bookmark Property" @click.stop.prevent="toggleBookmark" :class="[
         'absolute top-2 right-2 w-10 text-pink-500 text-xl h-10 shadow rounded-full flex bg-white items-center justify-center transition duration-300 z-10',
-        isBookmarked ? ' ' : '  hover:bg-pink-500 hover:text-white'
+        localBookmarkStatus ? ' ' : '  hover:bg-pink-500 hover:text-white'
     ]">
         <!-- <i class="fas fa-heart"></i> -->
-        <i :class="[isBookmarked ? 'fas' : 'far', 'fa-heart']"></i>
+        <i :class="[localBookmarkStatus ? 'fas' : 'far', 'fa-heart']"></i>
 
     </button>
 
@@ -61,34 +61,39 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
-const { property, initialBookmarkStatus } = defineProps({
+import { router } from '@inertiajs/vue3'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
+
+const props = defineProps({
     property: {
         type: Object,
         required: true,
-    },
-    initialBookmarkStatus: {
-        type: Boolean,
-        default: false,
     }
 })
+
+const { auth } = usePage().props
+const isAuthenticated = computed(() => auth?.user !== null)
+
+// Local bookmark status state
+const localBookmarkStatus = ref(props.property.bookmark?.length > 0)
+
 let url = ref(null)
 const page = usePage();
-if (page.props.auth.user.role == 'admin') {
-    url = `/properties/${property.id}`;
+if (page.props.auth.user?.role === 'admin') {
+    url = `/properties/${props.property.id}`;
 } else {
-    url = `/property/${property.id}-${slugify(property.title)}`
+    url = `/property/${props.property.id}-${slugify(props.property.title)}`
 }
 
-const isBookmarked = ref(property.bookmark?.length)
-
-const imageUrl = computed(() => `/storage/${property.image_url}`)
+const imageUrl = computed(() => `/storage/${props.property.image_url}`)
 const formattedPurchasePrice = computed(() =>
-    Number(property.purchase_price).toLocaleString()
+    Number(props.property.purchase_price).toLocaleString()
 )
 const formattedRentPrice = computed(() =>
-    Number(property.rent_price).toLocaleString()
+    Number(props.property.rent_price).toLocaleString()
 )
 
 function slugify(name) {
@@ -97,22 +102,35 @@ function slugify(name) {
 
 // Toggle bookmark status
 const toggleBookmark = () => {
-    if (!isBookmarked.value) {
-        Inertia.post('/bookmarks', { property_id: property.id }, {
+    if (!isAuthenticated.value) {
+        router.visit(route('login'))
+        return
+    }
+
+    // Optimistically update UI
+    localBookmarkStatus.value = !localBookmarkStatus.value
+    if (localBookmarkStatus.value) {
+        router.post(route('bookmarks.toggle', props.property.id), {}, {
+            preserveScroll: true,
             onSuccess: () => {
-                isBookmarked.value = true
+                toast.success('Property added to bookmarks!')
             },
             onError: () => {
-                console.error('Failed to bookmark the property.')
+                // Revert on error
+                localBookmarkStatus.value = !localBookmarkStatus.value
+                toast.error('Failed to add property to bookmarks')
             }
         })
     } else {
-        Inertia.delete(`/bookmarks/${property.id}`, {
+        router.delete(route('bookmarks.toggle', props.property.id), {
+            preserveScroll: true,
             onSuccess: () => {
-                isBookmarked.value = false
+                toast.success('Property removed from bookmarks!')
             },
             onError: () => {
-                console.error('Failed to remove bookmark.')
+                // Revert on error
+                localBookmarkStatus.value = !localBookmarkStatus.value
+                toast.error('Failed to remove property from bookmarks')
             }
         })
     }

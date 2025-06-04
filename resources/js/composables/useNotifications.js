@@ -99,7 +99,7 @@ export function useNotifications(userId) {
 
         // Listen for notifications
         echo.private(`notifications.${userId}`)
-            .listen('.NewNotification', (data) => {
+            .listen('NewNotification', (data) => {
                 notifications.value.unshift(data.notification)
                 unreadCount.value++
             })

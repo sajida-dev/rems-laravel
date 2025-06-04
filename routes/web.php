@@ -14,6 +14,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\BookmarkController;
 use App\Models\Agent;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -79,8 +80,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/application/{application}/approve', [ApplicationController::class, 'update'])->name('application.update');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/bookmarks', [PropertyController::class, 'updateBookMark'])->name('property-bookmark-update');
-    Route::delete('/bookmarks/{id}', [PropertyController::class, 'deleteBookMark'])->name('property-bookmark-delete');
+
+    // Bookmark routes
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    Route::post('/bookmarks/{property}', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
+    Route::delete('/bookmarks/{property}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+    Route::get('/bookmarks/{property}', [BookmarkController::class, 'show'])->name('bookmarks.show');
+
+    // Admin/Agent bookmark routes
+    Route::middleware(['role:admin|agent'])->group(function () {
+        Route::get('/properties/bookmarks', [BookmarkController::class, 'adminIndex'])->name('bookmarks.admin.index');
+        Route::get('/properties/{property}/bookmarks', [BookmarkController::class, 'showBookmarkedUsers'])->name('bookmarks.users');
+    });
 
     Route::get('/property/{property}/buy', [TransactionController::class, 'createBuy'])->name('buy.create');
     Route::post('/property/{property}/buy', [TransactionController::class, 'storeBuy'])->name('buy.store');

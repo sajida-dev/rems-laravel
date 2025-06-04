@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ApplicationStatusUpdated;
-use App\Mail\NewApplicationNotification;
+use App\Mail\PropertyApplicationNotification;
 use App\Models\Application;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -12,10 +12,17 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use App\Services\NotificationService;
-
+use App\Services\EmailNotificationService;
 
 class ApplicationController extends Controller
 {
+    protected $emailService;
+
+    public function __construct(EmailNotificationService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -76,11 +83,11 @@ class ApplicationController extends Controller
         ]);
 
         if ($property->agent && $property->agent->user) {
-            // Send email notification
-            Mail::to($property->agent->user->email)->send(new NewApplicationNotification($property, $request->type, $user));
+            // Send email notification using the service
+            $this->emailService->sendPropertyApplicationNotification($application);
 
             // Send real-time notification to agent
-            $notificationService = new \App\Services\NotificationService();
+            $notificationService = new NotificationService();
             $notificationService->notify(
                 $property->agent->user,
                 'new_application',
@@ -121,7 +128,6 @@ class ApplicationController extends Controller
             'status' => 'required|in:approved,rejected',
         ]);
 
-        // Check if there's already an approved application for this property
         if ($request->status === 'approved') {
             $existingApproved = Application::where('property_id', $application->property_id)
                 ->where('status', 'approved')
@@ -136,22 +142,17 @@ class ApplicationController extends Controller
         DB::beginTransaction();
 
         try {
-            // Update the application status
             $application->update([
                 'status' => $request->status,
             ]);
 
-            // Load relationships if not already loaded
             $application->load(['user', 'property']);
 
-            // Send notification email to the applicant
-            $user = $application->user;
-            if ($user && $user->email) {
-                Mail::to($user->email)->send(new ApplicationStatusUpdated($application));
-            }
+            // Send notification email using the service
+            $this->emailService->sendApplicationStatusUpdate($application);
 
             // Send real-time notification to user
-            $notificationService = new \App\Services\NotificationService();
+            $notificationService = new NotificationService();
             $notificationService->notify(
                 $application->user,
                 'application_status',
@@ -168,8 +169,6 @@ class ApplicationController extends Controller
             return redirect()->back()->with('success', 'Application status updated and user notified.');
         } catch (\Exception $e) {
             DB::rollBack();
-
-            // Optional: log the error
             Log::error('Failed to update application status', [
                 'error' => $e->getMessage(),
                 'application_id' => $application->id,

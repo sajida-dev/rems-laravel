@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AgentApprovedMail extends Mailable
+class AgentApprovedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
     public $username;
@@ -40,6 +40,10 @@ class AgentApprovedMail extends Mailable
     {
         return new Content(
             view: 'emails.agent_approved',
+            with: [
+                'username' => $this->username,
+                'password' => $this->password
+            ]
         );
     }
 

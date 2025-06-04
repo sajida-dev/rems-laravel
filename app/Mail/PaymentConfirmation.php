@@ -4,10 +4,11 @@ namespace App\Mail;
 
 use App\Models\Payment;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class PaymentConfirmation extends Mailable
+class PaymentConfirmation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -2,7 +2,11 @@
     <Head :title="property.title" />
         <section class="py-8">
             <div class="container mx-auto px-4">
-                <PropertyHeader :property="property" @buy="buyNow" />
+                <PropertyHeader 
+                    :property="property" 
+                    @buy="handleBuy" 
+                    @rent="handleRent" 
+                />
                 <PropertyTabs :property="property" />
             </div>
         </section>
@@ -23,10 +27,14 @@ const props = defineProps({
     }
 })
 
-
-
-const buyNow = () => {
+const handleBuy = (property) => {
+    // Handle buy request
     alert('Proceeding to buy this property!')
+}
+
+const handleRent = (property) => {
+    // Handle rent application
+    alert('Proceeding to rent this property!')
 }
 </script>
 <script>

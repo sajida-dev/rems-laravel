@@ -79,11 +79,10 @@ function toggleUserMenu() {
 
 const menu = computed(() => {
     const commonItems = [
-        { title: 'Profile', href: '/user/profile', icon: 'fas fa-user' },
-        { title: 'Hiring Requests', href: '/hiring-requests', icon: 'fas fa-briefcase' },
-        { title: 'Applications', href: '/all-applications', icon: 'fas fa-file-signature' },
-        { title: 'Payments', href: '/payments', icon: 'fas fa-credit-card' },
-
+        { title: 'Profile', href: route('profile.show'), icon: 'fas fa-user' },
+        { title: 'Hiring Requests', href: route('hiring-requests.index'), icon: 'fas fa-briefcase' },
+        { title: 'Applications', href: route('application.index'), icon: 'fas fa-file-signature' },
+        { title: 'Payments', href: route('payment.index'), icon: 'fas fa-credit-card' },
     ];
     if (user.role === 'admin') {
         return [
@@ -91,14 +90,20 @@ const menu = computed(() => {
                 label: 'Management',
                 items: [
                     ...commonItems,
-                    { title: 'Categories', href: '/categories', icon: 'fas fa-th-large' },
-                    { title: 'Amenities', href: '/amenities', icon: 'fas fa-cogs' },
-                    { title: 'End-users', href: '/end-users', icon: 'fas fa-users' },
+                    { title: 'Categories', href: route('categories.index'), icon: 'fas fa-th-large' },
+                    { title: 'Amenities', href: route('amenities.index'), icon: 'fas fa-cogs' },
+                    { title: 'End-users', href: route('end-users.index'), icon: 'fas fa-users' },
                     {
-                        title: 'Agents', href: '/agents', icon: 'fas fa-user-tie',
+                        title: 'Agents', href: route('agents.index'), icon: 'fas fa-user-tie',
                         showPendingCount: true, badgeCount: pendingCount
                     },
-                    { title: 'Properties', href: '/properties', icon: 'fas fa-building' },
+                    { title: 'Properties', href: route('properties.index'), icon: 'fas fa-building' },
+                ],
+            },
+            {
+                label: 'Bookmarks',
+                items: [
+                    { title: 'All Bookmarks', href: route('bookmarks.admin.index'), icon: 'fas fa-bookmark' },
                 ],
             },
         ];
@@ -107,10 +112,15 @@ const menu = computed(() => {
             {
                 label: 'Agent Panel',
                 items: [
-                    { title: 'My Properties', href: '/properties', icon: 'fas fa-building' },
+                    { title: 'My Properties', href: route('properties.index'), icon: 'fas fa-building' },
                     ...commonItems,
-                    { title: 'Messages', href: '/messages', icon: 'fas fa-envelope' },
-
+                    { title: 'Messages', href: route('messages.index'), icon: 'fas fa-envelope' },
+                ],
+            },
+            {
+                label: 'Bookmarks',
+                items: [
+                    { title: 'Property Bookmarks', href: route('bookmarks.admin.index'), icon: 'fas fa-bookmark' },
                 ],
             },
         ];
@@ -120,8 +130,8 @@ const menu = computed(() => {
                 label: 'User Panel',
                 items: [
                     ...commonItems,
-                    { title: 'Messages', href: '/messages', icon: 'fas fa-envelope' },
-
+                    { title: 'My Bookmarks', href: route('bookmarks.index'), icon: 'fas fa-heart' },
+                    { title: 'Messages', href: route('messages.index'), icon: 'fas fa-envelope' },
                 ],
             },
         ];

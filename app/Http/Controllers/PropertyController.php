@@ -32,6 +32,11 @@ class PropertyController extends Controller
             $query->where('agent_id', $user->agent->id);
         }
 
+        // Type filter
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
         // Global search
         if ($request->filled('global')) {
             $search = $request->global;
@@ -57,6 +62,7 @@ class PropertyController extends Controller
 
         return Inertia::render('Dashboard/Property/Index', [
             'properties' => $properties,
+            'filters' => $request->only(['type', 'global', 'sortField', 'sortAsc', 'perPage']),
         ]);
     }
 
@@ -225,29 +231,5 @@ class PropertyController extends Controller
         $upload->delete();
 
         return response()->noContent();
-    }
-
-
-    public function updateBookMark(Request $request)
-    {
-        $request->validate([
-            'property_id' => 'required|exists:properties,id',
-        ]);
-
-        $bookmark = Bookmark::firstOrCreate([
-            'user_id' => Auth::id(),
-            'property_id' => $request->property_id,
-        ]);
-
-        return back(); // Or return response()->json(['success' => true]);
-    }
-
-    public function deleteBookMark(Property $property)
-    {
-        $deleted = Bookmark::where('user_id', Auth::id())
-            ->where('property_id', $property->id)
-            ->delete();
-
-        return back(); // Or return response()->json(['success' => $deleted > 0]);
     }
 }
