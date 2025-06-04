@@ -4,6 +4,8 @@
     <div class="bg-white rounded w-[95%] p-5 mx-auto">
         <h2 class="text-2xl font-semibold mb-4">Applications</h2>
 
+        <StatsCards :cards="statsCards" />
+
         <ServerSideDataTable :columns="columns" :rows="formattedApplications" :selectable="false" :expandable="false"
             :filterable="true" :virtualScroll="false" :hasRowActions="true" :pagination="{
                 total: applications.total,
@@ -44,6 +46,7 @@
 <script setup>
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ServerSideDataTable from '@/Components/Dashboard/Common/ServerSideDataTable.vue'
+import StatsCards from '@/Components/Dashboard/Common/StatsCards.vue'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import { provide, computed, reactive } from 'vue'
 import { toast } from 'vue3-toastify'
@@ -54,7 +57,7 @@ const user = page.props.auth.user;
 const header = {
     title: 'Applications',
     mainPage: 'Pages',
-    page: 'List',
+    page: 'Index',
 }
 provide('layoutHeader', header)
 
@@ -63,6 +66,7 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    counts: Object,
     flash: Object,
 })
 
@@ -147,4 +151,27 @@ const loadData = (options = {}) => {
         replace: true,
     })
 }
+
+const statsCards = computed(() => [
+    {
+        title: 'Total Applications',
+        value: props.counts.total,
+        valueColor: 'text-blue-600'
+    },
+    {
+        title: 'Pending',
+        value: props.counts.pending,
+        valueColor: 'text-yellow-600'
+    },
+    {
+        title: 'Approved',
+        value: props.counts.approved,
+        valueColor: 'text-green-600'
+    },
+    {
+        title: 'Rejected',
+        value: props.counts.rejected,
+        valueColor: 'text-red-600'
+    }
+]);
 </script>

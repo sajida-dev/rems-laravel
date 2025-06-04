@@ -5,6 +5,8 @@
         <div>
             <h2 class="text-2xl font-semibold mb-4">Hiring Requests</h2>
 
+            <StatsCards :cards="statsCards" />
+
             <ServerSideDataTable :columns="columns" :rows="updatedHiringRequests" :selectable="false"
                 :expandable="false" :filterable="true" :perPage="hiringRequests?.per_page" :virtualScroll="false"
                 :hasRowActions="true" :pagination="{
@@ -25,6 +27,7 @@
 import { router } from '@inertiajs/vue3'
 import RowActions from '@/Components/Dashboard/Common/RowActions.vue'
 import ServerSideDataTable from '@/Components/Dashboard/Common/ServerSideDataTable.vue'
+import StatsCards from '@/Components/Dashboard/Common/StatsCards.vue'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import { provide, reactive, computed } from 'vue'
@@ -41,6 +44,7 @@ provide('layoutHeader', header)
 
 const props = defineProps({
     hiringRequests: Object,
+    counts: Object,
 })
 const updatedHiringRequests = computed(() =>
     props.hiringRequests.data.map(request => ({
@@ -110,4 +114,27 @@ const updateTableState = ({ filters, sortBy, sortDesc, page, perPage }) => {
 
     loadData()
 }
+
+const statsCards = computed(() => [
+    {
+        title: 'Total Requests',
+        value: props.counts.total,
+        valueColor: 'text-blue-600'
+    },
+    {
+        title: 'Pending',
+        value: props.counts.pending,
+        valueColor: 'text-yellow-600'
+    },
+    {
+        title: 'Accepted',
+        value: props.counts.accepted,
+        valueColor: 'text-green-600'
+    },
+    {
+        title: 'Rejected',
+        value: props.counts.rejected,
+        valueColor: 'text-red-600'
+    }
+]);
 </script>

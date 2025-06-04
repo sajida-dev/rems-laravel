@@ -71,6 +71,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'agent' => \App\Http\Middleware\AgentMiddleware::class,
-
+        'message.access' => \App\Http\Middleware\CheckMessageAccess::class,
     ];
 }

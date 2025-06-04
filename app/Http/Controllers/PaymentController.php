@@ -47,7 +47,7 @@ class PaymentController extends Controller
             } elseif (auth()->user()->role === 'agent') {
                 $user = auth()->user();
                 if ($user->properties) {
-                    $propertyIds = auth()->user()->properties->pluck('id');
+                    $propertyIds = $user->properties->pluck('id');
                     $query->whereHas('transaction', function ($q) use ($propertyIds) {
                         $q->whereIn('property_id', $propertyIds);
                     });
@@ -231,17 +231,19 @@ class PaymentController extends Controller
      */
     public function show(Payment $payment)
     {
-        // Verify user has access to this payment
+        $user = auth()->user();
+
         if (
-            auth()->user()->role !== 'admin' &&
-            $payment->transaction->user_id !== auth()->id()
+            $user->role === 'admin' ||
+            ($user->role === 'agent' && $payment->property->user_id === $user->id) ||
+            $payment->user_id === $user->id
         ) {
-            abort(403);
+            return Inertia::render('Dashboard/Payment/Show', [
+                'payment' => $payment->load(['user', 'property'])
+            ]);
         }
 
-        return Inertia::render('Dashboard/Payment/Show', [
-            'payment' => $payment->load(['transaction.property', 'transaction.user'])
-        ]);
+        abort(403, 'Unauthorized action.');
     }
 
     /**

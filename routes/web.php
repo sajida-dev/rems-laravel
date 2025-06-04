@@ -70,11 +70,14 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Payment routes
     Route::get('/payments', [PaymentController::class, 'index'])->name('payment.index');
+    Route::get('/payment/{payment}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
     Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
     Route::post('/payment/createIntent', [PaymentController::class, 'create'])->name('payment.createIntent');
 
+    // Application routes
     Route::post('/application', [ApplicationController::class, 'store'])->name('application.store');
     Route::get('/all-applications', [ApplicationController::class, 'index'])->name('application.index');
     Route::post('/application/{application}/approve', [ApplicationController::class, 'update'])->name('application.update');
@@ -112,19 +115,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
 
     // Message Routes
-    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    Route::get('/messages/latest-chats', [MessageController::class, 'getLatestChats'])->name('messages.latest-chats');
-    Route::get('/messages/search-users', [MessageController::class, 'searchUsers'])->name('messages.search-users');
-    Route::get('/messages/search', [MessageController::class, 'search'])->name('messages.search');
-    Route::get('/messages/notifications', [MessageController::class, 'notifications'])->name('messages.notifications');
-    Route::post('/messages/mark-all-read', [MessageController::class, 'markAllAsRead'])->name('messages.mark-all-read');
-    Route::post('/messages/{user}/mark-read', [MessageController::class, 'markChatAsRead'])->name('messages.mark-chat-read');
-    Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
-    Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
-    Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
-    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
-    Route::post('/messages/{message}/attachments', [MessageController::class, 'storeAttachment'])->name('messages.attachments.store');
-    Route::delete('/messages/{message}/attachments/{attachment}', [MessageController::class, 'destroyAttachment'])->name('messages.attachments.destroy');
+    Route::middleware(['auth', 'verified', 'message.access'])->group(function () {
+        Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/latest-chats', [MessageController::class, 'getLatestChats'])->name('messages.latest-chats');
+        Route::get('/messages/search-users', [MessageController::class, 'searchUsers'])->name('messages.search-users');
+        Route::get('/messages/search', [MessageController::class, 'search'])->name('messages.search');
+        Route::get('/messages/notifications', [MessageController::class, 'notifications'])->name('messages.notifications');
+        Route::post('/messages/mark-all-read', [MessageController::class, 'markAllAsRead'])->name('messages.mark-all-read');
+        Route::post('/messages/{user}/mark-read', [MessageController::class, 'markChatAsRead'])->name('messages.mark-chat-read');
+        Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
+        Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
+        Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
+        Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+        Route::post('/messages/{message}/attachments', [MessageController::class, 'storeAttachment'])->name('messages.attachments.store');
+        Route::delete('/messages/{message}/attachments/{attachment}', [MessageController::class, 'destroyAttachment'])->name('messages.attachments.destroy');
+    });
 });
 
 // Property routes for both agents and admins

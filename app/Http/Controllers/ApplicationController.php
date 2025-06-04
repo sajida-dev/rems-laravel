@@ -34,14 +34,50 @@ class ApplicationController extends Controller
 
         $query = Application::with(['user', 'property.agent.user']);
 
+        // Get counts for different statuses
+        $counts = [
+            'total' => 0,
+            'pending' => 0,
+            'approved' => 0,
+            'rejected' => 0
+        ];
+
         if ($user->role === 'agent') {
             $agent = $user->agent;
-
             $query->whereHas('property', function ($q) use ($agent) {
                 $q->where('agent_id', $agent->id);
             });
+
+            // Get counts for agent's applications
+            $counts['total'] = Application::whereHas('property', function ($q) use ($agent) {
+                $q->where('agent_id', $agent->id);
+            })->count();
+
+            $counts['pending'] = Application::whereHas('property', function ($q) use ($agent) {
+                $q->where('agent_id', $agent->id);
+            })->where('status', 'pending')->count();
+
+            $counts['approved'] = Application::whereHas('property', function ($q) use ($agent) {
+                $q->where('agent_id', $agent->id);
+            })->where('status', 'approved')->count();
+
+            $counts['rejected'] = Application::whereHas('property', function ($q) use ($agent) {
+                $q->where('agent_id', $agent->id);
+            })->where('status', 'rejected')->count();
         } elseif ($user->role === 'user') {
             $query->where('user_id', $user->id);
+
+            // Get counts for user's applications
+            $counts['total'] = Application::where('user_id', $user->id)->count();
+            $counts['pending'] = Application::where('user_id', $user->id)->where('status', 'pending')->count();
+            $counts['approved'] = Application::where('user_id', $user->id)->where('status', 'approved')->count();
+            $counts['rejected'] = Application::where('user_id', $user->id)->where('status', 'rejected')->count();
+        } else {
+            // Admin sees all applications
+            $counts['total'] = Application::count();
+            $counts['pending'] = Application::where('status', 'pending')->count();
+            $counts['approved'] = Application::where('status', 'approved')->count();
+            $counts['rejected'] = Application::where('status', 'rejected')->count();
         }
 
         $applications = $query->latest()
@@ -50,6 +86,7 @@ class ApplicationController extends Controller
 
         return Inertia::render("Dashboard/Application/Index", [
             'applications' => $applications,
+            'counts' => $counts
         ]);
     }
 

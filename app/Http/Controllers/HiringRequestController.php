@@ -36,10 +36,37 @@ class HiringRequestController extends Controller
 
         $authUser = auth()->user();
         $agent = $authUser->agent;
+
+        // Get counts for different statuses
+        $counts = [
+            'total' => 0,
+            'pending' => 0,
+            'accepted' => 0,
+            'rejected' => 0
+        ];
+
         if ($authUser->role == 'agent') {
             $query->where('agent_id', $agent->id);
+
+            // Get counts for agent's hiring requests
+            $counts['total'] = HiringRequest::where('agent_id', $agent->id)->count();
+            $counts['pending'] = HiringRequest::where('agent_id', $agent->id)->where('status', 'pending')->count();
+            $counts['accepted'] = HiringRequest::where('agent_id', $agent->id)->where('status', 'accepted')->count();
+            $counts['rejected'] = HiringRequest::where('agent_id', $agent->id)->where('status', 'rejected')->count();
         } elseif ($authUser->role == 'user') {
             $query->where('user_id', $authUser->id);
+
+            // Get counts for user's hiring requests
+            $counts['total'] = HiringRequest::where('user_id', $authUser->id)->count();
+            $counts['pending'] = HiringRequest::where('user_id', $authUser->id)->where('status', 'pending')->count();
+            $counts['accepted'] = HiringRequest::where('user_id', $authUser->id)->where('status', 'accepted')->count();
+            $counts['rejected'] = HiringRequest::where('user_id', $authUser->id)->where('status', 'rejected')->count();
+        } else {
+            // Admin sees all hiring requests
+            $counts['total'] = HiringRequest::count();
+            $counts['pending'] = HiringRequest::where('status', 'pending')->count();
+            $counts['accepted'] = HiringRequest::where('status', 'accepted')->count();
+            $counts['rejected'] = HiringRequest::where('status', 'rejected')->count();
         }
 
         if ($request->filled('global')) {
@@ -66,8 +93,10 @@ class HiringRequestController extends Controller
 
         $hiringRequests = $query->paginate($perPage, ['*'], 'page', $page)
             ->appends($request->all());
+
         return Inertia::render('Dashboard/Hiring-Request/Index', [
             'hiringRequests' => $hiringRequests,
+            'counts' => $counts
         ]);
     }
 
